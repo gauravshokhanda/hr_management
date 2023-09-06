@@ -1,20 +1,6 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
 
 /** 
-  All of the routes for the Soft UI Dashboard React are added here,
+  All of the routes for the Hr Management Dashboard React are added here,
   You can add a new route, customize the routes and delete the routes here.
 
   Once you add a new route on this file it will be visible automatically on
@@ -35,43 +21,63 @@ Coded by www.creative-tim.com
   10. The `component` key is used to store the component of its route.
 */
 
-// Soft UI Dashboard React layouts
-import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
+// Hr Management Dashboard React layouts
+import Attendence from "layouts/attendence";
+import Leave from "layouts/leave";
+import SalarySlip from "layouts/salary";
+import NoticeBoard from "layouts/noticeBoard";
+import HolidayList from "layouts/holidayList";
+import Employee from "layouts/manageEmployee";
 import Billing from "layouts/billing";
-import VirtualReality from "layouts/virtual-reality";
-import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
 
-// Soft UI Dashboard React icons
+// Hr Management Dashboard React icons
 import Shop from "examples/Icons/Shop";
 import Office from "examples/Icons/Office";
-import Settings from "examples/Icons/Settings";
 import Document from "examples/Icons/Document";
-import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
-import Cube from "examples/Icons/Cube";
+import BackHandIcon from '@mui/icons-material/BackHand';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 const routes = [
   {
     type: "collapse",
-    name: "Dashboard",
-    key: "dashboard",
-    route: "/dashboard",
-    icon: <Shop size="12px" />,
-    component: <Dashboard />,
+    name: "Attendence",
+    key: "attendence",
+    route: "/attendence",
+    icon: <BackHandIcon sx={{width: '14px'}} />,
+    component: <Attendence />,
     noCollapse: true,
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
-    route: "/tables",
+    name: "Notice Board",
+    key: "notice",
+    route: "/notice",
+    icon: <AssignmentIcon sx={{width: '14px'}} />,
+    component: <NoticeBoard />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "Holiday List",
+    key: "holiday-list",
+    route: "/holiday-list",
+    icon: <Shop size="12px" />,
+    component: <HolidayList />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "Employee",
+    key: "manageEmployee",
+    route: "/manageEmployee",
     icon: <Office size="12px" />,
-    component: <Tables />,
+    component: <Employee />,
     noCollapse: true,
   },
   {
@@ -85,20 +91,20 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Virtual Reality",
-    key: "virtual-reality",
-    route: "/virtual-reality",
-    icon: <Cube size="12px" />,
-    component: <VirtualReality />,
+    name: "Leave",
+    key: "leave",
+    route: "/leave",
+    icon: <CalendarMonthIcon sx={{width: '16px'}} />,
+    component: <Leave />,
     noCollapse: true,
   },
   {
     type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    route: "/rtl",
-    icon: <Settings size="12px" />,
-    component: <RTL />,
+    name: "Salary Slip",
+    key: "salary",
+    route: "/salary-slip",
+    icon: <AccountBalanceWalletIcon sx={{width: '14px'}}  />,
+    component: <SalarySlip />,
     noCollapse: true,
   },
   { type: "title", title: "Account Pages", key: "account-pages" },
@@ -118,15 +124,6 @@ const routes = [
     route: "/authentication/sign-in",
     icon: <Document size="12px" />,
     component: <SignIn />,
-    noCollapse: true,
-  },
-  {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    route: "/authentication/sign-up",
-    icon: <SpaceShip size="12px" />,
-    component: <SignUp />,
     noCollapse: true,
   },
 ];
