@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { store } from "./layouts/store/store";
 
 // react-router components
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
@@ -32,6 +33,7 @@ import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "contex
 
 // Images
 import brand from "assets/images/logo-ct.png";
+import { Provider } from "react-redux";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -119,9 +121,36 @@ export default function App() {
 
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
-      <ThemeProvider theme={themeRTL}>
+      <Provider store={store}>
+        <ThemeProvider theme={themeRTL}>
+          <CssBaseline />
+          {layout === "attendence" && (
+            <>
+              <Sidenav
+                color={sidenavColor}
+                brand={brand}
+                brandName="Hr Management Dashboard"
+                routes={routes}
+                onMouseEnter={handleOnMouseEnter}
+                onMouseLeave={handleOnMouseLeave}
+              />
+              <Configurator />
+              {configsButton}
+            </>
+          )}
+          {layout === "vr" && <Configurator />}
+          <Routes>
+            {getRoutes(routes)}
+            <Route path="*" element={<Navigate to="/attendence" />} />
+          </Routes>
+        </ThemeProvider>
+      </Provider>
+    </CacheProvider>
+  ) : (
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
         <CssBaseline />
-        {layout === "dashboard" && (
+        {layout === "attendence" && (
           <>
             <Sidenav
               color={sidenavColor}
@@ -138,32 +167,9 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="*" element={<Navigate to="/attendence" />} />
         </Routes>
       </ThemeProvider>
-    </CacheProvider>
-  ) : (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      {layout === "dashboard" && (
-        <>
-          <Sidenav
-            color={sidenavColor}
-            brand={brand}
-            brandName="Hr Management Dashboard"
-            routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
-          />
-          <Configurator />
-          {configsButton}
-        </>
-      )}
-      {layout === "vr" && <Configurator />}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
-    </ThemeProvider>
+    </Provider>
   );
 }

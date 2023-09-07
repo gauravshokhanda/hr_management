@@ -19,14 +19,14 @@ import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
 import typography from "assets/theme/base/typography";
 
 // Dashboard layout components
-import BuildByDevelopers from "layouts/dashboard/components/BuildByDevelopers";
-import WorkWithTheRockets from "layouts/dashboard/components/WorkWithTheRockets";
-import Projects from "layouts/dashboard/components/Projects";
-import OrderOverview from "layouts/dashboard/components/OrderOverview";
+import BuildByDevelopers from "layouts/attendence/components/BuildByDevelopers";
+import WorkWithTheRockets from "layouts/attendence/components/WorkWithTheRockets";
+import Projects from "layouts/attendence/components/Projects";
+import OrderOverview from "layouts/attendence/components/OrderOverview";
 
 // Data
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import gradientLineChartData from "layouts/dashboard/data/gradientLineChartData";
+import reportsBarChartData from "layouts/attendence/data/reportsBarChartData";
+import gradientLineChartData from "layouts/attendence/data/gradientLineChartData";
 
 function Attendence() {
   const { size } = typography;

@@ -1,31 +1,32 @@
 import { useEffect, useState } from "react";
 
 // react-router-dom components
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 // @mui material components
 import Switch from "@mui/material/Switch";
-
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import axios from "axios";
-
+import { useDispatch } from "react-redux";
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
-
 // Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 import { API_URL } from "../../../config";
+import { loginSuccess } from "../../../layouts/store/actions";
 
 function SignIn() {
+  const dispatch = useDispatch();
   const [rememberMe, setRememberMe] = useState(true);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+  const navigate = useNavigate();
 
   const handleUserName = (event) => {
     const { value } = event.target;
@@ -42,7 +43,6 @@ function SignIn() {
     userName: userName,
     password: password,
   };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -53,12 +53,18 @@ function SignIn() {
       }
 
       const response = await axios.post(`${API_URL}/employes/login`, loginData);
-      console.log(response.data, "Response");
+      if (response.status === 200) {
+        console.log("Successfully login");
+        setToken(response.data.token);
+        localStorage.setItem("token", response.data.token);
+        dispatch(loginSuccess(response.data));
+        navigate("/attendence", { replace: true });
+      }
+      console.log(response.data.user, "Response");
     } catch (error) {
       console.error(error, "There is some issue");
     }
   };
-
   return (
     <CoverLayout
       title="Welcome back"

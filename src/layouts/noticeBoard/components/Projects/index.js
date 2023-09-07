@@ -15,7 +15,7 @@ import SoftTypography from "components/SoftTypography";
 import Table from "examples/Tables/Table";
 
 // Data
-import data from "layouts/dashboard/components/Projects/data";
+import data from "layouts/attendence/components/Projects/data";
 
 function Projects() {
   const { columns, rows } = data();

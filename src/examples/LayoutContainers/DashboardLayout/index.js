@@ -19,7 +19,7 @@ function DashboardLayout({ children }) {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    setLayout(dispatch, "dashboard");
+    setLayout(dispatch, "attendence");
   }, [pathname]);
 
   return (

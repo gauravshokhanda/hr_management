@@ -10,7 +10,7 @@ import team2 from "assets/images/team-2.jpg";
 import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
 
-function Author({ image, name, email }) {
+function Author({ image, name, email, employes }) {
   return (
     <SoftBox display="flex" alignItems="center" px={1} py={0.5}>
       <SoftBox mr={2}>
@@ -49,7 +49,6 @@ const authorsTableData = {
     { name: "employed", align: "center" },
     { name: "action", align: "center" },
   ],
-
   rows: [
     {
       author: <Author image={team2} name="John Michael" email="john@creative-tim.com" />,

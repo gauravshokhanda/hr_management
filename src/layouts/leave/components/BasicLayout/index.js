@@ -22,7 +22,7 @@ function BasicLayout({ title, description, image, children }) {
       <DefaultNavbar
         action={{
           type: "external",
-          route: "https://creative-tim.com/product/soft-ui-dashboard-react",
+          route: "https://creative-tim.com/product/soft-ui-attendence-react",
           label: "free download",
         }}
         transparent

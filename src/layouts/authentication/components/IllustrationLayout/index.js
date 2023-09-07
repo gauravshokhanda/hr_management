@@ -26,7 +26,7 @@ function IllustrationLayout({ color, header, title, description, illustration, c
         routes={pageRoutes}
         action={{
           type: "external",
-          route: "https://creative-tim.com/product/soft-ui-dashboard-pro-react",
+          route: "https://creative-tim.com/product/soft-ui-attendence-pro-react",
           label: "buy now",
         }}
       />
