@@ -11,9 +11,9 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import Table from "examples/Tables/Table";
+import EmployesTable from "./data/employesTable";
 
 // Data
-import authorsTableData from "layouts/manageEmployee/data/authorsTableData";
 import projectsTableData from "layouts/manageEmployee/data/projectsTableData";
 import axios from "axios";
 import { API_URL } from "config";
@@ -22,31 +22,6 @@ import { useEffect, useState } from "react";
 
 function Employee() {
 
-  const [employes, setEmployes] = useState([]);
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/employes/list`, {
-        header: {
-          'Authorization': `token ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      if (response.status === 200){
-        setEmployes(response.data)
-      }
-    }
-    catch (error) {
-      console.error('There is some issue ' + error);
-    }
-  }
-  
-  
-  useEffect(() => {
-    fetchData();
-  }, []);
-  
-  const { columns, rows } = authorsTableData;
   const { columns: prCols, rows: prRows } = projectsTableData;
 
   return (
@@ -68,7 +43,7 @@ function Employee() {
                 },
               }}
             >
-              <Table employes={employes} columns={columns} rows={rows} />
+              <EmployesTable />
             </SoftBox>
           </Card>
         </SoftBox>

@@ -31,6 +31,7 @@ import Employee from "layouts/manageEmployee";
 import Billing from "layouts/billing";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
+import Register from "layouts/authentication/register";
 
 // Hr Management Dashboard React icons
 import Shop from "examples/Icons/Shop";
@@ -121,10 +122,17 @@ const routes = [
     type: "collapse",
     name: "Sign In",
     key: "sign-in",
-    route: "/authentication/sign-in",
+    route: "/sign-in",
     icon: <Document size="12px" />,
     component: <SignIn />,
     noCollapse: true,
+  },
+  {
+    type: "hidden",
+    name: "Register",
+    key: "register",
+    route: "/register",
+    component: <Register />,
   },
 ];
 
