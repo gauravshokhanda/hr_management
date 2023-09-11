@@ -1,134 +1,176 @@
-
 // @mui material components
+import { Box, Card, CardContent, CardMedia, IconButton, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
-
-// Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
-import SoftTypography from "components/SoftTypography";
-
-// Hr Management Dashboard React examples
+import { Link } from "react-router-dom";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import MiniStatisticsCard from "examples/Cards/StatisticsCards/MiniStatisticsCard";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
-import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
+import { grey } from "@mui/material/colors";
+import AddIcon from "@mui/icons-material/Add";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Pagination } from 'swiper/modules';
 
-// Hr Management Dashboard React base styles
-import typography from "assets/theme/base/typography";
-
-// Dashboard layout components
-import BuildByDevelopers from "layouts/attendence/components/BuildByDevelopers";
-import WorkWithTheRockets from "layouts/attendence/components/WorkWithTheRockets";
-import Projects from "layouts/attendence/components/Projects";
-import OrderOverview from "layouts/attendence/components/OrderOverview";
-
-// Data
-import reportsBarChartData from "layouts/attendence/data/reportsBarChartData";
-import gradientLineChartData from "layouts/attendence/data/gradientLineChartData";
+const CARD_PROPERTY = {
+  borderRadius: 3,
+  boxShadow: 0,
+};
 
 function NoticeBoard() {
-  const { size } = typography;
-  const { chart, items } = reportsBarChartData;
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox py={3}>
         <SoftBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "today's money" }}
-                count="$53,000"
-                percentage={{ color: "success", text: "+55%" }}
-                icon={{ color: "info", component: "paid" }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "today's users" }}
-                count="2,300"
-                percentage={{ color: "success", text: "+3%" }}
-                icon={{ color: "info", component: "public" }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "new clients" }}
-                count="+3,462"
-                percentage={{ color: "error", text: "-2%" }}
-                icon={{ color: "info", component: "emoji_events" }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "sales" }}
-                count="$103,430"
-                percentage={{ color: "success", text: "+5%" }}
-                icon={{
-                  color: "info",
-                  component: "shopping_cart",
-                }}
-              />
+          <Grid container justifyContent="center" spacing={3}>
+            <Grid item xs={12} lg={8}>
+              <Card sx={CARD_PROPERTY}>
+                <Box
+                  sx={{
+                    p: 3,
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "start",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "start",
+                    }}
+                  >
+                    <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                      Notice Board
+                    </Typography>
+                  </Box>
+                  <IconButton>
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+                <Box sx={{ height: "1px", width: "100%", bgcolor: grey[100] }}></Box>
+                <CardContent sx={{ p: 3, mb: 0 }}>
+                  <Box className="swiper-container" style={{}}>
+                    <Swiper
+                      autoplay={true}
+                      direction="vertical"
+                      slidesPerView={1}
+                      spaceBetween={20}
+                      grabCursor={true}
+                      mousewheel={true}
+                      pagination={{
+                        clickable: true,
+                      }}
+                      modules={[Pagination]}
+                      autoHeight={true}
+                      className="swiper-wrapper"
+                    >
+                      <SwiperSlide>
+                        {/* Content for Slide 1 */}
+                        <CardMedia
+                          component="img"
+                          image="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                          sx={{
+                            borderRadius: 3,
+                            width: "100%",
+                            ml: 0,
+                            mt: 0,
+                            mb: 3,
+                            height: "400px",
+                          }}
+                        />
+                        <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
+                          News 1
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                          14 May 2014
+                        </Typography>
+                        <Typography variant="body1" sx={{ mb: 3 }}>
+                          This impressive paella is a perfect party dish and a fun meal to cook
+                          together with your guests. Add 1 cup of froze. This impressive paella is a
+                          perfect party dish and a fun meal to cook together with your guests. Add 1
+                          cup of froze. This impressive paella is a perfect party dish and a fun
+                          meal to cook together with your guests. Add 1 cup of froze.
+                        </Typography>
+                      </SwiperSlide>
+                      <SwiperSlide>
+                        {/* Content for Slide 1 */}
+                        <CardMedia
+                          component="img"
+                          image="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                          sx={{
+                            borderRadius: 3,
+                            width: "100%",
+                            ml: 0,
+                            mt: 0,
+                            mb: 3,
+                            height: "400px",
+                          }}
+                        />
+                        <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
+                          News 1
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                          14 May 2014
+                        </Typography>
+                        <Typography variant="body1" sx={{ mb: 3 }}>
+                          This impressive paella is a perfect party dish and a fun meal to cook
+                          together with your guests. Add 1 cup of froze.
+                        </Typography>
+                      </SwiperSlide>
+                      <SwiperSlide>
+                        {/* Content for Slide 1 */}
+                        <CardMedia
+                          component="img"
+                          image="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                          sx={{
+                            borderRadius: 3,
+                            width: "100%",
+                            ml: 0,
+                            mt: 0,
+                            mb: 3,
+                            height: "400px",  
+                          }}
+                        />
+                        <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
+                          News 1
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                          14 May 2014
+                        </Typography>
+                        <Typography variant="body1" sx={{ mb: 3 }}>
+                          This impressive paella is a perfect party dish and a fun meal to cook
+                          together with your guests. Add 1 cup of froze.
+                        </Typography>
+                      </SwiperSlide>
+                    </Swiper>
+                  </Box>
+                  {/* <CardMedia
+                    component="img"
+                    image="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                    sx={{ borderRadius: 3, width: "100%", ml: 0, mt: 0, mb: 3 }}
+                  />
+                  <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
+                    News
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                    14 May 2014
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 3 }}>
+                    This impressive paella is a perfect party dish and a fun meal to cook together
+                    with your guests. Add 1 cup of froze . This impressive paella is a perfect party
+                    dish and a fun meal to cook together with your guests. Add 1 cup of froze This
+                    impressive paella is a perfect party dish and a fun meal to cook together with
+                    your guests. Add 1 cup of froze
+                  </Typography> */}
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
         </SoftBox>
-        <SoftBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={7}>
-              <BuildByDevelopers />
-            </Grid>
-            <Grid item xs={12} lg={5}>
-              <WorkWithTheRockets />
-            </Grid>
-          </Grid>
-        </SoftBox>
-        <SoftBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={5}>
-              <ReportsBarChart
-                title="active users"
-                description={
-                  <>
-                    (<strong>+23%</strong>) than last week
-                  </>
-                }
-                chart={chart}
-                items={items}
-              />
-            </Grid>
-            <Grid item xs={12} lg={7}>
-              <GradientLineChart
-                title="Sales Overview"
-                description={
-                  <SoftBox display="flex" alignItems="center">
-                    <SoftBox fontSize={size.lg} color="success" mb={0.3} mr={0.5} lineHeight={0}>
-                      <Icon className="font-bold">arrow_upward</Icon>
-                    </SoftBox>
-                    <SoftTypography variant="button" color="text" fontWeight="medium">
-                      4% more{" "}
-                      <SoftTypography variant="button" color="text" fontWeight="regular">
-                        in 2021
-                      </SoftTypography>
-                    </SoftTypography>
-                  </SoftBox>
-                }
-                height="20.25rem"
-                chart={gradientLineChartData}
-              />
-            </Grid>
-          </Grid>
-        </SoftBox>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={8}>
-            <Projects />
-          </Grid>
-          <Grid item xs={12} md={6} lg={4}>
-            <OrderOverview />
-          </Grid>
-        </Grid>
       </SoftBox>
       <Footer />
     </DashboardLayout>
