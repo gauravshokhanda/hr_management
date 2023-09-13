@@ -11,6 +11,7 @@ import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 // Images
@@ -57,7 +58,7 @@ function SignIn() {
         console.log("Successfully login");
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-        dispatch(loginSuccess(response.data));
+        dispatch(loginSuccess(response.data.user));
         navigate("/attendence", { replace: true });
       }
       console.log(response.data.user, "Response");

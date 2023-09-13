@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { store } from "./layouts/store/store";
+import { persistor, store } from "./layouts/store/store";
 
 // react-router components
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
@@ -34,6 +34,7 @@ import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "contex
 // Images
 import brand from "assets/images/logo-ct.png";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -122,7 +123,36 @@ export default function App() {
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
       <Provider store={store}>
-        <ThemeProvider theme={themeRTL}>
+        <PersistGate loading={null} persistor={persistor}>
+          <ThemeProvider theme={themeRTL}>
+            <CssBaseline />
+            {layout === "attendence" && (
+              <>
+                <Sidenav
+                  color={sidenavColor}
+                  brand={brand}
+                  brandName="Hr Management Dashboard"
+                  routes={routes}
+                  onMouseEnter={handleOnMouseEnter}
+                  onMouseLeave={handleOnMouseLeave}
+                />
+                <Configurator />
+                {configsButton}
+              </>
+            )}
+            {layout === "vr" && <Configurator />}
+            <Routes>
+              {getRoutes(routes)}
+              <Route path="*" element={<Navigate to="/attendence" />} />
+            </Routes>
+          </ThemeProvider>
+        </PersistGate>
+      </Provider>
+    </CacheProvider>
+  ) : (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider theme={theme}>
           <CssBaseline />
           {layout === "attendence" && (
             <>
@@ -144,32 +174,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/attendence" />} />
           </Routes>
         </ThemeProvider>
-      </Provider>
-    </CacheProvider>
-  ) : (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {layout === "attendence" && (
-          <>
-            <Sidenav
-              color={sidenavColor}
-              brand={brand}
-              brandName="Hr Management Dashboard"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-            />
-            <Configurator />
-            {configsButton}
-          </>
-        )}
-        {layout === "vr" && <Configurator />}
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/attendence" />} />
-        </Routes>
-      </ThemeProvider>
+      </PersistGate>
     </Provider>
   );
 }
