@@ -78,13 +78,26 @@ function NoticeBoard() {
   }
 
   function stringAvatar(name) {
+    if (typeof name === 'string' && name.trim() !== '') {
+      const nameParts = name.split(" ");
+      if (nameParts.length >= 2) {
+        return {
+          sx: {
+            bgcolor: stringToColor(name),
+          },
+          children: `${nameParts[0][0]}${nameParts[1][0]}`,
+        };
+      }
+    }
+  
     return {
       sx: {
-        bgcolor: stringToColor(name),
+        bgcolor: '#000000', // Default background color
       },
-      children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+      children: 'NA', // Default initials or placeholder
     };
   }
+  
 
   return (
     <DashboardLayout>
