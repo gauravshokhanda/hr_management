@@ -3,10 +3,17 @@ import SoftBox from "components/SoftBox";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Box, Chip } from "@mui/material";
+import { Box, Chip, Stack } from "@mui/material";
+import { Link } from "react-router-dom";
+import SoftButton from "components/SoftButton";
+import EditIcon from "@mui/icons-material/Edit";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 export default function EmployesTable() {
   const [employees, setEmployees] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openedMenuRow, setOpenedMenuRow] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -17,11 +24,23 @@ export default function EmployesTable() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event, rowId) => {
+    setAnchorEl(event.currentTarget);
+    setOpenedMenuRow(rowId);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setOpenedMenuRow(null);
+  };
+
   const fetchData = async () => {
     try {
       const response = await axios.get(`${API_URL}/employes/list`, {
         headers: {
-          Authorization: `token ${localStorage.getItem("token")}`,
+          Authorization: `${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
       });
@@ -44,7 +63,16 @@ export default function EmployesTable() {
   // Define columns as a separate constant
   const initialColumns = [
     { field: "srNo", headerName: "Sr. No", width: 70 },
-    { field: "firstName", headerName: "First name", width: 130 },
+    {
+      field: "firstName",
+      headerName: "First name",
+      width: 130,
+      renderCell: (params) => (
+        <Link to={`/manageEmployee/${params.row._id}`} style={{ color: "inherit" }}>
+          {params.row.firstName}
+        </Link>
+      ),
+    },
     { field: "lastName", headerName: "Last name", width: 130 },
     {
       field: "userName",
@@ -88,6 +116,47 @@ export default function EmployesTable() {
       headerName: "Salary",
       sortable: true,
       width: 160,
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 160,
+      renderCell: (params) => {
+        const rowId = params.row._id;
+        const isOpen = openedMenuRow === rowId;
+
+        return (
+          <Stack spacing={2}>
+            <SoftButton
+              aria-controls={isOpen ? "basic-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={isOpen ? "true" : undefined}
+              onClick={(event) => handleClick(event, rowId)}
+              iconOnly
+              variant="contained" // Fix the typo here
+            >
+              <EditIcon />
+            </SoftButton>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={isOpen}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+            >
+              <MenuItem>Edit Employee</MenuItem>
+              <MenuItem>
+                <Link to={`/manageEmployee/${params.row._id}`} style={{ color: "inherit" }}>
+                  View Attendence
+                </Link>
+              </MenuItem>
+              <MenuItem>Delete Employee</MenuItem>
+            </Menu>
+          </Stack>
+        );
+      },
     },
   ];
 

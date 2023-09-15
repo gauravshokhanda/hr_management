@@ -10,6 +10,7 @@ import Billing from "layouts/billing";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import Register from "layouts/authentication/register";
+import EmployeeDetail from "layouts/manageEmployee/employeeDetail";
 
 // Hr Management Dashboard React icons
 import Shop from "examples/Icons/Shop";
@@ -118,6 +119,13 @@ const routes = [
     key: "add-notice",
     route: "/notice/add-notice",
     component: <AddNotice />,
+  },
+  {
+    type: "hidden",
+    name: "Employees/",
+    key: "employee",
+    route: "/manageEmployee/:id",
+    component: <EmployeeDetail />,
   },
 ];
 

@@ -14,7 +14,6 @@ import Table from "examples/Tables/Table";
 import EmployesTable from "./data/employesTable";
 
 // Data
-import projectsTableData from "layouts/manageEmployee/data/projectsTableData";
 import axios from "axios";
 import { API_URL } from "config";
 import { useEffect, useState } from "react";
@@ -22,7 +21,6 @@ import { useEffect, useState } from "react";
 
 function Employee() {
 
-  const { columns: prCols, rows: prRows } = projectsTableData;
 
   return (
     <DashboardLayout>
@@ -47,23 +45,6 @@ function Employee() {
             </SoftBox>
           </Card>
         </SoftBox>
-        <Card>
-          <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-            <SoftTypography variant="h6">Projects table</SoftTypography>
-          </SoftBox>
-          <SoftBox
-            sx={{
-              "& .MuiTableRow-root:not(:last-child)": {
-                "& td": {
-                  borderBottom: ({ borders: { borderWidth, borderColor } }) =>
-                    `${borderWidth[1]} solid ${borderColor}`,
-                },
-              },
-            }}
-          >
-            <Table columns={prCols} rows={prRows} />
-          </SoftBox>
-        </Card>
       </SoftBox>
       <Footer />
     </DashboardLayout>
