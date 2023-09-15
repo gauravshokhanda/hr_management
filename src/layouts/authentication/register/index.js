@@ -1,7 +1,6 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 // react-router-dom components
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -22,7 +21,33 @@ import { Grid } from "@mui/material";
 import axios from "axios";
 import { API_URL } from "../../../config";
 
+
 function Register() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if 'id' is available and fetch employee data if it exists
+    if (id) {
+      axios.get(`${API_URL}/employes/view/${id}`, {
+        headers: {
+          'Authorization': `${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((response) => {
+          const employeeData = response.data;
+          setFormData({
+            ...employeeData,
+          });
+          console.log(employeeData, 'Employee data register');
+        })
+        .catch((error) => {
+          console.error("Error fetching employee data", error);
+        });
+    }
+  }, [id]);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,7 +56,7 @@ function Register() {
     isAdmin: false,
     isStaff: false,
     salary: "",
-    dateOfJoining: new Date(),
+    dateOfJoining: "",
   });
 
   const handleChange = (e) => {
@@ -58,10 +83,15 @@ function Register() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${API_URL}/employes/register`, data);
 
-      console.log("Registration successful", response.data);
-
+      if (id){
+        const response = await axios.put(`${API_URL}/employes/update/${id}`, data);
+        console.log('Employee updated successfully');
+        navigate("/attendence", { replace: true });
+      } else{
+        const response = await axios.post(`${API_URL}/employes/register`, data);
+        console.log("Registration successful", response.data);
+      }
       setFormData({
         firstName: "",
         lastName: "",
@@ -129,6 +159,15 @@ function Register() {
                 onChange={handleChange}
                 type="password"
                 placeholder="Password"
+              />
+            </SoftBox>
+            <SoftBox mb={2}>
+              <SoftInput
+              name='dateOfJoining'
+                value={formData.dateOfJoining}
+                onChange={handleChange}
+                type="date"
+                placeholder="Date of joining"
               />
             </SoftBox>
             <Grid container>

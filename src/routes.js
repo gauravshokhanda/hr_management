@@ -110,7 +110,7 @@ const routes = [
     type: "hidden",
     name: "Register",
     key: "register",
-    route: "/register",
+    route: "/register/:id?",
     component: <Register />,
   },
   {

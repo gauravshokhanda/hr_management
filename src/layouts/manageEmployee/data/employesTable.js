@@ -85,7 +85,7 @@ export default function EmployesTable() {
       field: "isAdmin",
       headerName: "Is Admin",
       sortable: true,
-      width: 160,
+      width: 100,
       renderCell: (params) =>
         params.row.isAdmin ? (
           <Chip label="Yes" color="success" />
@@ -97,7 +97,7 @@ export default function EmployesTable() {
       field: "isStaff",
       headerName: "Is Staff",
       sortable: true,
-      width: 160,
+      width: 100,
       renderCell: (params) =>
         params.row.isStaff ? (
           <Chip label="Yes" color="success" />
@@ -109,13 +109,13 @@ export default function EmployesTable() {
       field: "dateOfJoining",
       headerName: "Date of joining",
       sortable: true,
-      width: 160,
+      width: 200,
     },
     {
       field: "salary",
       headerName: "Salary",
       sortable: true,
-      width: 160,
+      width: 100,
     },
     {
       field: "action",
@@ -146,7 +146,11 @@ export default function EmployesTable() {
                 "aria-labelledby": "basic-button",
               }}
             >
-              <MenuItem>Edit Employee</MenuItem>
+              <MenuItem>
+                <Link to={`/register/${params.row._id}`} style={{ color: "inherit" }}>
+                  Edit Employee
+                </Link>
+              </MenuItem>
               <MenuItem>
                 <Link to={`/manageEmployee/${params.row._id}`} style={{ color: "inherit" }}>
                   View Attendence
