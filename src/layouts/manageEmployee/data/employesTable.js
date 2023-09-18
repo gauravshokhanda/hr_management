@@ -3,7 +3,7 @@ import SoftBox from "components/SoftBox";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Box, Chip, Stack } from "@mui/material";
+import { Avatar, Box, Chip, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import SoftButton from "components/SoftButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -14,6 +14,8 @@ export default function EmployesTable() {
   const [employees, setEmployees] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openedMenuRow, setOpenedMenuRow] = useState(null);
+
+  console.log(employees, "employees table");
 
   useEffect(() => {
     fetchData();
@@ -64,6 +66,17 @@ export default function EmployesTable() {
   const initialColumns = [
     { field: "srNo", headerName: "Sr. No", width: 70 },
     {
+      field: "image",
+      headerName: "User Image",
+      width: 130,
+      renderCell: (params) => {
+        console.log(params, "User image");
+        return (
+          <Avatar src={`${API_URL}/${params.row.image}`} alt={params.row.userName} />
+        )
+      }
+    },
+    {
       field: "firstName",
       headerName: "First name",
       width: 130,
@@ -80,6 +93,12 @@ export default function EmployesTable() {
       description: "This column has a value getter and is not sortable.",
       sortable: false,
       width: 160,
+    },
+    {
+      field: "userEmail",
+      headerName: "User Email",
+      sortable: true,
+      width: 250,
     },
     {
       field: "isAdmin",

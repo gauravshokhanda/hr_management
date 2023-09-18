@@ -17,10 +17,9 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
 import curved6 from "assets/images/curved-images/curved14.jpg";
-import { Grid } from "@mui/material";
+import { Box, Button, Grid, Input, Typography } from "@mui/material";
 import axios from "axios";
 import { API_URL } from "../../../config";
-
 
 function Register() {
   const { id } = useParams();
@@ -29,18 +28,19 @@ function Register() {
   useEffect(() => {
     // Check if 'id' is available and fetch employee data if it exists
     if (id) {
-      axios.get(`${API_URL}/employes/view/${id}`, {
-        headers: {
-          'Authorization': `${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      })
+      axios
+        .get(`${API_URL}/employes/view/${id}`, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        })
         .then((response) => {
           const employeeData = response.data;
           setFormData({
             ...employeeData,
           });
-          console.log(employeeData, 'Employee data register');
+          console.log(employeeData, "Employee data register");
         })
         .catch((error) => {
           console.error("Error fetching employee data", error);
@@ -57,41 +57,57 @@ function Register() {
     isStaff: false,
     salary: "",
     dateOfJoining: "",
+    image: "",
+    userEmail: "",
   });
+
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImgPath, setSelectedImgPath] = useState("");
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log(file, "Selected image");
+      setSelectedImage(file);
+      const imageUrl = URL.createObjectURL(file);
+      console.log(imageUrl, "Selected image URL");
+      setSelectedImgPath(imageUrl);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-  
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-  
-  const data = {
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    userName: formData.userName,
-    password:formData.password,
-    isAdmin: formData.isAdmin, 
-    isStaff: formData.isStaff,
-    salary: formData.salary,
-    dateOfJoining: formData.dateOfJoining,
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-
-      if (id){
-        const response = await axios.put(`${API_URL}/employes/update/${id}`, data);
-        console.log('Employee updated successfully');
-        navigate("/attendence", { replace: true });
-      } else{
-        const response = await axios.post(`${API_URL}/employes/register`, data);
-        console.log("Registration successful", response.data);
+      const formDataToSend = new FormData();
+      if (selectedImage) {
+        formDataToSend.append("image", selectedImage, selectedImage.name);
       }
+      formDataToSend.append("firstName", formData.firstName);
+      formDataToSend.append("lastName", formData.lastName);
+      formDataToSend.append("userName", formData.userName);
+      formDataToSend.append("password", formData.password);
+      formDataToSend.append("isAdmin", formData.isAdmin);
+      formDataToSend.append("isStaff", formData.isStaff);
+      formDataToSend.append("salary", formData.salary);
+      formDataToSend.append("userEmail", formData.userEmail);
+
+      const response = id
+        ? await axios.put(`${API_URL}/employes/update/${id}`, formDataToSend)
+        : await axios.post(`${API_URL}/employes/register`, formDataToSend);
+
+      console.log(`Employee ${id ? 'updated' : 'registered'} successfully`);
+      navigate("/attendence", { replace: true });
+
       setFormData({
         firstName: "",
         lastName: "",
@@ -100,11 +116,16 @@ function Register() {
         isAdmin: false,
         isStaff: false,
         salary: "",
+        userEmail: "",
+        image: "",
       });
+
+      setSelectedImage("");
     } catch (error) {
       console.error("Registration failed", error);
     }
   };
+
   return (
     <BasicLayout
       title="Welcome!"
@@ -121,7 +142,7 @@ function Register() {
           <SoftBox component="form" role="form" onSubmit={handleSubmit}>
             <SoftBox mb={2}>
               <SoftInput
-              name='firstName'
+                name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
                 placeholder="First Name"
@@ -129,7 +150,7 @@ function Register() {
             </SoftBox>
             <SoftBox mb={2}>
               <SoftInput
-              name='lastName'
+                name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Last Name"
@@ -137,7 +158,7 @@ function Register() {
             </SoftBox>
             <SoftBox mb={2}>
               <SoftInput
-              name='userName'
+                name="userName"
                 value={formData.userName}
                 onChange={handleChange}
                 placeholder="User Name"
@@ -145,7 +166,16 @@ function Register() {
             </SoftBox>
             <SoftBox mb={2}>
               <SoftInput
-              name='salary'
+                name="userEmail"
+                value={formData.userEmail}
+                onChange={handleChange}
+                type="email"
+                placeholder="User Email"
+              />
+            </SoftBox>
+            <SoftBox mb={2}>
+              <SoftInput
+                name="salary"
                 value={formData.salary}
                 onChange={handleChange}
                 type="number"
@@ -153,8 +183,48 @@ function Register() {
               />
             </SoftBox>
             <SoftBox mb={2}>
+              <Box
+                sx={{
+                  padding: "20px",
+                  border: "0.0625rem solid #d2d6da",
+                  borderRadius: "0.5rem!important",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "22px",
+                }}
+              >
+                <Box>
+                  <Typography sx={{ mb: 1 }} variant="h5">
+                    Upload an Image
+                  </Typography>
+                  <Input
+                  name="image"
+                    accept="image/*"
+                    type="file"
+                    id="image-input"
+                    onChange={handleImageChange}
+                    sx={{ display: "none!important" }}
+                  />
+
+                  <label htmlFor="image-input">
+                    <Button variant="contained" component="span">
+                      Choose Image
+                    </Button>
+                  </label>
+                </Box>
+                <Box>
+                  {selectedImage && (
+                    <div>
+                      <img src={selectedImgPath} alt="Selected" style={{ maxWidth: "100%" }} />
+                      <Typography variant="body1">{selectedImgPath}</Typography>
+                    </div>
+                  )}
+                </Box>
+              </Box>
+            </SoftBox>
+            <SoftBox mb={2}>
               <SoftInput
-              name='password'
+                name="password"
                 value={formData.password}
                 onChange={handleChange}
                 type="password"
@@ -163,7 +233,7 @@ function Register() {
             </SoftBox>
             <SoftBox mb={2}>
               <SoftInput
-              name='dateOfJoining'
+                name="dateOfJoining"
                 value={formData.dateOfJoining}
                 onChange={handleChange}
                 type="date"
