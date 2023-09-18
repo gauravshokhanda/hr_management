@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Card,
-  CardContent,
   Input,
   InputLabel,
   Typography,
@@ -19,9 +18,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import { grey } from "@mui/material/colors";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import { Pagination } from "swiper/modules";
 import { API_URL } from "config";
 import axios from "axios";
 import { useState } from "react";
@@ -61,9 +58,23 @@ function NoticeBoard() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${API_URL}/notices/notice`, data);
+      const formData = new FormData();
+      formData.append("heading", data.heading);
+      formData.append("description", data.description);
 
-      console.log("Notice saved successful", response.data);
+      // Check if data.tags is defined before joining
+      if (data.tags && data.tags.length > 0) {
+        formData.append("tags", data.tags.join(","));
+      }
+
+      // Append the image as binary data
+      if (selectedImage) {
+        formData.append("image", selectedImage, selectedImage.name);
+      }
+
+      const response = await axios.post(`${API_URL}/notices/notice`, formData);
+
+      console.log("Notice saved successfully", response.data);
 
       setFormData({
         heading: "",
@@ -71,7 +82,9 @@ function NoticeBoard() {
         imgPath: "",
         tags: [],
       });
+
       setSelectedImage("");
+
       setPersonName([]);
     } catch (error) {
       console.error("Notice saved failed", error);
@@ -87,12 +100,15 @@ function NoticeBoard() {
   }
 
   const [selectedImage, setSelectedImage] = useState(null);
+  const [setectedImgPath, setSelectedImgPath] = useState("");
   const [personName, setPersonName] = useState([]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      console.log(file, 'Selected image');
+      setSelectedImage(file);
+      setSelectedImgPath(URL.createObjectURL(file));
       const imageName = file.name;
       setFormData((prevData) => ({
         ...prevData,
@@ -100,6 +116,8 @@ function NoticeBoard() {
       }));
     }
   };
+  
+  console.log(selectedImage, 'Imagew');
 
   const handleChangeSelect = (event) => {
     const {
@@ -108,10 +126,10 @@ function NoticeBoard() {
     setPersonName(value);
     setFormData((prevData) => {
       return {
-      ...prevData,
+        ...prevData,
         tags: value,
       };
-    })
+    });
   };
 
   return (
@@ -186,9 +204,8 @@ function NoticeBoard() {
                           <Input
                             accept="image/*"
                             type="file"
-                            id="image-input"  
+                            id="image-input"
                             onChange={handleImageChange}
-                            name="imgPath"
                             sx={{ display: "none!important" }}
                           />
 
@@ -202,7 +219,7 @@ function NoticeBoard() {
                           {selectedImage && (
                             <div>
                               <img
-                                src={selectedImage}
+                                src={setectedImgPath}
                                 alt="Selected"
                                 style={{ maxWidth: "100%" }}
                               />

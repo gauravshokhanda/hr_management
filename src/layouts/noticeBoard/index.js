@@ -152,12 +152,12 @@ function NoticeBoard() {
                       style={{ height: "700px" }}
                       className="swiper-wrapper"
                     >
-                      {notice.map((item) => {
+                      {notice.reverse().map((item) => {
                         return (
                           <SwiperSlide key={item._id}>
                             <CardMedia
                               component="img"
-                              image={item.imgPath}
+                              image={`${API_URL}/${item.imgPath}`}
                               sx={{
                                 borderRadius: 3,
                                 width: "100%",
