@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 // react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
@@ -10,17 +10,15 @@ import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useSoftUIController, setUser, setToken } from "../../../context/index";
 
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 // Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 import { API_URL } from "../../../config";
-import { loginSuccess } from "../../../layouts/store/actions";
 
 function SignIn() {
-  const dispatch = useDispatch();
   const [rememberMe, setRememberMe] = useState(true);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +30,6 @@ function SignIn() {
   const handleUserName = (event) => {
     const { value } = event.target;
     setUserName(value);
-    console.log(value, "Username");
   };
   const handlePassword = (event) => {
     const { value } = event.target;
@@ -58,7 +55,6 @@ function SignIn() {
         console.log("Successfully login");
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-        dispatch(loginSuccess(response.data.user));
         navigate("/attendence", { replace: true });
       }
       console.log(response.data.user, "Response");
