@@ -1,5 +1,5 @@
+import * as React from "react";
 import { useEffect, useState } from "react";
-
 // react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
 // @mui material components
@@ -11,6 +11,12 @@ import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import Dialog from "@mui/material/Dialog";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Slide from "@mui/material/Slide";
 
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
@@ -25,6 +31,29 @@ function SignIn() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
+  const [open, setOpen] = useState(false);
+  const [buttonShow, setButtonShow] = useState(false);
+
+  const handleCloseAfterDelay = () => {
+    setTimeout(() => {
+      setButtonShow(true);
+    }, 3000);
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+    setButtonShow(false);
+    handleCloseAfterDelay();
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    navigate("/notice", { replace: true });
+  };
+
+  const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  });
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
   const navigate = useNavigate();
@@ -59,13 +88,14 @@ function SignIn() {
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
         dispatch(loginSuccess(response.data.user));
-        navigate("/attendence", { replace: true });
+        handleClickOpen();
       }
       console.log(response.data.user, "Response");
     } catch (error) {
       console.error(error, "There is some issue");
     }
   };
+
   return (
     <CoverLayout
       title="Welcome back"
@@ -116,6 +146,19 @@ function SignIn() {
           </SoftButton>
         </SoftBox>
       </SoftBox>
+
+      {/* Modal */}
+      <Dialog fullScreen open={open} onClose={null} TransitionComponent={Transition}>
+        <AppBar sx={{ position: "relative" }}>
+          <Toolbar>
+            {buttonShow && (
+              <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
+                <CloseIcon />
+              </IconButton>
+            )}
+          </Toolbar>
+        </AppBar>
+      </Dialog>
     </CoverLayout>
   );
 }

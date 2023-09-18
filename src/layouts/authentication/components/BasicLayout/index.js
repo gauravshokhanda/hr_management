@@ -10,7 +10,6 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
 // Hr Management Dashboard React examples
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
 import PageLayout from "examples/LayoutContainers/PageLayout";
 
 // Authentication layout components
@@ -19,15 +18,6 @@ import Footer from "layouts/authentication/components/Footer";
 function BasicLayout({ title, description, image, children }) {
   return (
     <PageLayout>
-      <DefaultNavbar
-        action={{
-          type: "external",
-          route: "https://creative-tim.com/product/soft-ui-attendence-react",
-          label: "free download",
-        }}
-        transparent
-        light
-      />
       <SoftBox
         width="calc(100% - 2rem)"
         minHeight="50vh"

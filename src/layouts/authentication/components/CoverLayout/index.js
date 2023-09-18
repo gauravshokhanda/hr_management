@@ -19,14 +19,6 @@ import Footer from "layouts/authentication/components/Footer";
 function CoverLayout({ color, header, title, description, image, top, children }) {
   return (
     <PageLayout background="white">
-      <DefaultNavbar
-        action={{
-          type: "external",
-          route: "https://creative-tim.com/product/soft-ui-attendence-react",
-          label: "free download",
-          color: "dark",
-        }}
-      />
       <Grid
         container
         justifyContent="center"
