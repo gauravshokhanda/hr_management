@@ -33,8 +33,7 @@ import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "contex
 
 // Images
 import brand from "assets/images/logo-ct.png";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -42,6 +41,7 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   // Cache for the rtl
   useMemo(() => {
@@ -60,6 +60,16 @@ export default function App() {
       setOnMouseEnter(true);
     }
   };
+
+  const token = controller.token;
+
+  // Redirect to Sign In if the token is not present
+  // useEffect(() => {
+  //   // Redirect to Sign In if the token is not present
+  //   if (!token) {
+  //     navigate("/sign-in");
+  //   }
+  // }, [token, navigate]);
 
   // Close sidenav when mouse leave mini sidenav
   const handleOnMouseLeave = () => {
@@ -122,59 +132,51 @@ export default function App() {
 
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <ThemeProvider theme={themeRTL}>
-            <CssBaseline />
-            {layout === "attendence" && (
-              <>
-                <Sidenav
-                  color={sidenavColor}
-                  brand={brand}
-                  brandName="Hr Management Dashboard"
-                  routes={routes}
-                  onMouseEnter={handleOnMouseEnter}
-                  onMouseLeave={handleOnMouseLeave}
-                />
-                <Configurator />
-                {configsButton}
-              </>
-            )}
-            {layout === "vr" && <Configurator />}
-            <Routes>
-              {getRoutes(routes)}
-              <Route path="*" element={<Navigate to="/attendence" />} />
-            </Routes>
-          </ThemeProvider>
-        </PersistGate>
-      </Provider>
+      <ThemeProvider theme={themeRTL}>
+        <CssBaseline />
+        {layout === "attendence" && (
+          <>
+            <Sidenav
+              color={sidenavColor}
+              brand={brand}
+              brandName="Hr Management Dashboard"
+              routes={routes}
+              onMouseEnter={handleOnMouseEnter}
+              onMouseLeave={handleOnMouseLeave}
+            />
+            <Configurator />
+            {configsButton}
+          </>
+        )}
+        {layout === "vr" && <Configurator />}
+        <Routes>
+          {getRoutes(routes)}
+          <Route path="*" element={<Navigate to="/attendence" />} />
+        </Routes>
+      </ThemeProvider>
     </CacheProvider>
   ) : (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {layout === "attendence" && (
-            <>
-              <Sidenav
-                color={sidenavColor}
-                brand={brand}
-                brandName="Hr Management Dashboard"
-                routes={routes}
-                onMouseEnter={handleOnMouseEnter}
-                onMouseLeave={handleOnMouseLeave}
-              />
-              <Configurator />
-              {configsButton}
-            </>
-          )}
-          {layout === "vr" && <Configurator />}
-          <Routes>
-            {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/attendence" />} />
-          </Routes>
-        </ThemeProvider>
-      </PersistGate>
-    </Provider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {layout === "attendence" && (
+        <>
+          <Sidenav
+            color={sidenavColor}
+            brand={brand}
+            brandName="Hr Management Dashboard"
+            routes={routes}
+            onMouseEnter={handleOnMouseEnter}
+            onMouseLeave={handleOnMouseLeave}
+          />
+          <Configurator />
+          {configsButton}
+        </>
+      )}
+      {layout === "vr" && <Configurator />}
+      <Routes>
+        {getRoutes(routes)}
+        <Route path="*" element={<Navigate to="/attendence" />} />
+      </Routes>
+    </ThemeProvider>
   );
 }

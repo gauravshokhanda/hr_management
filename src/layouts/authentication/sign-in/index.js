@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../../layouts/store/actions"; 
 import Dialog from "@mui/material/Dialog";
@@ -10,18 +10,23 @@ import CloseIcon from "@mui/icons-material/Close";
 import { API_URL } from "../../../config";
 import axios from "axios";
 import Switch from "@mui/material/Switch";
-import { useNavigate } from "react-router-dom";
-import CoverLayout from "layouts/authentication/components/CoverLayout";
+import { Link, useNavigate } from "react-router-dom";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
-import { DialogContent } from "@mui/material";
-import NoticeBoard from "layouts/noticeBoard";
+import { useSoftUIController, setUser, setToken } from "../../../context/index";
+
+// react-router-dom components
+
+// Authentication layout components
+import CoverLayout from "layouts/authentication/components/CoverLayout";
+// Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
+import NoticeBoard from "layouts/noticeBoard";
+import { DialogContent } from "@mui/material";
 
 function SignIn() {
-  const dispatch = useDispatch(); // Step 1: Get the dispatch function from Redux
   const [rememberMe, setRememberMe] = useState(true);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -54,7 +59,6 @@ function SignIn() {
   const handleUserName = (event) => {
     const { value } = event.target;
     setUserName(value);
-    console.log(value, "Username");
   };
 
   const handlePassword = (event) => {
@@ -82,10 +86,7 @@ function SignIn() {
         console.log("Successfully login");
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-  
-        // Dispatch the action here.
-        dispatch(loginSuccess(response.data.user, response.data.token));
-  
+    
         handleClickOpen();
         setSignInTrue(true);
       }

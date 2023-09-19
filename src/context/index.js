@@ -1,4 +1,3 @@
-
 /**
   This file is used for controlling the global states of the components,
   you can customize the states for the different components here.
@@ -42,6 +41,12 @@ function reducer(state, action) {
     case "LAYOUT": {
       return { ...state, layout: action.value };
     }
+    case "SET_USER": {
+      return { ...state, user: action.user };
+    }
+    case "SET_TOKEN": {
+      return { ...state, token: action.token };
+    }
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -59,6 +64,8 @@ function SoftUIControllerProvider({ children }) {
     openConfigurator: false,
     direction: "ltr",
     layout: "attendence",
+    user: null,
+    token: null,
   };
 
   const [controller, dispatch] = useReducer(reducer, initialState);
@@ -93,6 +100,8 @@ const setFixedNavbar = (dispatch, value) => dispatch({ type: "FIXED_NAVBAR", val
 const setOpenConfigurator = (dispatch, value) => dispatch({ type: "OPEN_CONFIGURATOR", value });
 const setDirection = (dispatch, value) => dispatch({ type: "DIRECTION", value });
 const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
+const setUser = (dispatch, user) => dispatch({ type: "SET_USER", user });
+const dispatchSetToken = (dispatch, token) => dispatch({ type: "SET_TOKEN", token });
 
 export {
   SoftUIControllerProvider,
@@ -105,4 +114,6 @@ export {
   setOpenConfigurator,
   setDirection,
   setLayout,
+  dispatchSetToken,
+  setUser,
 };
