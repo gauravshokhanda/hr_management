@@ -1,38 +1,34 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-// react-router-dom components
-import { Link, useNavigate } from "react-router-dom";
-// @mui material components
-import Switch from "@mui/material/Switch";
-// Hr Management Dashboard React components
-import SoftBox from "components/SoftBox";
-import SoftTypography from "components/SoftTypography";
-import SoftInput from "components/SoftInput";
-import SoftButton from "components/SoftButton";
-import axios from "axios";
 import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../../layouts/store/actions"; 
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import Slide from "@mui/material/Slide";
-
-// Authentication layout components
-import CoverLayout from "layouts/authentication/components/CoverLayout";
-// Images
-import curved9 from "assets/images/curved-images/curved-6.jpg";
 import { API_URL } from "../../../config";
-import { loginSuccess } from "../../../layouts/store/actions";
+import axios from "axios";
+import Switch from "@mui/material/Switch";
+import { useNavigate } from "react-router-dom";
+import CoverLayout from "layouts/authentication/components/CoverLayout";
+import SoftBox from "components/SoftBox";
+import SoftTypography from "components/SoftTypography";
+import SoftInput from "components/SoftInput";
+import SoftButton from "components/SoftButton";
+import { DialogContent } from "@mui/material";
+import NoticeBoard from "layouts/noticeBoard";
+import curved9 from "assets/images/curved-images/curved-6.jpg";
 
 function SignIn() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Step 1: Get the dispatch function from Redux
   const [rememberMe, setRememberMe] = useState(true);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [open, setOpen] = useState(false);
   const [buttonShow, setButtonShow] = useState(false);
+  const [signInTrue, setSignInTrue] = useState(false);
 
   const handleCloseAfterDelay = () => {
     setTimeout(() => {
@@ -49,11 +45,8 @@ function SignIn() {
   const handleClose = () => {
     setOpen(false);
     navigate("/notice", { replace: true });
+    setSignInTrue(false);
   };
-
-  const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
   const navigate = useNavigate();
@@ -63,6 +56,7 @@ function SignIn() {
     setUserName(value);
     console.log(value, "Username");
   };
+
   const handlePassword = (event) => {
     const { value } = event.target;
     setPassword(value);
@@ -73,6 +67,7 @@ function SignIn() {
     userName: userName,
     password: password,
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -81,14 +76,18 @@ function SignIn() {
         console.error("Username and password are required");
         return;
       }
-
+  
       const response = await axios.post(`${API_URL}/employes/login`, loginData);
       if (response.status === 200) {
         console.log("Successfully login");
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-        dispatch(loginSuccess(response.data.user));
+  
+        // Dispatch the action here.
+        dispatch(loginSuccess(response.data.user, response.data.token));
+  
         handleClickOpen();
+        setSignInTrue(true);
       }
       console.log(response.data.user, "Response");
     } catch (error) {
@@ -138,7 +137,7 @@ function SignIn() {
             sx={{ cursor: "pointer", userSelect: "none" }}
           >
             &nbsp;&nbsp;Remember me
-          </SoftTypography>
+          </SoftTypography> 
         </SoftBox>
         <SoftBox mt={4} mb={1}>
           <SoftButton type="submit" variant="gradient" color="info" fullWidth>
@@ -148,7 +147,7 @@ function SignIn() {
       </SoftBox>
 
       {/* Modal */}
-      <Dialog fullScreen open={open} onClose={null} TransitionComponent={Transition}>
+      <Dialog fullScreen open={open} onClose={null}>
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
             {buttonShow && (
@@ -158,6 +157,9 @@ function SignIn() {
             )}
           </Toolbar>
         </AppBar>
+        <DialogContent>
+          <NoticeBoard signInTrue={signInTrue} />
+        </DialogContent>
       </Dialog>
     </CoverLayout>
   );

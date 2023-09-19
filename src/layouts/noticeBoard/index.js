@@ -25,15 +25,19 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import SoftButton from "components/SoftButton";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const CARD_PROPERTY = {
   borderRadius: 3,
   boxShadow: 0,
 };
 
-function NoticeBoard() {
-  const [notice, setNotice] = useState([]);
+NoticeBoard.propTypes = {
+  signInTrue: PropTypes.bool.isRequired,
+};
 
+function NoticeBoard({ signInTrue }) {
+  const [notice, setNotice] = useState([]);
   const fetchData = async () => {
     try {
       const response = await axios.get(`${API_URL}/notices/list`);
@@ -78,7 +82,7 @@ function NoticeBoard() {
   }
 
   function stringAvatar(name) {
-    if (typeof name === 'string' && name.trim() !== '') {
+    if (typeof name === "string" && name.trim() !== "") {
       const nameParts = name.split(" ");
       if (nameParts.length >= 2) {
         return {
@@ -89,19 +93,18 @@ function NoticeBoard() {
         };
       }
     }
-  
+
     return {
       sx: {
-        bgcolor: '#000000', // Default background color
+        bgcolor: "#000000", // Default background color
       },
-      children: 'NA', // Default initials or placeholder
+      children: "NA", // Default initials or placeholder
     };
   }
-  
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
+      {signInTrue ? null : <DashboardNavbar />}
       <SoftBox py={3}>
         <SoftBox mb={3}>
           <Grid container justifyContent="center" spacing={3}>
@@ -200,7 +203,7 @@ function NoticeBoard() {
           </Grid>
         </SoftBox>
       </SoftBox>
-      <Footer />
+      {signInTrue ? null : <Footer />}
     </DashboardLayout>
   );
 }
