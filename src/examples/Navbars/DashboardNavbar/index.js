@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 // react-router components
@@ -51,6 +50,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
 
+  console.log(controller, "controller");
   useEffect(() => {
     // Setting the navbar type
     if (fixedNavbar) {

@@ -9,7 +9,7 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
-import { useSoftUIController, setUser, setToken } from "../../../context/index";
+import { useSoftUIController, dispatchSetToken, setUser } from "context";
 import * as yup from "yup";
 
 // Authentication layout components
@@ -25,7 +25,7 @@ function SignIn() {
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  const [controller, dispatch] = useSoftUIController();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
   // Define Yup validation schema
@@ -36,35 +36,37 @@ function SignIn() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     try {
       if (!userName || !password) {
         setError("Username and password are required");
         console.log("Error set to:", error); // Debugging statement
         return;
       }
-  
+
       const response = await axios.post(`${API_URL}/employes/login`, {
         userName: userName,
         password: password,
       });
-  
+
       if (response.status === 200) {
         console.log("Successfully login");
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-        setError(""); // Clear any previous errors
-        console.log("Error cleared:", error); // Debugging statement
+        setError("");
+        console.log("Error cleared:", error);
         navigate("/attendence", { replace: true });
+        dispatchSetToken(dispatch, response.data.token);
+        setUser(dispatch, response.data.user);
       } else if (response.status === 401) {
         setError("Please Enter Correct Username or Password");
-        console.log("Error set to:", error); // Debugging statement
+        console.log("Error set to:", error);
       }
     } catch (error) {
       console.error(error, "There is some issue");
     }
   };
-  
+
   console.log("Error right before rendering:", error);
   return (
     <CoverLayout
