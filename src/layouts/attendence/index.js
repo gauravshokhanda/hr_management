@@ -1,4 +1,3 @@
-
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
@@ -6,9 +5,9 @@ import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import NoticeBoard from "layouts/noticeBoard";
-import { DialogContent } from "@mui/material";
+import { Button, DialogContent } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 // Hr Management Dashboard React components
@@ -36,6 +35,7 @@ import OrderOverview from "layouts/attendence/components/OrderOverview";
 import reportsBarChartData from "layouts/attendence/data/reportsBarChartData";
 import gradientLineChartData from "layouts/attendence/data/gradientLineChartData";
 import { useEffect, useState } from "react";
+import SoftButton from "components/SoftButton";
 
 function Attendence() {
   const { size } = typography;
@@ -47,33 +47,29 @@ function Attendence() {
   const location = useLocation();
   const currentPage = location.pathname;
 
-  
   const handleCloseAfterDelay = () => {
     setTimeout(() => {
       setButtonShow(true);
-    }, 3000);
+    }, 5000);
   };
-  
+
   const handleClickOpen = () => {
     setOpen(true);
     setButtonShow(false);
     handleCloseAfterDelay();
     setSignInTrue(true);
   };
-  
+
   useEffect(() => {
     if (currentPage === "/attendence") {
       handleClickOpen();
     }
   }, []);
 
-
   const handleClose = () => {
     setOpen(false);
     setSignInTrue(false);
   };
-
-  
 
   return (
     <DashboardLayout>
@@ -175,16 +171,21 @@ function Attendence() {
       </SoftBox>
       <Footer />
 
-
       {/* Modal */}
       <Dialog fullScreen open={open} onClose={null}>
         <AppBar sx={{ position: "relative" }}>
-          <Toolbar>
-            {buttonShow && (
-              <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
-                <CloseIcon />
-              </IconButton>
-            )}
+          <Toolbar sx={{ justifyContent: "flex-end" }}>
+            <SoftButton
+              edge="start"
+              variant="contained"
+              color="success"
+              onClick={handleClose}
+              aria-label="close"
+              disabled={!buttonShow}
+              endIcon={<ArrowRightAltIcon />}
+            >
+              Proceed
+            </SoftButton>
           </Toolbar>
         </AppBar>
         <DialogContent>

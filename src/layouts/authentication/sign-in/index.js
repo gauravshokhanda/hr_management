@@ -17,6 +17,7 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 // Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 import { Switch } from "@mui/material";
+import { useEffect } from "react";
 
 function SignIn() {
   const [rememberMe, setRememberMe] = useState(true);
@@ -58,16 +59,15 @@ function SignIn() {
         navigate("/attendence", { replace: true });
         dispatchSetToken(dispatch, response.data.token);
         setUser(dispatch, response.data.user);
-      } else if (response.status === 401) {
-        setError("Please Enter Correct Username or Password");
-        console.log("Error set to:", error);
       }
     } catch (error) {
       console.error(error, "There is some issue");
+      if (error.response.status === 401) {
+        setError("Please Enter Correct Username or Password");
+      }
     }
   };
 
-  console.log("Error right before rendering:", error);
   return (
     <CoverLayout
       title="Welcome back"

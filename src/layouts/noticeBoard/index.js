@@ -155,7 +155,7 @@ function NoticeBoard({ signInTrue }) {
                       style={{ height: "700px" }}
                       className="swiper-wrapper"
                     >
-                      {notice.reverse().map((item) => {
+                      {notice.map((item) => {
                         return (
                           <SwiperSlide key={item._id}>
                             <CardMedia

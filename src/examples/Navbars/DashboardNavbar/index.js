@@ -12,6 +12,10 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import Icon from "@mui/material/Icon";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import { CardMedia, MenuItem, Typography } from "@mui/material";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -42,6 +46,8 @@ import {
 // Images
 import team2 from "assets/images/team-2.jpg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
+import { Avatar } from "@mui/material";
+import { API_URL } from "config";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -49,8 +55,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+  const [open, setOpen] = useState(false);
 
-  console.log(controller, "controller");
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
+  console.log(controller.user, "controller");
   useEffect(() => {
     // Setting the navbar type
     if (fixedNavbar) {
@@ -139,25 +150,59 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 icon={{ component: "search", direction: "left" }}
               />
             </SoftBox>
-            <SoftBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in">
-                <IconButton sx={navbarIconButton} size="small">
-                  <Icon
-                    sx={({ palette: { dark, white } }) => ({
-                      color: light ? white.main : dark.main,
-                    })}
-                  >
-                    account_circle
-                  </Icon>
-                  <SoftTypography
-                    variant="button"
-                    fontWeight="medium"
-                    color={light ? "white" : "dark"}
-                  >
-                    Sign in
-                  </SoftTypography>
-                </IconButton>
-              </Link>
+            <SoftBox sx={{ display: "flex" }} color={light ? "white" : "inherit"}>
+              {controller.user ? (
+                <>
+                  <Avatar
+                    aria-label="open user menu"
+                    id="demo-positioned-button"
+                    onClick={handleClick}
+                    src={`${API_URL}/${controller.user.image}`}
+                    alt={controller.user.firstName}
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      "& img": {
+                        height: "100%!important",
+                      },
+                    }}
+                    title={controller.user.firstName}
+                  />
+                  {open && (
+                    <Card id="demo-positioned-menu" sx={{ maxWidth: 320, position: 'absolute', top: '100%', right: '14px' }}>
+                      <CardMedia
+                        component="img"
+                        alt="green iguana"
+                        height="140"
+                        image="/static/images/cards/contemplative-reptile.jpg"
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="Box">
+                          Lizard
+                        </Typography>
+                        <MenuItem onClick={handleClick}>
+                          <Avatar sx={{ mr: 1 }} /> Profile
+                        </MenuItem>
+                        <MenuItem onClick={handleClick}>My account</MenuItem>
+                        <MenuItem onClick={handleClick}>Logout</MenuItem>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
+              ) : (
+                <Link to="/authentication/sign-in">
+                  <IconButton sx={navbarIconButton} size="small">
+                    <SoftTypography
+                      variant="button"
+                      fontWeight="medium"
+                      color={light ? "white" : "dark"}
+                    >
+                      Sign in
+                    </SoftTypography>
+                  </IconButton>
+                </Link>
+              )}
+
               <IconButton
                 size="small"
                 color="inherit"
