@@ -16,6 +16,8 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { CardMedia, MenuItem, Typography } from "@mui/material";
+import Stack from "@mui/material/Stack";
+import Divider from "@mui/material/Divider";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -55,13 +57,15 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
-  const [open, setOpen] = useState(false);
-
-  const handleClick = () => {
-    setOpen(!open);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
-  console.log(controller.user, "controller");
   useEffect(() => {
     // Setting the navbar type
     if (fixedNavbar) {
@@ -154,8 +158,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
               {controller.user ? (
                 <>
                   <Avatar
-                    aria-label="open user menu"
                     id="demo-positioned-button"
+                    aria-controls={open ? "demo-positioned-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
                     onClick={handleClick}
                     src={`${API_URL}/${controller.user.image}`}
                     alt={controller.user.firstName}
@@ -168,26 +174,52 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     }}
                     title={controller.user.firstName}
                   />
-                  {open && (
-                    <Card id="demo-positioned-menu" sx={{ maxWidth: 320, position: 'absolute', top: '100%', right: '14px' }}>
-                      <CardMedia
-                        component="img"
-                        alt="green iguana"
-                        height="140"
-                        image="/static/images/cards/contemplative-reptile.jpg"
-                      />
-                      <CardContent>
-                        <Typography gutterBottom variant="h5" component="Box">
-                          Lizard
-                        </Typography>
-                        <MenuItem onClick={handleClick}>
-                          <Avatar sx={{ mr: 1 }} /> Profile
-                        </MenuItem>
+                  <Menu
+                    id="demo-positioned-menu"
+                    aria-labelledby="demo-positioned-button"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      alt="green iguana"
+                      sx={{
+                        borderRadius: "250px",
+                        width: "140px",
+                        height: "140px",
+                        mx: "auto",
+                      }}
+                      image={`${API_URL}/${controller.user.image}`}
+                    />
+                    <Typography gutterBottom sx={{ mt: 1 }} align="center" variant="h5">
+                      {controller.user.userName}
+                    </Typography>
+                    <Divider />
+                    <CardContent>
+                      <Stack
+                        spacing={0.5}
+                        justifyContent="center"
+                        sx={{
+                          "& li": {
+                            justifyContent: "center",
+                          },
+                        }}
+                      >
+                        <MenuItem onClick={handleClick}>Profile</MenuItem>
                         <MenuItem onClick={handleClick}>My account</MenuItem>
                         <MenuItem onClick={handleClick}>Logout</MenuItem>
-                      </CardContent>
-                    </Card>
-                  )}
+                      </Stack>
+                    </CardContent>
+                  </Menu>
                 </>
               ) : (
                 <Link to="/authentication/sign-in">
@@ -256,3 +288,4 @@ DashboardNavbar.propTypes = {
 };
 
 export default DashboardNavbar;
+export {useSoftUIController};

@@ -171,7 +171,7 @@ export default function EmployesTable() {
                 </Link>
               </MenuItem>
               <MenuItem>
-                <Link to={`/manageEmployee/${params.row._id}`} style={{ color: "inherit" }}>
+                <Link to={`/attendence/${params.row._id}`} style={{ color: "inherit" }}>
                   View Attendence
                 </Link>
               </MenuItem>
