@@ -26,6 +26,7 @@ import { useState, useEffect } from "react";
 import SoftButton from "components/SoftButton";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useSoftUIController } from "examples/Navbars/DashboardNavbar";
 
 const CARD_PROPERTY = {
   borderRadius: 3,
@@ -54,6 +55,10 @@ function NoticeBoard({ signInTrue }) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const controller = useSoftUIController();
+
+  const user = controller[0].user;
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -101,7 +106,6 @@ function NoticeBoard({ signInTrue }) {
       children: "NA", // Default initials or placeholder
     };
   }
-
   return (
     <DashboardLayout>
       {signInTrue ? null : <DashboardNavbar />}
@@ -130,12 +134,14 @@ function NoticeBoard({ signInTrue }) {
                       Notice Board
                     </Typography>
                   </Box>
-                  <Link to="/notice/add-notice" underline="none" color="primary">
-                    <SoftButton variant="gradient" color="dark">
-                      <AddIcon />
-                      &nbsp;add new notice
-                    </SoftButton>
-                  </Link>
+                  {user && (
+                    <Link to="/notice/add-notice" underline="none" color="primary">
+                      <SoftButton variant="gradient" color="dark">
+                        <AddIcon />
+                        &nbsp;add new notice
+                      </SoftButton>
+                    </Link>
+                  )}
                 </Box>
                 <Box sx={{ height: "1px", width: "100%", bgcolor: grey[100] }}></Box>
                 <CardContent sx={{ p: 3, mb: 0 }}>

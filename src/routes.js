@@ -1,6 +1,5 @@
 // Hr Management Dashboard React layouts
 import Attendence from "layouts/attendence";
-import Leave from "layouts/leave";
 import SalarySlip from "layouts/salary";
 import NoticeBoard from "layouts/noticeBoard";
 import AddNotice from "layouts/noticeBoard/addnotice";
@@ -20,7 +19,6 @@ import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
 import BackHandIcon from '@mui/icons-material/BackHand';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 const routes = [
@@ -71,15 +69,6 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Leave",
-    key: "leave",
-    route: "/leave",
-    icon: <CalendarMonthIcon sx={{width: '16px'}} />,
-    component: <Leave />,
-    noCollapse: true,
-  },
-  {
-    type: "collapse",
     name: "Salary Slip",
     key: "salary",
     route: "/salary-slip",
@@ -87,7 +76,6 @@ const routes = [
     component: <SalarySlip />,
     noCollapse: true,
   },
-  { type: "title", title: "Account Pages", key: "account-pages" },
   {
     type: "collapse",
     name: "Profile",
@@ -98,13 +86,12 @@ const routes = [
     noCollapse: true,
   },
   {
-    type: "collapse",
+    type: "hidden",
     name: "Sign In",
     key: "sign-in",
     route: "/sign-in",
     icon: <Document size="12px" />,
     component: <SignIn />,
-    noCollapse: true,
   },
   {
     type: "hidden",
@@ -124,7 +111,7 @@ const routes = [
     type: "hidden",
     name: "Employees/",
     key: "employee",
-    route: "/manageEmployee/:id",
+    route: "/attendence/:id",
     component: <EmployeeDetail />,
   },
 ];

@@ -19,14 +19,14 @@ import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
 import typography from "assets/theme/base/typography";
 
 // Dashboard layout components
-import BuildByDevelopers from "layouts/attendence/components/BuildByDevelopers";
-import WorkWithTheRockets from "layouts/attendence/components/WorkWithTheRockets";
-import Projects from "layouts/attendence/components/Projects";
-import OrderOverview from "layouts/attendence/components/OrderOverview";
+import BuildByDevelopers from "layouts/holidayList/components/BuildByDevelopers";
+import WorkWithTheRockets from "layouts/holidayList/components/WorkWithTheRockets";
+import Projects from "layouts/holidayList/components/Projects";
+import OrderOverview from "layouts/holidayList/components/OrderOverview";
 
 // Data
-import reportsBarChartData from "layouts/attendence/data/reportsBarChartData";
-import gradientLineChartData from "layouts/attendence/data/gradientLineChartData";
+import reportsBarChartData from "layouts/holidayList/data/reportsBarChartData";
+import gradientLineChartData from "layouts/holidayList/data/gradientLineChartData";
 
 function HolidayList() {
   const { size } = typography;

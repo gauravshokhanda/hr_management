@@ -5,10 +5,15 @@ import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import NoticeBoard from "layouts/noticeBoard";
 import { Button, DialogContent } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import { API_URL } from "config";
+import axios from "axios";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { Box, Chip } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -16,33 +21,184 @@ import SoftTypography from "components/SoftTypography";
 
 // Hr Management Dashboard React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import DashboardNavbar, { useSoftUIController } from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import MiniStatisticsCard from "examples/Cards/StatisticsCards/MiniStatisticsCard";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
-import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
 
 // Hr Management Dashboard React base styles
 import typography from "assets/theme/base/typography";
 
-// Dashboard layout components
-import BuildByDevelopers from "layouts/attendence/components/BuildByDevelopers";
-import WorkWithTheRockets from "layouts/attendence/components/WorkWithTheRockets";
-import Projects from "layouts/attendence/components/Projects";
-import OrderOverview from "layouts/attendence/components/OrderOverview";
-
 // Data
-import reportsBarChartData from "layouts/attendence/data/reportsBarChartData";
-import gradientLineChartData from "layouts/attendence/data/gradientLineChartData";
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
+import { ResetTvSharp } from "@mui/icons-material";
+import { check } from "prettier";
+import storage from "redux-persist/lib/storage";
 
 function Attendence() {
   const { size } = typography;
-  const { chart, items } = reportsBarChartData;
-  const [open, setOpen] = useState(false);
   const [buttonShow, setButtonShow] = useState(false);
   const [signInTrue, setSignInTrue] = useState(false);
+  const [attendance, setAttendance] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [attendanceId, setAttendanceId] = useState("");
+  const [disableButton, setDisableButton] = useState(false);
+  const [attendanceData, setAttendanceData] = useState({
+    date: "",
+    checkIn: "",
+    checkOut: "",
+    breakStart: "",
+    breakEnd: "",
+    status: "",
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const controller = useSoftUIController();
+
+  const user = controller[0].user;
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+  const formatDay = (dateString) => {
+    const options = { weekday: "long" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+  const formatTime = (timeString) => {
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return new Date(timeString).toLocaleTimeString(undefined, options);
+  };
+
+  const fetchData = async () => {
+    if (user) {
+      try {
+        const response = await axios.get(`${API_URL}/employes/${user._id}/attendance`, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.status === 200) {
+          const employeeData = response.data.map((item) => ({
+            ...item,
+            day: formatDay(item.date),
+            date: formatDate(item.date),
+            checkIn: formatTime(item.checkIn)
+          }));
+
+          setAttendance(employeeData);
+          setAttendanceId(employeeData[0]._id);
+        }
+        console.log(response, "Attendence response");
+      } catch (error) {
+        console.error("There is some issue " + error);
+      }
+    }
+  };
+
+  const submitData = async () => {
+    if (user) {
+      if (attendanceId) {
+        try {
+          const response = await axios.put(
+            `${API_URL}/employes/${user._id}/attendance/${attendanceId}`,
+            attendanceData,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (response.status === 200) {
+            console.log(response, "Succesfully updated attendence");
+          }
+        } catch (error) {
+          console.log(error, "There is some error in submitting data");
+        }
+      } else {
+        try {
+          const response = await axios.post(
+            `${API_URL}/employes/${user._id}/attendance/`,
+            attendanceData,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (response.status === 200) {
+            console.log(response, "Succesfully submitted attendence");
+          }
+        } catch (error) {
+          console.log(error, "There is some error in submitting data");
+        }
+      }
+    }
+  };
+
+  const handleCheckIn = () => {
+    setAttendanceData((prevData) => ({
+      ...prevData,
+      date: new Date(),
+      status: "absent",
+      checkIn: new Date(),
+    }));
+    submitData();
+    setDisableButton(true);
+  };
+
+  const initialColumns = [
+    {
+      field: "date",
+      headerName: "Date",
+      width: 200,
+    },
+    {
+      field: "day",
+      headerName: "Day",
+      width: 120,
+    },
+    {
+      field: "checkIn",
+      headerName: "Checkin Time",
+      width: 150,
+    },
+    {
+      field: "checkOut",
+      headerName: "Checkout Time",
+      width: 150,
+    },
+    {
+      field: "breakStart",
+      headerName: "Break Start",
+      width: 150,
+    },
+    {
+      field: "breakEnd",
+      headerName: "Break End",
+      width: 150,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) => {
+        console.log(params.row.status);
+        return (
+          <Box>
+            {params.row.status === "absent" ? (
+              <Chip variant="filled" color="error" label="Absent" />
+            ) : (
+              <Chip variant="filled" color="success" label="Present" />
+            )}
+          </Box>
+        );
+      },
+    },
+  ];
 
   const location = useLocation();
   const currentPage = location.pathname;
@@ -61,7 +217,9 @@ function Attendence() {
   };
 
   useEffect(() => {
-    if (currentPage === "/attendence") {
+    const hasSeenDialog = localStorage.getItem("hasSeenDialog");
+
+    if (currentPage === "/attendence" && !hasSeenDialog) {
       handleClickOpen();
     }
   }, []);
@@ -69,105 +227,57 @@ function Attendence() {
   const handleClose = () => {
     setOpen(false);
     setSignInTrue(false);
+
+    localStorage.setItem("hasSeenDialog", "true");
   };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      {user && (
+        <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+          <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
+            <Avatar
+              src={`${API_URL}/${user.image}`}
+              sx={{ width: "60px", height: "60px", "& img": { height: "100%!important" } }}
+            />
+            <SoftTypography sx={{ textTransform: "capitalize" }} variant="h6">
+              {user.userName}
+            </SoftTypography>
+          </SoftBox>
+          <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
+            <SoftButton
+              disabled={!disableButton}
+              variant="contained"
+              color="info"
+              onClick={handleCheckIn}
+            >
+              Check In
+            </SoftButton>
+            <SoftButton variant="contained" color="warning">
+              Break In
+            </SoftButton>
+            <SoftButton variant="contained" color="warning">
+              Break Out
+            </SoftButton>
+            <SoftButton variant="contained" color="success">
+              Check Out
+            </SoftButton>
+          </SoftBox>
+        </SoftBox>
+      )}
       <SoftBox py={3}>
-        <SoftBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "today's money" }}
-                count="$53,000"
-                percentage={{ color: "success", text: "+55%" }}
-                icon={{ color: "info", component: "paid" }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "today's users" }}
-                count="2,300"
-                percentage={{ color: "success", text: "+3%" }}
-                icon={{ color: "info", component: "public" }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "new clients" }}
-                count="+3,462"
-                percentage={{ color: "error", text: "-2%" }}
-                icon={{ color: "info", component: "emoji_events" }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "sales" }}
-                count="$103,430"
-                percentage={{ color: "success", text: "+5%" }}
-                icon={{
-                  color: "info",
-                  component: "shopping_cart",
-                }}
-              />
-            </Grid>
-          </Grid>
-        </SoftBox>
-        <SoftBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={7}>
-              <BuildByDevelopers />
-            </Grid>
-            <Grid item xs={12} lg={5}>
-              <WorkWithTheRockets />
-            </Grid>
-          </Grid>
-        </SoftBox>
-        <SoftBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={5}>
-              <ReportsBarChart
-                title="active users"
-                description={
-                  <>
-                    (<strong>+23%</strong>) than last week
-                  </>
-                }
-                chart={chart}
-                items={items}
-              />
-            </Grid>
-            <Grid item xs={12} lg={7}>
-              <GradientLineChart
-                title="Sales Overview"
-                description={
-                  <SoftBox display="flex" alignItems="center">
-                    <SoftBox fontSize={size.lg} color="success" mb={0.3} mr={0.5} lineHeight={0}>
-                      <Icon className="font-bold">arrow_upward</Icon>
-                    </SoftBox>
-                    <SoftTypography variant="button" color="text" fontWeight="medium">
-                      4% more{" "}
-                      <SoftTypography variant="button" color="text" fontWeight="regular">
-                        in 2021
-                      </SoftTypography>
-                    </SoftTypography>
-                  </SoftBox>
-                }
-                height="20.25rem"
-                chart={gradientLineChartData}
-              />
-            </Grid>
-          </Grid>
-        </SoftBox>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={8}>
-            <Projects />
-          </Grid>
-          <Grid item xs={12} md={6} lg={4}>
-            <OrderOverview />
-          </Grid>
-        </Grid>
+        <DataGrid
+          rows={attendance}
+          columns={initialColumns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          autoHeight
+          components={{
+            Toolbar: GridToolbar,
+          }}
+          getRowId={(row) => row._id}
+        />
       </SoftBox>
       <Footer />
 
