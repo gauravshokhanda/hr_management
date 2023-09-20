@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 // @mui material components
@@ -28,9 +27,18 @@ import breakpoints from "assets/theme/base/breakpoints";
 import burceMars from "assets/images/bruce-mars.jpg";
 import curved0 from "assets/images/curved-images/curved0.jpg";
 
+import {
+  useSoftUIController,
+  setTransparentNavbar,
+  setMiniSidenav,
+  setOpenConfigurator,
+} from "context";
+import { API_URL } from "config";
+
 function Header() {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
+  const [controller, dispatch] = useSoftUIController();
 
   useEffect(() => {
     // A function that sets the orientation state of the tabs.
@@ -89,7 +97,7 @@ function Header() {
         <Grid container spacing={3} alignItems="center">
           <Grid item>
             <SoftAvatar
-              src={burceMars}
+              src={`${API_URL}/${controller.user?.image}`}
               alt="profile-image"
               variant="rounded"
               size="xl"
@@ -99,14 +107,14 @@ function Header() {
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
-                Alex Thompson
+                {controller.user?.firstName + " " + controller.user?.lastName}
               </SoftTypography>
               <SoftTypography variant="button" color="text" fontWeight="medium">
-                CEO / Co-Founder
+                {controller.user?.userName}
               </SoftTypography>
             </SoftBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
+          {/* <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
             <AppBar position="static">
               <Tabs
                 orientation={tabsOrientation}
@@ -119,7 +127,7 @@ function Header() {
                 <Tab label="Settings" icon={<Settings />} />
               </Tabs>
             </AppBar>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Card>
     </SoftBox>
