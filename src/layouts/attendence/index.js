@@ -42,6 +42,12 @@ function Attendence() {
   const [open, setOpen] = useState(false);
   const [attendanceId, setAttendanceId] = useState("");
   const [disableButton, setDisableButton] = useState(false);
+  const [todayRecords, setTodayRecords] = useState({
+    checkInTime: null,
+    checkOutTime: null,
+    breakInTime: null,
+    breakOutTime: null,
+  });
   const [attendanceData, setAttendanceData] = useState({
     date: "",
     checkIn: "",
@@ -68,7 +74,7 @@ function Attendence() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
   const formatTime = (timeString) => {
-    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    const options = { hour: "numeric", minute: "numeric", hour12: true };
     return new Date(timeString).toLocaleTimeString(undefined, options);
   };
 
@@ -86,7 +92,10 @@ function Attendence() {
             ...item,
             day: formatDay(item.date),
             date: formatDate(item.date),
-            checkIn: formatTime(item.checkIn)
+            checkIn: formatTime(item.checkIn),
+            checkOut: item.checkOut ? formatTime(item.checkOut) : "",
+            breakStart: formatTime(item.breakStart),
+            breakEnd: formatTime(item.breakEnd)
           }));
 
           setAttendance(employeeData);
@@ -101,40 +110,21 @@ function Attendence() {
 
   const submitData = async () => {
     if (user) {
-      if (attendanceId) {
-        try {
-          const response = await axios.put(
-            `${API_URL}/employes/${user._id}/attendance/${attendanceId}`,
-            attendanceData,
-            {
-              headers: {
-                Authorization: `${localStorage.getItem("token")}`,
-              },
-            }
-          );
-          if (response.status === 200) {
-            console.log(response, "Succesfully updated attendence");
+      try {
+        const response = await axios.post(
+          `${API_URL}/employes/${user._id}/attendance/`,
+          attendanceData,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
           }
-        } catch (error) {
-          console.log(error, "There is some error in submitting data");
+        );
+        if (response.status === 200) {
+          console.log(response, "Succesfully submitted attendence");
         }
-      } else {
-        try {
-          const response = await axios.post(
-            `${API_URL}/employes/${user._id}/attendance/`,
-            attendanceData,
-            {
-              headers: {
-                Authorization: `${localStorage.getItem("token")}`,
-              },
-            }
-          );
-          if (response.status === 200) {
-            console.log(response, "Succesfully submitted attendence");
-          }
-        } catch (error) {
-          console.log(error, "There is some error in submitting data");
-        }
+      } catch (error) {
+        console.log(error, "There is some error in submitting data");
       }
     }
   };
@@ -143,13 +133,37 @@ function Attendence() {
     setAttendanceData((prevData) => ({
       ...prevData,
       date: new Date(),
-      status: "absent",
+      status: "present",
       checkIn: new Date(),
     }));
-    submitData();
     setDisableButton(true);
   };
+  
+  const handleBreakIn = () => {
+    setAttendanceData((prevData) => {
+      return { ...prevData, breakStart: new Date() };
+    });
+  };
+  const handleBreakOut = () => {
+    setAttendanceData((prevData) => {
+      return { ...prevData, breakEnd: new Date() };
+    });
+  };
 
+  const handleCheckOut = async () => {
+    await setAttendanceData((prevData) => ({
+      ...prevData,
+      checkOut: new Date(),
+    }));
+    
+    // Log the updated attendanceData here to see if it has changed
+    console.log("After update:", attendanceData);
+  
+    submitData();
+    setDisableButton(false);
+  };
+  
+  
   const initialColumns = [
     {
       field: "date",
@@ -186,7 +200,6 @@ function Attendence() {
       headerName: "Status",
       width: 120,
       renderCell: (params) => {
-        console.log(params.row.status);
         return (
           <Box>
             {params.row.status === "absent" ? (
@@ -247,20 +260,20 @@ function Attendence() {
           </SoftBox>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
             <SoftButton
-              disabled={!disableButton}
+              disabled={disableButton}
               variant="contained"
               color="info"
               onClick={handleCheckIn}
             >
               Check In
             </SoftButton>
-            <SoftButton variant="contained" color="warning">
+            <SoftButton variant="contained" color="warning" onClick={handleBreakIn}>
               Break In
             </SoftButton>
-            <SoftButton variant="contained" color="warning">
+            <SoftButton variant="contained" color="warning" onClick={handleBreakOut}>
               Break Out
             </SoftButton>
-            <SoftButton variant="contained" color="success">
+            <SoftButton disabled={!disableButton} variant="contained" color="success" onClick={handleCheckOut}>
               Check Out
             </SoftButton>
           </SoftBox>
