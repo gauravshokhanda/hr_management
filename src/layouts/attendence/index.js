@@ -21,7 +21,7 @@ import SoftTypography from "components/SoftTypography";
 
 // Hr Management Dashboard React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar,{ useSoftUIController } from "examples/Navbars/DashboardNavbar";
+import DashboardNavbar, { useSoftUIController } from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // Hr Management Dashboard React base styles
@@ -30,12 +30,27 @@ import typography from "assets/theme/base/typography";
 // Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
+import { ResetTvSharp } from "@mui/icons-material";
+import { check } from "prettier";
+import storage from "redux-persist/lib/storage";
 
 function Attendence() {
   const { size } = typography;
   const [buttonShow, setButtonShow] = useState(false);
   const [signInTrue, setSignInTrue] = useState(false);
   const [attendance, setAttendance] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [attendanceId, setAttendanceId] = useState("");
+  const [disableButton, setDisableButton] = useState(false);
+  const [attendanceData, setAttendanceData] = useState({
+    date: "",
+    checkIn: "",
+    checkOut: "",
+    breakStart: "",
+    breakEnd: "",
+    status: "",
+  });
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -52,11 +67,13 @@ function Attendence() {
     const options = { weekday: "long" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
-  console.log(user, "Attendce controller");
+  const formatTime = (timeString) => {
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return new Date(timeString).toLocaleTimeString(undefined, options);
+  };
 
   const fetchData = async () => {
-    if(user) {
+    if (user) {
       try {
         const response = await axios.get(`${API_URL}/employes/${user._id}/attendance`, {
           headers: {
@@ -67,18 +84,70 @@ function Attendence() {
         if (response.status === 200) {
           const employeeData = response.data.map((item) => ({
             ...item,
-            checkinTime: "",
-            checkoutTime: "",
             day: formatDay(item.date),
             date: formatDate(item.date),
+            checkIn: formatTime(item.checkIn)
           }));
-  
+
           setAttendance(employeeData);
+          setAttendanceId(employeeData[0]._id);
         }
+        console.log(response, "Attendence response");
       } catch (error) {
         console.error("There is some issue " + error);
       }
     }
+  };
+
+  const submitData = async () => {
+    if (user) {
+      if (attendanceId) {
+        try {
+          const response = await axios.put(
+            `${API_URL}/employes/${user._id}/attendance/${attendanceId}`,
+            attendanceData,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (response.status === 200) {
+            console.log(response, "Succesfully updated attendence");
+          }
+        } catch (error) {
+          console.log(error, "There is some error in submitting data");
+        }
+      } else {
+        try {
+          const response = await axios.post(
+            `${API_URL}/employes/${user._id}/attendance/`,
+            attendanceData,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (response.status === 200) {
+            console.log(response, "Succesfully submitted attendence");
+          }
+        } catch (error) {
+          console.log(error, "There is some error in submitting data");
+        }
+      }
+    }
+  };
+
+  const handleCheckIn = () => {
+    setAttendanceData((prevData) => ({
+      ...prevData,
+      date: new Date(),
+      status: "absent",
+      checkIn: new Date(),
+    }));
+    submitData();
+    setDisableButton(true);
   };
 
   const initialColumns = [
@@ -93,13 +162,23 @@ function Attendence() {
       width: 120,
     },
     {
-      field: "checkinTime",
+      field: "checkIn",
       headerName: "Checkin Time",
       width: 150,
     },
     {
-      field: "checkoutTime",
+      field: "checkOut",
       headerName: "Checkout Time",
+      width: 150,
+    },
+    {
+      field: "breakStart",
+      headerName: "Break Start",
+      width: 150,
+    },
+    {
+      field: "breakEnd",
+      headerName: "Break End",
       width: 150,
     },
     {
@@ -138,7 +217,9 @@ function Attendence() {
   };
 
   useEffect(() => {
-    if (currentPage === "/attendence") {
+    const hasSeenDialog = localStorage.getItem("hasSeenDialog");
+
+    if (currentPage === "/attendence" && !hasSeenDialog) {
       handleClickOpen();
     }
   }, []);
@@ -146,6 +227,8 @@ function Attendence() {
   const handleClose = () => {
     setOpen(false);
     setSignInTrue(false);
+
+    localStorage.setItem("hasSeenDialog", "true");
   };
 
   return (
@@ -163,11 +246,19 @@ function Attendence() {
             </SoftTypography>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
-            <SoftButton variant="contained" color="info">
+            <SoftButton
+              disabled={!disableButton}
+              variant="contained"
+              color="info"
+              onClick={handleCheckIn}
+            >
               Check In
             </SoftButton>
             <SoftButton variant="contained" color="warning">
-              Break
+              Break In
+            </SoftButton>
+            <SoftButton variant="contained" color="warning">
+              Break Out
             </SoftButton>
             <SoftButton variant="contained" color="success">
               Check Out

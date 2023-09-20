@@ -59,6 +59,7 @@ function SignIn() {
         navigate("/attendence", { replace: true });
         dispatchSetToken(dispatch, response.data.token);
         setUser(dispatch, response.data.user);
+        localStorage.removeItem("hasSeenDialog");
       }
     } catch (error) {
       console.error(error, "There is some issue");

@@ -106,7 +106,6 @@ function NoticeBoard({ signInTrue }) {
       children: "NA", // Default initials or placeholder
     };
   }
-  console.log(user, "Notice Contorller");
   return (
     <DashboardLayout>
       {signInTrue ? null : <DashboardNavbar />}
