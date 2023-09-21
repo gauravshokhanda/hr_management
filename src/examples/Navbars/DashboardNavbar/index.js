@@ -79,8 +79,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const data = useSelector((state) => state.auth);
 
-  console.log(data.user, "selector");
-
   useEffect(() => {
     // Setting the navbar type
     if (fixedNavbar) {

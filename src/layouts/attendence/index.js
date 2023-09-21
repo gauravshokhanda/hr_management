@@ -31,78 +31,76 @@ import typography from "assets/theme/base/typography";
 // Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
-import { ResetTvSharp } from "@mui/icons-material";
-import { check } from "prettier";
-import storage from "redux-persist/lib/storage";
-
 
 function Attendence() {
-  const { size } = typography;
   const [buttonShow, setButtonShow] = useState(false);
   const [signInTrue, setSignInTrue] = useState(false);
   const [attendance, setAttendance] = useState([]);
   const [open, setOpen] = useState(false);
   const [attendanceId, setAttendanceId] = useState("");
-  const [disableButton, setDisableButton] = useState(false);
-  const [todayRecords, setTodayRecords] = useState({
-    checkInTime: "",
-    checkOutTime: "",
-    breakInTime: "",
-    breakOutTime: "",
-  });
   const data = useSelector((state) => state.auth);
-  
-  console.log(data.user, "selector");
-  const [attendanceData, setAttendanceData] = useState({
+
+  const [checkInData, setCheckInData] = useState({
     date: "",
     checkIn: "",
-    checkOut: "",
-    breakStart: "",
-    breakEnd: "",
     status: "",
   });
+  const [breakInData, setBreakInData] = useState({
+    attendanceId: attendanceId,
+    breakStart: "",
+  });
+  const [breakOutData, setBreakOutData] = useState({
+    attendanceId: attendanceId,
+    breakEnd: "",
+  });
+  const [checkOutData, setCheckOutData] = useState({
+    attendanceId: attendanceId,
+    checkOut: "",
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  console.log(attendanceId, "Attendence id");
 
+  
   const user = data.user;
-
+  
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+  
   const formatDay = (dateString) => {
     const options = { weekday: "long" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+  
   const formatTime = (timeString) => {
     const options = { hour: "numeric", minute: "numeric", hour12: true };
     return new Date(timeString).toLocaleTimeString(undefined, options);
   };
-
+  
   const fetchData = async () => {
     if (user) {
       try {
-        const response = await axios.get(`${API_URL}/employes/${user._id}/attendance`, {
+        const response = await axios.get(`${API_URL}/attendance/view/${user._id}`, {
           headers: {
             Authorization: `${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
         if (response.status === 200) {
-          const employeeData = response.data.map((item) => ({
+          console.log(response);
+          console.log(response, "response");
+          const attendenceData = response.data.map((item) => ({
             ...item,
-            day: formatDay(item.date),
-            date: formatDate(item.date),
-            checkIn: formatTime(item.checkIn),
+            day: item.checkIn ? formatDay(item.date) : "",
+            date: item.checkIn ? formatDate(item.date) : "",
+            checkIn: item.checkIn ? formatTime(item.checkIn) : "",
             checkOut: item.checkOut ? formatTime(item.checkOut) : "",
-            breakStart: formatTime(item.breakStart),
-            breakEnd: formatTime(item.breakEnd)
+            breakStart: item.breakStart ? formatTime(item.breakStart) : "",
+            breakEnd: item.breakEnd ? formatTime(item.breakEnd) : "",
           }));
-
-          setAttendance(employeeData);
-          setAttendanceId(employeeData[0]._id);
+          
+          setAttendance(attendenceData);
         }
         console.log(response, "Attendence response");
       } catch (error) {
@@ -110,19 +108,68 @@ function Attendence() {
       }
     }
   };
+  
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const submitData = async () => {
+  const submitCheckIn = async () => {
     if (user) {
       try {
-        const response = await axios.post(
-          `${API_URL}/employes/${user._id}/attendance/`,
-          attendanceData,
-          {
-            headers: {
-              Authorization: `${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await axios.post(`${API_URL}/attendance/checkin`, checkInData, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        });
+        if (response.status === 200) {
+          console.log(response, "Succesfully submitted attendence");
+        }
+      } catch (error) {
+        console.log(error, "There is some error in submitting data");
+      }
+    }
+  };
+
+  const submitBreakIn = async () => {
+    if (user) {
+      try {
+        const response = await axios.post(`${API_URL}/attendance/break`, breakInData, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        });
+        if (response.status === 200) {
+          console.log(response, "Succesfully submitted attendence");
+        }
+      } catch (error) {
+        console.log(error, "There is some error in submitting data");
+      }
+    }
+  };
+  const submitBreakOut = async () => {
+    if (user) {
+      try {
+        const response = await axios.post(`${API_URL}/attendance/breakend`, breakOutData, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        });
+        if (response.status === 200) {
+          console.log(response, "Succesfully submitted attendence");
+        }
+      } catch (error) {
+        console.log(error, "There is some error in submitting data");
+      }
+    }
+  };
+  const submitCheckOut = async () => {
+    if (user) {
+      try {
+        const response = await axios.post(`${API_URL}/attendance/checkout`, checkOutData, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        });
         if (response.status === 200) {
           console.log(response, "Succesfully submitted attendence");
         }
@@ -133,73 +180,61 @@ function Attendence() {
   };
 
   const handleCheckIn = () => {
-    setAttendanceData((prevData) => ({
+    setCheckInData((prevData) => ({
       ...prevData,
       date: new Date(),
       status: "present",
       checkIn: new Date(),
-    }));
-    setDisableButton(true);
-    setTodayRecords((prevData) => ({
-      ...prevData,
-      checkInTime: new Date(),
+      employeeId: user._id,
     }));
   };
   
   const handleBreakIn = () => {
-    setAttendanceData((prevData) => {
-      return { ...prevData, breakStart: new Date() };
-    });
-    setTodayRecords((prevData) => ({
+    setBreakInData((prevData) => ({
       ...prevData,
-      breakInTime: new Date(),
+      breakStart: new Date(),
     }));
   };
+  
   const handleBreakOut = () => {
-    setAttendanceData((prevData) => {
-      return { ...prevData, breakEnd: new Date() };
-    });
-    setTodayRecords((prevData) => ({
+    setBreakOutData((prevData) => ({
       ...prevData,
-      breakOutTime: new Date(),
+      breakEnd: new Date(),
     }));
   };
-
+  
   const handleCheckOut = () => {
-    setAttendanceData((prevData) => ({
+    setCheckOutData((prevData) => ({
       ...prevData,
       checkOut: new Date(),
     }));
-    setTodayRecords((prevData) => ({
-      ...prevData,
-      checkOutTime: new Date(),
-    }));
   };
+
+  useEffect(() => {
+    if (checkInData.checkIn) {
+      submitCheckIn();
+    }
+  }, [checkInData]);
   
   useEffect(() => {
-    if (attendanceData.checkOut) {
-      submitData();
-      setDisableButton(false);
+    if (breakInData.breakStart) {
+      submitBreakIn();
     }
-  }, [attendanceData.checkOut]);
-
-
-  const dummyRow = {
-    _id: "020202",
-    date: "Today",
-    day: todayRecords.checkInTime ? formatDay(todayRecords.checkInTime) : "",
-    checkIn: todayRecords.checkInTime ? formatTime(todayRecords.checkInTime) : "",
-    checkOut: todayRecords.checkOutTime ? formatTime(todayRecords.checkOutTime) : "",
-    breakStart: todayRecords.breakInTime ? formatTime(todayRecords.breakInTime) : "", 
-    breakEnd: todayRecords.breakOutTime ? formatTime(todayRecords.breakOutTime) : "",
-    status: todayRecords.checkInTime ? "present" : "absent",
-  };
-
-  // Add the dummy row to the beginning of the attendance data
-  const augmentedAttendance = [dummyRow, ...attendance];
-
+  }, [breakInData]);
   
+  useEffect(() => {
+    if (breakOutData.breakEnd) {
+      submitBreakOut();
+    }
+  }, [breakOutData]);
   
+  useEffect(() => {
+    if (checkOutData.checkOut) {
+      submitCheckOut();
+    }
+  }, [checkOutData]);
+
+
   const initialColumns = [
     {
       field: "date",
@@ -296,7 +331,6 @@ function Attendence() {
           </SoftBox>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
             <SoftButton
-              disabled={disableButton}
               variant="contained"
               color="info"
               onClick={handleCheckIn}
@@ -309,7 +343,11 @@ function Attendence() {
             <SoftButton variant="contained" color="warning" onClick={handleBreakOut}>
               Break Out
             </SoftButton>
-            <SoftButton disabled={!disableButton} variant="contained" color="success" onClick={handleCheckOut}>
+            <SoftButton
+              variant="contained"
+              color="success"
+              onClick={handleCheckOut}
+            >
               Check Out
             </SoftButton>
           </SoftBox>
@@ -317,7 +355,7 @@ function Attendence() {
       )}
       <SoftBox py={3}>
         <DataGrid
-          rows={augmentedAttendance}
+          rows={attendance}
           columns={initialColumns}
           pageSize={5}
           rowsPerPageOptions={[5]}

@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 // react-router components
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 // @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
+import { useDispatch, useSelector } from "react-redux";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -31,7 +33,6 @@ import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "contex
 
 // Images
 import brand from "assets/images/logo-ct.png";
-import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -39,7 +40,9 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const data = useSelector((state) => state.auth);
+  const user = data.user;
+
 
   // Cache for the rtl
   useMemo(() => {
@@ -61,15 +64,14 @@ export default function App() {
 
   const token = controller.token;
 
-  // Redirect to Sign In if the token is not present
-  // useEffect(() => {
-  //   // Redirect to Sign In if the token is not present
-  //   if (!token) {
-  //     navigate("/sign-in");
-  //   }
-  // }, [token, navigate]);
+  const navigate = useNavigate();
 
-  // Close sidenav when mouse leave mini sidenav
+  useEffect(() => {
+    if (!user) {
+      navigate("/sign-in");
+    }
+  }, [user, navigate]);
+
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {
       setMiniSidenav(dispatch, true);
@@ -92,17 +94,18 @@ export default function App() {
   }, [pathname]);
 
   const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
-      if (route.collapse) {
-        return getRoutes(route.collapse);
-      }
+  allRoutes.map((route) => {
+    if (route.collapse) {
+      return getRoutes(route.collapse);
+    }
+    
+    if (route.route) {
+      return <Route exact path={route.route} element={route.component} key={route.key} />;
+    }
+    
+    return null;
+  });
 
-      if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
-      }
-
-      return null;
-    });
 
   const configsButton = (
     <SoftBox
