@@ -1,7 +1,5 @@
 import * as React from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../../layouts/store/actions";
 import { API_URL } from "../../../config";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,13 +9,14 @@ import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import { useSoftUIController, dispatchSetToken, setUser } from "context";
 import * as yup from "yup";
-
-// Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 // Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 import { Switch } from "@mui/material";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setUserAndToken } from "../../../store/authSlice"; // Update the path
+import { clearUserAndToken } from "../../../store/authSlice";
 
 function SignIn() {
   const [rememberMe, setRememberMe] = useState(true);
@@ -28,6 +27,8 @@ function SignIn() {
   const navigate = useNavigate();
   const [controller, dispatch] = useSoftUIController();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const dispatchRedux = useDispatch();
 
   // Define Yup validation schema
   const validationSchema = yup.object().shape({
@@ -58,6 +59,7 @@ function SignIn() {
         console.log("Error cleared:", error);
         navigate("/attendence", { replace: true });
         dispatchSetToken(dispatch, response.data.token);
+        dispatchRedux(setUserAndToken({ user: response.data.user, token: response.data.token }));
         setUser(dispatch, response.data.user);
         localStorage.removeItem("hasSeenDialog");
       }

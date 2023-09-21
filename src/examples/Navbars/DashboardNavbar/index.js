@@ -44,7 +44,7 @@ import {
   setMiniSidenav,
   setOpenConfigurator,
 } from "context";
-
+import { useDispatch, useSelector } from "react-redux";
 // Images
 import team2 from "assets/images/team-2.jpg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
@@ -65,6 +65,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const data = useSelector((state) => state.auth);
+
+  console.log(data, "selector");
 
   useEffect(() => {
     // Setting the navbar type
@@ -288,4 +292,4 @@ DashboardNavbar.propTypes = {
 };
 
 export default DashboardNavbar;
-export {useSoftUIController};
+export { useSoftUIController };

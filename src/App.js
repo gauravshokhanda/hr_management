@@ -1,6 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { persistor, store } from "./layouts/store/store";
-
 // react-router components
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
