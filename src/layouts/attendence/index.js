@@ -14,6 +14,7 @@ import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
+import { useDispatch, useSelector } from "react-redux";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -21,7 +22,7 @@ import SoftTypography from "components/SoftTypography";
 
 // Hr Management Dashboard React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar, { useSoftUIController } from "examples/Navbars/DashboardNavbar";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // Hr Management Dashboard React base styles
@@ -34,6 +35,7 @@ import { ResetTvSharp } from "@mui/icons-material";
 import { check } from "prettier";
 import storage from "redux-persist/lib/storage";
 
+
 function Attendence() {
   const { size } = typography;
   const [buttonShow, setButtonShow] = useState(false);
@@ -43,11 +45,14 @@ function Attendence() {
   const [attendanceId, setAttendanceId] = useState("");
   const [disableButton, setDisableButton] = useState(false);
   const [todayRecords, setTodayRecords] = useState({
-    checkInTime: null,
-    checkOutTime: null,
-    breakInTime: null,
-    breakOutTime: null,
+    checkInTime: "",
+    checkOutTime: "",
+    breakInTime: "",
+    breakOutTime: "",
   });
+  const data = useSelector((state) => state.auth);
+  
+  console.log(data.user, "selector");
   const [attendanceData, setAttendanceData] = useState({
     date: "",
     checkIn: "",
@@ -61,9 +66,7 @@ function Attendence() {
     fetchData();
   }, []);
 
-  const controller = useSoftUIController();
-
-  const user = controller[0].user;
+  const user = data.user;
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -137,31 +140,64 @@ function Attendence() {
       checkIn: new Date(),
     }));
     setDisableButton(true);
+    setTodayRecords((prevData) => ({
+      ...prevData,
+      checkInTime: new Date(),
+    }));
   };
   
   const handleBreakIn = () => {
     setAttendanceData((prevData) => {
       return { ...prevData, breakStart: new Date() };
     });
+    setTodayRecords((prevData) => ({
+      ...prevData,
+      breakInTime: new Date(),
+    }));
   };
   const handleBreakOut = () => {
     setAttendanceData((prevData) => {
       return { ...prevData, breakEnd: new Date() };
     });
+    setTodayRecords((prevData) => ({
+      ...prevData,
+      breakOutTime: new Date(),
+    }));
   };
 
-  const handleCheckOut = async () => {
-    await setAttendanceData((prevData) => ({
+  const handleCheckOut = () => {
+    setAttendanceData((prevData) => ({
       ...prevData,
       checkOut: new Date(),
     }));
-    
-    // Log the updated attendanceData here to see if it has changed
-    console.log("After update:", attendanceData);
-  
-    submitData();
-    setDisableButton(false);
+    setTodayRecords((prevData) => ({
+      ...prevData,
+      checkOutTime: new Date(),
+    }));
   };
+  
+  useEffect(() => {
+    if (attendanceData.checkOut) {
+      submitData();
+      setDisableButton(false);
+    }
+  }, [attendanceData.checkOut]);
+
+
+  const dummyRow = {
+    _id: "020202",
+    date: "Today",
+    day: todayRecords.checkInTime ? formatDay(todayRecords.checkInTime) : "",
+    checkIn: todayRecords.checkInTime ? formatTime(todayRecords.checkInTime) : "",
+    checkOut: todayRecords.checkOutTime ? formatTime(todayRecords.checkOutTime) : "",
+    breakStart: todayRecords.breakInTime ? formatTime(todayRecords.breakInTime) : "", 
+    breakEnd: todayRecords.breakOutTime ? formatTime(todayRecords.breakOutTime) : "",
+    status: todayRecords.checkInTime ? "present" : "absent",
+  };
+
+  // Add the dummy row to the beginning of the attendance data
+  const augmentedAttendance = [dummyRow, ...attendance];
+
   
   
   const initialColumns = [
@@ -281,7 +317,7 @@ function Attendence() {
       )}
       <SoftBox py={3}>
         <DataGrid
-          rows={attendance}
+          rows={augmentedAttendance}
           columns={initialColumns}
           pageSize={5}
           rowsPerPageOptions={[5]}

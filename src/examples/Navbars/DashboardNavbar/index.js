@@ -18,6 +18,7 @@ import CardContent from "@mui/material/CardContent";
 import { CardMedia, MenuItem, Typography } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
+import { clearUserAndToken } from "store/authSlice";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -51,9 +52,11 @@ import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 import { Avatar } from "@mui/material";
 import { API_URL } from "config";
 
+
+
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
-  const [controller, dispatch] = useSoftUIController();
+  const [controller] = useSoftUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
@@ -66,9 +69,17 @@ function DashboardNavbar({ absolute, light, isMini }) {
     setAnchorEl(null);
   };
 
+  const dispatch = useDispatch();
+
+  const handleClickLogout = () => {
+    dispatch(clearUserAndToken());
+    localStorage.clear(); 
+    window.location.reload();
+  };
+
   const data = useSelector((state) => state.auth);
 
-  console.log(data, "selector");
+  console.log(data.user, "selector");
 
   useEffect(() => {
     // Setting the navbar type
@@ -159,7 +170,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               />
             </SoftBox>
             <SoftBox sx={{ display: "flex" }} color={light ? "white" : "inherit"}>
-              {controller.user ? (
+              {data.user ? (
                 <>
                   <Avatar
                     id="demo-positioned-button"
@@ -167,8 +178,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
                     onClick={handleClick}
-                    src={`${API_URL}/${controller.user.image}`}
-                    alt={controller.user.firstName}
+                    src={`${API_URL}/${data.user.image}`}
+                    alt={data.user.firstName}
                     sx={{
                       width: 30,
                       height: 30,
@@ -176,7 +187,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                         height: "100%!important",
                       },
                     }}
-                    title={controller.user.firstName}
+                    title={data.user.firstName}
                   />
                   <Menu
                     id="demo-positioned-menu"
@@ -202,10 +213,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
                         height: "140px",
                         mx: "auto",
                       }}
-                      image={`${API_URL}/${controller.user.image}`}
+                      image={`${API_URL}/${data.user.image}`}
                     />
                     <Typography gutterBottom sx={{ mt: 1 }} align="center" variant="h5">
-                      {controller.user.userName}
+                      {data.user.userName}
                     </Typography>
                     <Divider />
                     <CardContent>
@@ -220,7 +231,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                       >
                         <MenuItem onClick={handleClick}>Profile</MenuItem>
                         <MenuItem onClick={handleClick}>My account</MenuItem>
-                        <MenuItem onClick={handleClick}>Logout</MenuItem>
+                        <MenuItem onClick={handleClickLogout}>Logout</MenuItem>
                       </Stack>
                     </CardContent>
                   </Menu>
