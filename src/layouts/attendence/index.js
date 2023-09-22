@@ -15,6 +15,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { useDispatch, useSelector } from "react-redux";
+import moment from 'moment';
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -31,6 +32,7 @@ import typography from "assets/theme/base/typography";
 // Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
+import { TornadoRounded } from "@mui/icons-material";
 
 function Attendence() {
   const [buttonShow, setButtonShow] = useState(false);
@@ -38,6 +40,8 @@ function Attendence() {
   const [attendance, setAttendance] = useState([]);
   const [open, setOpen] = useState(false);
   const [attendanceId, setAttendanceId] = useState("");
+  const [todayAttendence, setTodayAttendence] = useState("");
+
   const data = useSelector((state) => state.auth);
 
   const [checkInData, setCheckInData] = useState({
@@ -46,38 +50,24 @@ function Attendence() {
     status: "",
   });
   const [breakInData, setBreakInData] = useState({
-    attendanceId: attendanceId,
+    attendanceId: "",
     breakStart: "",
   });
   const [breakOutData, setBreakOutData] = useState({
-    attendanceId: attendanceId,
-    breakEnd: "",
+    attendanceId: "",
+    breakEnd: "", 
   });
   const [checkOutData, setCheckOutData] = useState({
-    attendanceId: attendanceId,
+    attendanceId: "",
     checkOut: "",
   });
 
-  console.log(attendanceId, "Attendence id");
-
-  
   const user = data.user;
-  
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-  
-  const formatDay = (dateString) => {
-    const options = { weekday: "long" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-  
-  const formatTime = (timeString) => {
-    const options = { hour: "numeric", minute: "numeric", hour12: true };
-    return new Date(timeString).toLocaleTimeString(undefined, options);
-  };
-  
+
+  console.log(attendanceId, "Attendence Id");
+  console.log(attendance, "Attendence");
+
+
   const fetchData = async () => {
     if (user) {
       try {
@@ -87,32 +77,22 @@ function Attendence() {
             "Content-Type": "application/json",
           },
         });
-        if (response.status === 200) {
-          console.log(response);
-          console.log(response, "response");
-          const attendenceData = response.data.map((item) => ({
-            ...item,
-            day: item.checkIn ? formatDay(item.date) : "",
-            date: item.checkIn ? formatDate(item.date) : "",
-            checkIn: item.checkIn ? formatTime(item.checkIn) : "",
-            checkOut: item.checkOut ? formatTime(item.checkOut) : "",
-            breakStart: item.breakStart ? formatTime(item.breakStart) : "",
-            breakEnd: item.breakEnd ? formatTime(item.breakEnd) : "",
-          }));
-          
-          setAttendance(attendenceData);
+        if (response.status === 200) {          
+          setAttendance(response.data);
+
+          const lastAttendence = response.data.pop();
+          setAttendanceId(lastAttendence._id)
         }
-        console.log(response, "Attendence response");
       } catch (error) {
         console.error("There is some issue " + error);
       }
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
-
+  
   const submitCheckIn = async () => {
     if (user) {
       try {
@@ -188,24 +168,27 @@ function Attendence() {
       employeeId: user._id,
     }));
   };
-  
+
   const handleBreakIn = () => {
     setBreakInData((prevData) => ({
       ...prevData,
+      attendanceId: attendanceId,
       breakStart: new Date(),
     }));
   };
-  
+
   const handleBreakOut = () => {
     setBreakOutData((prevData) => ({
       ...prevData,
+      attendanceId: attendanceId,
       breakEnd: new Date(),
     }));
   };
-  
+
   const handleCheckOut = () => {
     setCheckOutData((prevData) => ({
       ...prevData,
+      attendanceId: attendanceId,
       checkOut: new Date(),
     }));
   };
@@ -215,56 +198,79 @@ function Attendence() {
       submitCheckIn();
     }
   }, [checkInData]);
-  
+
   useEffect(() => {
     if (breakInData.breakStart) {
       submitBreakIn();
     }
   }, [breakInData]);
-  
+
   useEffect(() => {
     if (breakOutData.breakEnd) {
       submitBreakOut();
     }
   }, [breakOutData]);
-  
+
   useEffect(() => {
     if (checkOutData.checkOut) {
       submitCheckOut();
     }
   }, [checkOutData]);
 
-
   const initialColumns = [
     {
       field: "date",
       headerName: "Date",
       width: 200,
+      renderCell: (params) => {
+        const date = params.row.date;
+        return date ? moment(date).format('ll') : "";
+      }
     },
     {
       field: "day",
       headerName: "Day",
       width: 120,
+      renderCell: (params) => {
+        const date = params.row.date;
+        return date ? moment(date).format('dddd') : "";
+      } 
     },
     {
       field: "checkIn",
       headerName: "Checkin Time",
       width: 150,
+      renderCell: (params) => {
+        const time = params.row.checkIn;
+        return time ? moment(time).format('LT') : "";
+      } 
     },
     {
       field: "checkOut",
       headerName: "Checkout Time",
       width: 150,
+      renderCell: (params) => {
+        const time = params.row.checkOut;
+        return time ? moment(time).format('LT') : "";
+      } 
     },
     {
       field: "breakStart",
       headerName: "Break Start",
       width: 150,
+      renderCell: (params) => {
+        const time = params.row.breakStart;
+        return time ? moment(time).format('LT') : "";
+      } 
     },
     {
       field: "breakEnd",
       headerName: "Break End",
       width: 150,
+      renderCell: (params) => {
+        const time = params.row.breakEnd;
+        return time ? moment(time).format('LT') : "";
+      } 
     },
     {
       field: "status",
@@ -330,11 +336,7 @@ function Attendence() {
             </SoftTypography>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
-            <SoftButton
-              variant="contained"
-              color="info"
-              onClick={handleCheckIn}
-            >
+            <SoftButton variant="contained" color="info" onClick={handleCheckIn}>
               Check In
             </SoftButton>
             <SoftButton variant="contained" color="warning" onClick={handleBreakIn}>
@@ -343,11 +345,7 @@ function Attendence() {
             <SoftButton variant="contained" color="warning" onClick={handleBreakOut}>
               Break Out
             </SoftButton>
-            <SoftButton
-              variant="contained"
-              color="success"
-              onClick={handleCheckOut}
-            >
+            <SoftButton variant="contained" color="success" onClick={handleCheckOut}>
               Check Out
             </SoftButton>
           </SoftBox>
