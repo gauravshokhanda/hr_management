@@ -7,7 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import NoticeBoard from "layouts/noticeBoard";
-import { Button, DialogContent } from "@mui/material";
+import { Button, DialogContent, Stack } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { API_URL } from "config";
 import axios from "axios";
@@ -71,59 +71,65 @@ function Attendence() {
   const todayDate = new Date();
 
   const isTodayAttendance =
-  todayAttendence && moment(todayAttendence.date).format("L") === moment(todayDate).format("L");
-const isCheckIn = isTodayAttendance && todayAttendence.checkIn;
-const isBreakStart = isTodayAttendance ? todayAttendence.breakStart : [];
-const isBreakEnd = isTodayAttendance ? todayAttendence.breakEnd : [];
-const isCheckOut = isTodayAttendance && todayAttendence.checkOut;
+    todayAttendence && moment(todayAttendence.date).format("L") === moment(todayDate).format("L");
+  const isCheckIn = isTodayAttendance && todayAttendence.checkIn;
+  const isBreakStart = isTodayAttendance ? todayAttendence.breakStart : [];
+  const isBreakEnd = isTodayAttendance ? todayAttendence.breakEnd : [];
+  const isCheckOut = isTodayAttendance && todayAttendence.checkOut;
 
-console.log(isBreakStart.length, "length");
-console.log(isBreakEnd.length, "end");
 
-useEffect(() => {
-  // Disable all buttons initially
-  setCheckInBtn(true);
-  setBreakInBtn(false);
-  setBreakEndBtn(false);
-  setCheckOutBtn(false);
 
-  if (!isCheckIn && isTodayAttendance) {
+
+
+
+
+  useEffect(() => {
+    // Disable all buttons initially
     setCheckInBtn(true);
-  }
-
-  if (isCheckIn) {
-    setCheckInBtn(false);
-    setCheckOutBtn(true);
-    if (isBreakStart.length === isBreakEnd.length) {
-      setBreakInBtn(true);
-    }
-  }
-}, [isCheckIn, isTodayAttendance, isBreakStart.length, isBreakEnd.length]);
-
-useEffect(() => {
-  if (isCheckIn && isBreakStart.length === isBreakEnd.length) {
-    setBreakInBtn(true);
-  }
-}, [isCheckIn, isBreakStart.length, isBreakEnd.length]);
-
-useEffect(() => {
-  if (isBreakEnd.length < isBreakStart.length ) {
-    setCheckOutBtn(true);
-    setBreakEndBtn(true);
-  }
-}, [isBreakStart.length, isBreakEnd.length]);
-
-useEffect(() => {
-  if (!isCheckOut && isTodayAttendance) {
-    setCheckOutBtn(true);
-  }
-  if (isCheckOut && isTodayAttendance) {
-    setCheckInBtn(false);
     setBreakInBtn(false);
     setBreakEndBtn(false);
     setCheckOutBtn(false);
-  }
-}, [isCheckOut, isTodayAttendance]);
+
+    if (!isCheckIn && isTodayAttendance) {
+      setCheckInBtn(true);
+    }
+
+    if (isCheckIn) {
+      setCheckInBtn(false);
+      setCheckOutBtn(true);
+      if (isBreakStart.length === isBreakEnd.length) {
+        setBreakInBtn(true);
+      }
+    }
+  }, [isCheckIn, isTodayAttendance, isBreakStart.length, isBreakEnd.length]);
+
+  useEffect(() => {
+    if (isCheckIn && isBreakStart.length === isBreakEnd.length) {
+      setBreakInBtn(true);
+      setBreakEndBtn(false);
+    }
+  }, [isCheckIn, isBreakStart.length, isBreakEnd.length]);
+  
+
+  useEffect(() => {
+    if (isBreakEnd.length < isBreakStart.length) {
+      setCheckOutBtn(true);
+      setBreakEndBtn(true);
+      setBreakInBtn(false);
+    }
+  }, [isBreakStart.length, isBreakEnd.length]);
+
+  useEffect(() => {
+    if (!isCheckOut && isTodayAttendance) {
+      setCheckOutBtn(true);
+    }
+    if (isCheckOut && isTodayAttendance) {
+      setCheckInBtn(false);
+      setBreakInBtn(false);
+      setBreakEndBtn(false);
+      setCheckOutBtn(false);
+    }
+  }, [isCheckOut, isTodayAttendance]);
 
   const fetchData = async () => {
     if (user) {
@@ -148,7 +154,7 @@ useEffect(() => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [attendance]);
 
   const submitCheckIn = async () => {
     if (user) {
@@ -312,25 +318,32 @@ useEffect(() => {
       },
     },
     {
-      field: "breakStart",
-      headerName: "Break Start",
-      width: 150,
+      headerName: "Break Time",
+      width: 360,
       renderCell: (params) => {
-        const time = params.row.breakStart;
-        time.map((item) => {
-          return item ? moment(item).format("LT") : "";
-        })
-      },
-    },
-    {
-      field: "breakEnd",
-      headerName: "Break End",
-      width: 150,
-      renderCell: (params) => {
-        const time = params.row.breakEnd;
-        time.map((item) => {
-          return item ? moment(item).format("LT") : "";
-        })
+        const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
+        const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
+
+        if (breakStarts && breakEnds) {
+          const formattedBreakTimes = [];
+
+          for (let i = 0; i < breakStarts.length; i++) {
+            const formattedStart = moment(breakStarts[i]).format("LT");
+            const formattedEnd = moment(breakEnds[i]).format("LT");
+            formattedBreakTimes.push(`${formattedStart} - ${formattedEnd ? formattedEnd : ""}`);
+          }
+
+          return (
+            <Stack direction="row" spacing={2}>
+              {formattedBreakTimes.slice(0, 2).map((breakTime, index) => (
+                <Chip key={index} label={breakTime} />
+              ))}
+              {formattedBreakTimes.length > 2 && <Chip label={`...`} />}
+            </Stack>
+          );          
+        }
+
+        return "N/A"; // Handle the case where breakStarts or breakEnds are missing
       },
     },
     {
