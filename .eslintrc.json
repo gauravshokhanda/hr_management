@@ -19,11 +19,8 @@
     "react"
   ],
   "rules": {
-    // Add your project-specific ESLint rules here
-    // For example:
-    // "indent": ["error", 2],
-    // "quotes": ["error", "single"],
-    // "semi": ["error", "always"]
+    "no-unused-vars": "off", 
+    "react/react-in-jsx-scope": "off"
   },
   "settings": {
     "react": {

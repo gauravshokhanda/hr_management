@@ -1,20 +1,17 @@
-// @mui material components
-import Grid from "@mui/material/Grid";
-import Icon from "@mui/material/Icon";
+import React from "react";
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import NoticeBoard from "layouts/noticeBoard";
-import { Button, DialogContent, Stack } from "@mui/material";
+import { DialogContent, Stack } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import moment from "moment";
 
 // Hr Management Dashboard React components
@@ -25,14 +22,8 @@ import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-
-// Hr Management Dashboard React base styles
-import typography from "assets/theme/base/typography";
-
-// Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
-import { TornadoRounded } from "@mui/icons-material";
 
 function Attendence() {
   const [buttonShow, setButtonShow] = useState(false);
@@ -154,7 +145,7 @@ function Attendence() {
 
   useEffect(() => {
     fetchData();
-  }, [attendance]);
+  }, []);
 
   const submitCheckIn = async () => {
     if (user) {
@@ -231,8 +222,7 @@ function Attendence() {
       employeeId: user._id,
     }));
   };
-
-  const handleBreakIn = () => {
+const handleBreakIn = () => {
     setBreakInData((prevData) => ({
       ...prevData,
       attendanceId: attendanceId,
@@ -323,16 +313,20 @@ function Attendence() {
       renderCell: (params) => {
         const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
         const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
-
+    
+        console.log(breakStarts, "Start ");
+        console.log(breakEnds, "End");
+    
         if (breakStarts && breakEnds) {
           const formattedBreakTimes = [];
-
+    
           for (let i = 0; i < breakStarts.length; i++) {
-            const formattedStart = moment(breakStarts[i]).format("LT");
-            const formattedEnd = moment(breakEnds[i]).format("LT");
-            formattedBreakTimes.push(`${formattedStart} - ${formattedEnd ? formattedEnd : ""}`);
+            const breakStartTime = moment(breakStarts[i]).format("LT");
+            const breakEndTime = breakEnds.length > i ? moment(breakEnds[i]).format("LT") : null;
+    
+            formattedBreakTimes.push(`${breakStartTime} - ${breakEndTime}`);
           }
-
+    
           return (
             <Stack direction="row" spacing={2}>
               {formattedBreakTimes.slice(0, 2).map((breakTime, index) => (
@@ -342,10 +336,10 @@ function Attendence() {
             </Stack>
           );          
         }
-
+    
         return "N/A"; // Handle the case where breakStarts or breakEnds are missing
       },
-    },
+    },    
     {
       field: "status",
       headerName: "Status",

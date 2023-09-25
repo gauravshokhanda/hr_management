@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect, useMemo } from "react";
 // react-router components
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import { Navigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -43,8 +44,9 @@ export default function App() {
   const data = useSelector((state) => state.auth);
   const user = data.user;
 
+  const isAdmin = user.isAdmin; 
 
-  // Cache for the rtl
+  // Cache for the rtl    
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",
@@ -62,8 +64,6 @@ export default function App() {
     }
   };
 
-  const token = controller.token;
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +78,10 @@ export default function App() {
       setOnMouseEnter(false);
     }
   };
+
+  const filteredRoutes = isAdmin
+    ? routes // If user is an admin, all routes are accessible
+    : routes.filter((route) => !route.adminOnly);
 
   // Change the openConfigurator state
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
@@ -141,7 +145,7 @@ export default function App() {
               color={sidenavColor}
               brand={brand}
               brandName="Hr Management Dashboard"
-              routes={routes}
+              routes={filteredRoutes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
             />
@@ -151,7 +155,7 @@ export default function App() {
         )}
         {layout === "vr" && <Configurator />}
         <Routes>
-          {getRoutes(routes)}
+          {getRoutes(filteredRoutes)}
           <Route path="*" element={<Navigate to="/attendence" />} />
         </Routes>
       </ThemeProvider>
@@ -165,7 +169,7 @@ export default function App() {
             color={sidenavColor}
             brand={brand}
             brandName="Hr Management Dashboard"
-            routes={routes}
+            routes={filteredRoutes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
@@ -174,8 +178,9 @@ export default function App() {
         </>
       )}
       {layout === "vr" && <Configurator />}
+      {/* {isAdmin ? } */}
       <Routes>
-        {getRoutes(routes)}
+        {getRoutes(filteredRoutes)}
         <Route path="*" element={<Navigate to="/attendence" />} />
       </Routes>
     </ThemeProvider>
