@@ -1,7 +1,7 @@
 // Hr Management Dashboard React layouts
 import React from "react";
 import Attendence from "layouts/attendence";
-import SalarySlip from "layouts/salary";
+import Salary from "layouts/salary";
 import NoticeBoard from "layouts/noticeBoard";
 import AddNotice from "layouts/noticeBoard/addnotice";
 import HolidayList from "layouts/holidayList";
@@ -79,7 +79,7 @@ const routes = [
     key: "salary",
     route: "/salary",
     icon: <AccountBalanceWalletIcon sx={{width: '14px'}}  />,
-    component: <SalarySlip />,
+    component: <Salary />,
     adminOnly: false,
     noCollapse: true,
   },
