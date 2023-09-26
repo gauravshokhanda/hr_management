@@ -75,9 +75,9 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Salary Slip",
+    name: "Salary",
     key: "salary",
-    route: "/salary-slip",
+    route: "/salary",
     icon: <AccountBalanceWalletIcon sx={{width: '14px'}}  />,
     component: <SalarySlip />,
     adminOnly: false,
@@ -116,7 +116,7 @@ const routes = [
     key: "add-notice",
     route: "/notice/add-notice",
     component: <AddNotice />,
-    adminOnly: false,
+    adminOnly: true,
   },
   {
     type: "hidden",

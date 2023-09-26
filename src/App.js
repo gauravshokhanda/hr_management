@@ -44,7 +44,7 @@ export default function App() {
   const data = useSelector((state) => state.auth);
   const user = data.user;
 
-  const isAdmin = user.isAdmin; 
+  const isAdmin = user ? user.isAdmin : false; 
 
   // Cache for the rtl    
   useMemo(() => {
@@ -97,8 +97,8 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
-  const getRoutes = (allRoutes) =>
-  allRoutes.map((route) => {
+  const getRoutes = (filteredRoutes) =>
+  filteredRoutes.map((route) => {
     if (route.collapse) {
       return getRoutes(route.collapse);
     }

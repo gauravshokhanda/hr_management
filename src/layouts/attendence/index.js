@@ -68,12 +68,6 @@ function Attendence() {
   const isBreakEnd = isTodayAttendance ? todayAttendence.breakEnd : [];
   const isCheckOut = isTodayAttendance && todayAttendence.checkOut;
 
-
-
-
-
-
-
   useEffect(() => {
     // Disable all buttons initially
     setCheckInBtn(true);
@@ -100,7 +94,6 @@ function Attendence() {
       setBreakEndBtn(false);
     }
   }, [isCheckIn, isBreakStart.length, isBreakEnd.length]);
-  
 
   useEffect(() => {
     if (isBreakEnd.length < isBreakStart.length) {
@@ -222,7 +215,7 @@ function Attendence() {
       employeeId: user._id,
     }));
   };
-const handleBreakIn = () => {
+  const handleBreakIn = () => {
     setBreakInData((prevData) => ({
       ...prevData,
       attendanceId: attendanceId,
@@ -313,20 +306,20 @@ const handleBreakIn = () => {
       renderCell: (params) => {
         const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
         const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
-    
+
         console.log(breakStarts, "Start ");
         console.log(breakEnds, "End");
-    
+
         if (breakStarts && breakEnds) {
           const formattedBreakTimes = [];
-    
+
           for (let i = 0; i < breakStarts.length; i++) {
             const breakStartTime = moment(breakStarts[i]).format("LT");
             const breakEndTime = breakEnds.length > i ? moment(breakEnds[i]).format("LT") : null;
-    
+
             formattedBreakTimes.push(`${breakStartTime} - ${breakEndTime}`);
           }
-    
+
           return (
             <Stack direction="row" spacing={2}>
               {formattedBreakTimes.slice(0, 2).map((breakTime, index) => (
@@ -334,12 +327,12 @@ const handleBreakIn = () => {
               ))}
               {formattedBreakTimes.length > 2 && <Chip label={`...`} />}
             </Stack>
-          );          
+          );
         }
-    
+
         return "N/A"; // Handle the case where breakStarts or breakEnds are missing
       },
-    },    
+    },
     {
       field: "status",
       headerName: "Status",
@@ -446,6 +439,12 @@ const handleBreakIn = () => {
           pageSize={5}
           rowsPerPageOptions={[5]}
           autoHeight
+          sortModel={[
+            {
+              field: "date",
+              sort: "desc",
+            },
+          ]}
           components={{
             Toolbar: GridToolbar,
           }}
