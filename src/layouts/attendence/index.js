@@ -15,8 +15,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { useDispatch, useSelector } from "react-redux";
-import moment from 'moment';
-
+import moment from "moment";
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -28,11 +27,13 @@ import Footer from "examples/Footer";
 
 // Hr Management Dashboard React base styles
 import typography from "assets/theme/base/typography";
-
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 // Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
 import { TornadoRounded } from "@mui/icons-material";
+import io from "socket.io-client";
 
 function Attendence() {
   const [buttonShow, setButtonShow] = useState(false);
@@ -43,6 +44,7 @@ function Attendence() {
   const [todayAttendence, setTodayAttendence] = useState("");
 
   const data = useSelector((state) => state.auth);
+  const socket = io(API_URL);
 
   const [checkInData, setCheckInData] = useState({
     date: "",
@@ -55,18 +57,41 @@ function Attendence() {
   });
   const [breakOutData, setBreakOutData] = useState({
     attendanceId: "",
-    breakEnd: "", 
+    breakEnd: "",
   });
   const [checkOutData, setCheckOutData] = useState({
     attendanceId: "",
     checkOut: "",
   });
 
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+
+  const displayNotification = (message) => {
+    setNotificationMessage(message);
+    setNotificationOpen(true);
+  };
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
   const user = data.user;
+  useEffect(() => {
+    // Listen for attendance updates from the server
+    socket.on("attendanceUpdate", (data) => {
+      // Display a notification to the user when an update is received
+      console.log("Received attendance update:", data);
 
-  console.log(attendanceId, "Attendence Id");
-  console.log(attendance, "Attendence");
+      // You can use a notification library (e.g., Snackbar, toast) to display notifications to the user
+      // Example: displayNotification(data.message);
+    });
 
+    return () => {
+      // Disconnect the Socket.io client when the component unmounts
+      socket.disconnect();
+    };
+  }, []);
 
   const fetchData = async () => {
     if (user) {
@@ -77,11 +102,11 @@ function Attendence() {
             "Content-Type": "application/json",
           },
         });
-        if (response.status === 200) {          
+        if (response.status === 200) {
           setAttendance(response.data);
 
           const lastAttendence = response.data.pop();
-          setAttendanceId(lastAttendence._id)
+          setAttendanceId(lastAttendence._id);
         }
       } catch (error) {
         console.error("There is some issue " + error);
@@ -92,7 +117,7 @@ function Attendence() {
   useEffect(() => {
     fetchData();
   }, []);
-  
+
   const submitCheckIn = async () => {
     if (user) {
       try {
@@ -224,8 +249,8 @@ function Attendence() {
       width: 200,
       renderCell: (params) => {
         const date = params.row.date;
-        return date ? moment(date).format('ll') : "";
-      }
+        return date ? moment(date).format("ll") : "";
+      },
     },
     {
       field: "day",
@@ -233,8 +258,8 @@ function Attendence() {
       width: 120,
       renderCell: (params) => {
         const date = params.row.date;
-        return date ? moment(date).format('dddd') : "";
-      } 
+        return date ? moment(date).format("dddd") : "";
+      },
     },
     {
       field: "checkIn",
@@ -242,8 +267,8 @@ function Attendence() {
       width: 150,
       renderCell: (params) => {
         const time = params.row.checkIn;
-        return time ? moment(time).format('LT') : "";
-      } 
+        return time ? moment(time).format("LT") : "";
+      },
     },
     {
       field: "checkOut",
@@ -251,8 +276,8 @@ function Attendence() {
       width: 150,
       renderCell: (params) => {
         const time = params.row.checkOut;
-        return time ? moment(time).format('LT') : "";
-      } 
+        return time ? moment(time).format("LT") : "";
+      },
     },
     {
       field: "breakStart",
@@ -260,8 +285,8 @@ function Attendence() {
       width: 150,
       renderCell: (params) => {
         const time = params.row.breakStart;
-        return time ? moment(time).format('LT') : "";
-      } 
+        return time ? moment(time).format("LT") : "";
+      },
     },
     {
       field: "breakEnd",
@@ -269,8 +294,8 @@ function Attendence() {
       width: 150,
       renderCell: (params) => {
         const time = params.row.breakEnd;
-        return time ? moment(time).format('LT') : "";
-      } 
+        return time ? moment(time).format("LT") : "";
+      },
     },
     {
       field: "status",
@@ -351,6 +376,20 @@ function Attendence() {
           </SoftBox>
         </SoftBox>
       )}
+      <Snackbar
+        open={notificationOpen}
+        autoHideDuration={5000} // Adjust the duration as needed
+        onClose={handleCloseNotification}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleCloseNotification}
+          severity="info" // Adjust the severity as needed
+        >
+          {notificationMessage}
+        </MuiAlert>
+      </Snackbar>
       <SoftBox py={3}>
         <DataGrid
           rows={attendance}
