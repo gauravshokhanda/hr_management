@@ -1,21 +1,19 @@
-// @mui material components
-import Grid from "@mui/material/Grid";
-import Icon from "@mui/material/Icon";
+import React from "react";
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import NoticeBoard from "layouts/noticeBoard";
-import { Button, DialogContent } from "@mui/material";
+import { DialogContent, Stack } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import moment from "moment";
+
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -39,6 +37,10 @@ function Attendence() {
   const [buttonShow, setButtonShow] = useState(false);
   const [signInTrue, setSignInTrue] = useState(false);
   const [attendance, setAttendance] = useState([]);
+  const [checkInBtn, setCheckInBtn] = useState(false);
+  const [breakInBtn, setBreakInBtn] = useState(false);
+  const [breakEndBtn, setBreakEndBtn] = useState(false);
+  const [checkOutBtn, setCheckOutBtn] = useState(false);
   const [open, setOpen] = useState(false);
   const [attendanceId, setAttendanceId] = useState("");
   const [todayAttendence, setTodayAttendence] = useState("");
@@ -92,6 +94,61 @@ function Attendence() {
       socket.disconnect();
     };
   }, []);
+  const todayDate = new Date();
+
+  const isTodayAttendance =
+    todayAttendence && moment(todayAttendence.date).format("L") === moment(todayDate).format("L");
+  const isCheckIn = isTodayAttendance && todayAttendence.checkIn;
+  const isBreakStart = isTodayAttendance ? todayAttendence.breakStart : [];
+  const isBreakEnd = isTodayAttendance ? todayAttendence.breakEnd : [];
+  const isCheckOut = isTodayAttendance && todayAttendence.checkOut;
+
+  useEffect(() => {
+    // Disable all buttons initially
+    setCheckInBtn(true);
+    setBreakInBtn(false);
+    setBreakEndBtn(false);
+    setCheckOutBtn(false);
+
+    if (!isCheckIn && isTodayAttendance) {
+      setCheckInBtn(true);
+    }
+
+    if (isCheckIn) {
+      setCheckInBtn(false);
+      setCheckOutBtn(true);
+      if (isBreakStart.length === isBreakEnd.length) {
+        setBreakInBtn(true);
+      }
+    }
+  }, [isCheckIn, isTodayAttendance, isBreakStart.length, isBreakEnd.length]);
+
+  useEffect(() => {
+    if (isCheckIn && isBreakStart.length === isBreakEnd.length) {
+      setBreakInBtn(true);
+      setBreakEndBtn(false);
+    }
+  }, [isCheckIn, isBreakStart.length, isBreakEnd.length]);
+
+  useEffect(() => {
+    if (isBreakEnd.length < isBreakStart.length) {
+      setCheckOutBtn(true);
+      setBreakEndBtn(true);
+      setBreakInBtn(false);
+    }
+  }, [isBreakStart.length, isBreakEnd.length]);
+
+  useEffect(() => {
+    if (!isCheckOut && isTodayAttendance) {
+      setCheckOutBtn(true);
+    }
+    if (isCheckOut && isTodayAttendance) {
+      setCheckInBtn(false);
+      setBreakInBtn(false);
+      setBreakEndBtn(false);
+      setCheckOutBtn(false);
+    }
+  }, [isCheckOut, isTodayAttendance]);
 
   const fetchData = async () => {
     if (user) {
@@ -103,10 +160,10 @@ function Attendence() {
           },
         });
         if (response.status === 200) {
+          const lastAttendance = response.data.slice(-1)[0];
           setAttendance(response.data);
-
-          const lastAttendence = response.data.pop();
-          setAttendanceId(lastAttendence._id);
+          setAttendanceId(lastAttendance._id);
+          setTodayAttendence(lastAttendance);
         }
       } catch (error) {
         console.error("There is some issue " + error);
@@ -193,7 +250,6 @@ function Attendence() {
       employeeId: user._id,
     }));
   };
-
   const handleBreakIn = () => {
     setBreakInData((prevData) => ({
       ...prevData,
@@ -280,21 +336,36 @@ function Attendence() {
       },
     },
     {
-      field: "breakStart",
-      headerName: "Break Start",
-      width: 150,
+      headerName: "Break Time",
+      width: 360,
       renderCell: (params) => {
-        const time = params.row.breakStart;
-        return time ? moment(time).format("LT") : "";
-      },
-    },
-    {
-      field: "breakEnd",
-      headerName: "Break End",
-      width: 150,
-      renderCell: (params) => {
-        const time = params.row.breakEnd;
-        return time ? moment(time).format("LT") : "";
+        const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
+        const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
+
+        console.log(breakStarts, "Start ");
+        console.log(breakEnds, "End");
+
+        if (breakStarts && breakEnds) {
+          const formattedBreakTimes = [];
+
+          for (let i = 0; i < breakStarts.length; i++) {
+            const breakStartTime = moment(breakStarts[i]).format("LT");
+            const breakEndTime = breakEnds.length > i ? moment(breakEnds[i]).format("LT") : null;
+
+            formattedBreakTimes.push(`${breakStartTime} - ${breakEndTime}`);
+          }
+
+          return (
+            <Stack direction="row" spacing={2}>
+              {formattedBreakTimes.slice(0, 2).map((breakTime, index) => (
+                <Chip key={index} label={breakTime} />
+              ))}
+              {formattedBreakTimes.length > 2 && <Chip label={`...`} />}
+            </Stack>
+          );
+        }
+
+        return "N/A"; // Handle the case where breakStarts or breakEnds are missing
       },
     },
     {
@@ -361,16 +432,36 @@ function Attendence() {
             </SoftTypography>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
-            <SoftButton variant="contained" color="info" onClick={handleCheckIn}>
+            <SoftButton
+              disabled={!checkInBtn}
+              variant="contained"
+              color="info"
+              onClick={handleCheckIn}
+            >
               Check In
             </SoftButton>
-            <SoftButton variant="contained" color="warning" onClick={handleBreakIn}>
+            <SoftButton
+              disabled={!breakInBtn}
+              variant="contained"
+              color="warning"
+              onClick={handleBreakIn}
+            >
               Break In
             </SoftButton>
-            <SoftButton variant="contained" color="warning" onClick={handleBreakOut}>
+            <SoftButton
+              disabled={!breakEndBtn}
+              variant="contained"
+              color="warning"
+              onClick={handleBreakOut}
+            >
               Break Out
             </SoftButton>
-            <SoftButton variant="contained" color="success" onClick={handleCheckOut}>
+            <SoftButton
+              disabled={!checkOutBtn}
+              variant="contained"
+              color="success"
+              onClick={handleCheckOut}
+            >
               Check Out
             </SoftButton>
           </SoftBox>
@@ -397,10 +488,23 @@ function Attendence() {
           pageSize={5}
           rowsPerPageOptions={[5]}
           autoHeight
+          sortModel={[
+            {
+              field: "date",
+              sort: "desc",
+            },
+          ]}
           components={{
             Toolbar: GridToolbar,
           }}
           getRowId={(row) => row._id}
+          sx={{
+            "& .MuiDataGrid-footerContainer": {
+              "& .MuiInputBase-root": {
+                width: "auto!Important",
+              },
+            },
+          }}
         />
       </SoftBox>
       <Footer />

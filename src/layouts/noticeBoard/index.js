@@ -26,7 +26,7 @@ import { useState, useEffect } from "react";
 import SoftButton from "components/SoftButton";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useSoftUIController } from "examples/Navbars/DashboardNavbar";
+import { useSelector } from "react-redux";
 
 const CARD_PROPERTY = {
   borderRadius: 3,
@@ -51,15 +51,14 @@ function NoticeBoard({ signInTrue }) {
       console.log("There is some error in fetching data ", error);
     }
   };
+  const data = useSelector((state) => state.auth);
+  const user = data.user;
+
   console.log(notice, "notices");
   useEffect(() => {
     fetchData();
   }, []);
-
-  const controller = useSoftUIController();
-
-  const user = controller[0].user;
-
+  
   function formatDate(dateString) {
     const date = new Date(dateString);
     const options = { weekday: "long", month: "long", day: "numeric" };
@@ -134,14 +133,14 @@ function NoticeBoard({ signInTrue }) {
                       Notice Board
                     </Typography>
                   </Box>
-                  {user && (
+                  {user.isAdmin ? (
                     <Link to="/notice/add-notice" underline="none" color="primary">
                       <SoftButton variant="gradient" color="dark">
                         <AddIcon />
                         &nbsp;add new notice
                       </SoftButton>
                     </Link>
-                  )}
+                  ) : null}
                 </Box>
                 <Box sx={{ height: "1px", width: "100%", bgcolor: grey[100] }}></Box>
                 <CardContent sx={{ p: 3, mb: 0 }}>

@@ -3,7 +3,7 @@ import SoftBox from "components/SoftBox";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Avatar, Box, Chip, Stack } from "@mui/material";
+import { Avatar, Chip, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import SoftButton from "components/SoftButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -25,8 +25,6 @@ export default function EmployesTable() {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
-  const open = Boolean(anchorEl);
 
   const handleClick = (event, rowId) => {
     setAnchorEl(event.currentTarget);
@@ -133,6 +131,18 @@ export default function EmployesTable() {
     {
       field: "salary",
       headerName: "Salary",
+      sortable: true,
+      width: 100,
+    },
+    {
+      field: "accountNumber",
+      headerName: "Account Number",
+      sortable: true,
+      width: 100,
+    },
+    {
+      field: "ifscCode",
+      headerName: "IFSC Code",
       sortable: true,
       width: 100,
     },
