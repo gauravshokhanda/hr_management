@@ -44,9 +44,10 @@ export default function App() {
   const data = useSelector((state) => state.auth);
   const user = data.user;
 
-  const isAdmin = user ? user.isAdmin : false; 
+  // Cache for the rtl
+  const isAdmin = user ? user.isAdmin : false;
 
-  // Cache for the rtl    
+  // Cache for the rtl
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",
@@ -98,18 +99,17 @@ export default function App() {
   }, [pathname]);
 
   const getRoutes = (filteredRoutes) =>
-  filteredRoutes.map((route) => {
-    if (route.collapse) {
-      return getRoutes(route.collapse);
-    }
-    
-    if (route.route) {
-      return <Route exact path={route.route} element={route.component} key={route.key} />;
-    }
-    
-    return null;
-  });
+    filteredRoutes.map((route) => {
+      if (route.collapse) {
+        return getRoutes(route.collapse);
+      }
 
+      if (route.route) {
+        return <Route exact path={route.route} element={route.component} key={route.key} />;
+      }
+
+      return null;
+    });
 
   const configsButton = (
     <SoftBox

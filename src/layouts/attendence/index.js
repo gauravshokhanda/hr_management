@@ -22,8 +22,16 @@ import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+
+// Hr Management Dashboard React base styles
+import typography from "assets/theme/base/typography";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+// Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
+import { TornadoRounded } from "@mui/icons-material";
+import io from "socket.io-client";
 
 function Attendence() {
   const [buttonShow, setButtonShow] = useState(false);
@@ -38,6 +46,7 @@ function Attendence() {
   const [todayAttendence, setTodayAttendence] = useState("");
 
   const data = useSelector((state) => state.auth);
+  const socket = io(API_URL);
 
   const [checkInData, setCheckInData] = useState({
     date: "",
@@ -57,8 +66,34 @@ function Attendence() {
     checkOut: "",
   });
 
-  const user = data.user;
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
+  const displayNotification = (message) => {
+    setNotificationMessage(message);
+    setNotificationOpen(true);
+  };
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const user = data.user;
+  useEffect(() => {
+    // Listen for attendance updates from the server
+    socket.on("attendanceUpdate", (data) => {
+      // Display a notification to the user when an update is received
+      console.log("Received attendance update:", data);
+
+      // You can use a notification library (e.g., Snackbar, toast) to display notifications to the user
+      // Example: displayNotification(data.message);
+    });
+
+    return () => {
+      // Disconnect the Socket.io client when the component unmounts
+      socket.disconnect();
+    };
+  }, []);
   const todayDate = new Date();
 
   const isTodayAttendance =
@@ -432,6 +467,20 @@ function Attendence() {
           </SoftBox>
         </SoftBox>
       )}
+      <Snackbar
+        open={notificationOpen}
+        autoHideDuration={5000} // Adjust the duration as needed
+        onClose={handleCloseNotification}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleCloseNotification}
+          severity="info" // Adjust the severity as needed
+        >
+          {notificationMessage}
+        </MuiAlert>
+      </Snackbar>
       <SoftBox py={3}>
         <DataGrid
           rows={attendance}
