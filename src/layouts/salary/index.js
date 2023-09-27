@@ -11,13 +11,14 @@ import { Box, Card, CardMedia, Dialog, Stack, Typography } from "@mui/material";
 import curved14 from "assets/images/curved-images/curved14.jpg";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { PDFViewer } from "@react-pdf/renderer";
+import { PDFDownloadLink, PDFViewer, pdf } from "@react-pdf/renderer";
 import EditIcon from "@mui/icons-material/Edit";
 import SoftButton from "components/SoftButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
 import SalarySlip from "layouts/salary/salary-slip";
+import { saveAs } from "file-saver";
 
 function Salary() {
   const [salaryData, setSalaryData] = useState([]);
@@ -44,30 +45,6 @@ function Salary() {
     setOpenedMenuRow(null);
   };
   // Define a function to download the salary slip PDF
-  const downloadSalarySlip = () => {
-    // Check if there is selected row data
-    if (selectedRowData) {
-      // Generate the PDF content using your SalarySlip component
-      const pdfBlob = generatePdf(selectedRowData);
-
-      // Create a blob URL for the PDF
-      const pdfUrl = window.URL.createObjectURL(pdfBlob);
-
-      // Create an anchor element to trigger the download
-      const a = document.createElement("a");
-      a.style.display = "none";
-      a.href = pdfUrl;
-      a.download = "salary_slip.pdf"; // Specify the file name
-      document.body.appendChild(a);
-
-      // Trigger the download
-      a.click();
-
-      // Clean up the URL and remove the anchor element
-      window.URL.revokeObjectURL(pdfUrl);
-      document.body.removeChild(a);
-    }
-  };
 
   const isAdmin = data?.user?.isAdmin || false;
 
@@ -163,6 +140,10 @@ function Salary() {
           handleClickOpenDailog();
         };
 
+        const handleViewSalarySlipDownload = () => {
+          generatePdf(params.row);
+        };
+
         return (
           <Stack spacing={2}>
             <SoftButton
@@ -185,7 +166,17 @@ function Salary() {
               }}
             >
               <MenuItem onClick={handleViewSalarySlipClick}>View Salary Slip</MenuItem>
-              <MenuItem onClick={downloadSalarySlip}>Download</MenuItem>
+              <MenuItem onClick={handleViewSalarySlipDownload}>Download Salary Slip</MenuItem>
+              {isAdmin ? (
+                <>
+                  <MenuItem>
+                    <Link to={`/salary/create-salary/${params.row.employeeId}`} style={{ color: "inherit" }}>
+                      Create Salary
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleViewSalarySlipDownload}>Delete Salary</MenuItem>
+                </>
+              ) : null}
             </Menu>
           </Stack>
         );
@@ -193,11 +184,16 @@ function Salary() {
     },
   ];
 
-  function generatePdf() {
-    return (
-      <SalarySlip salaryData={selectedRowData} />
-    );
-  }
+  const generatePdf = async (rowData) => {
+    if (rowData) {
+      try {
+        const pdfBlob = await pdf(<SalarySlip salaryData={rowData} />).toBlob();
+        saveAs(pdfBlob, `${rowData.employeeName}_salary_slip.pdf`);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      }
+    }
+  };
 
   return (
     <DashboardLayout>

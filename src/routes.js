@@ -2,6 +2,7 @@
 import React from "react";
 import Attendence from "layouts/attendence";
 import Salary from "layouts/salary";
+import CreateSalary from "layouts/salary/createSalarry";
 import NoticeBoard from "layouts/noticeBoard";
 import AddNotice from "layouts/noticeBoard/addnotice";
 import HolidayList from "layouts/holidayList";
@@ -120,10 +121,18 @@ const routes = [
   },
   {
     type: "hidden",
-    name: "Employees/",
+    name: "Employees",
     key: "employee",
     route: "/attendence/:id",
     component: <EmployeeDetail />,
+    adminOnly: false,
+  },
+  {
+    type: "hidden",
+    name: "Create Salary",
+    key: "createSalary",
+    route: "/salary/create-salary/:id",
+    component: <CreateSalary />,
     adminOnly: false,
   },
 ];
