@@ -12,7 +12,7 @@ import curved14 from "assets/images/curved-images/curved14.jpg";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { PDFViewer } from "@react-pdf/renderer";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import SoftButton from "components/SoftButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -26,6 +26,7 @@ function Salary() {
   const [open, setOpen] = useState(false);
   const [openedMenuRow, setOpenedMenuRow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRowData, setSelectedRowData] = useState(null);
 
   const handleCloseDailog = () => {
     setOpen(!open);
@@ -33,7 +34,6 @@ function Salary() {
   const handleClickOpenDailog = () => {
     setOpen(true);
   };
-
   const handleClick = (event, rowId) => {
     setAnchorEl(event.currentTarget);
     setOpenedMenuRow(rowId);
@@ -43,20 +43,51 @@ function Salary() {
     setAnchorEl(null);
     setOpenedMenuRow(null);
   };
+  // Define a function to download the salary slip PDF
+  const downloadSalarySlip = () => {
+    // Check if there is selected row data
+    if (selectedRowData) {
+      // Generate the PDF content using your SalarySlip component
+      const pdfBlob = generatePdf(selectedRowData);
 
+      // Create a blob URL for the PDF
+      const pdfUrl = window.URL.createObjectURL(pdfBlob);
+
+      // Create an anchor element to trigger the download
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = pdfUrl;
+      a.download = "salary_slip.pdf"; // Specify the file name
+      document.body.appendChild(a);
+
+      // Trigger the download
+      a.click();
+
+      // Clean up the URL and remove the anchor element
+      window.URL.revokeObjectURL(pdfUrl);
+      document.body.removeChild(a);
+    }
+  };
+
+  const isAdmin = data?.user?.isAdmin || false;
 
   // In your fetchData function
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/salary/view-salary/${userId}`, {
-        headers: {
-          Authorization: `${data.token}`,
-        },
-      });
+      const response = await axios.get(
+        isAdmin
+          ? `${API_URL}/salary/view/employees-salary`
+          : `${API_URL}/salary/view-salary/${userId}`,
+        {
+          headers: {
+            Authorization: `${data.token}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         console.log("Successfully found user");
-        setSalaryData([response.data]);
+        setSalaryData(isAdmin ? response.data : [response.data]);
       }
     } catch (error) {
       console.log("Something went wrong " + error);
@@ -127,6 +158,11 @@ function Salary() {
         const rowId = params.row._id;
         const isOpen = openedMenuRow === rowId;
 
+        const handleViewSalarySlipClick = () => {
+          setSelectedRowData(params.row);
+          handleClickOpenDailog();
+        };
+
         return (
           <Stack spacing={2}>
             <SoftButton
@@ -135,7 +171,7 @@ function Salary() {
               aria-expanded={isOpen ? "true" : undefined}
               onClick={(event) => handleClick(event, rowId)}
               iconOnly
-              variant="contained" // Fix the typo here
+              variant="contained"
             >
               <EditIcon />
             </SoftButton>
@@ -148,20 +184,20 @@ function Salary() {
                 "aria-labelledby": "basic-button",
               }}
             >
-              <MenuItem onClick={handleClickOpenDailog}>
-                View Salary Slip
-              </MenuItem>
-              <MenuItem>
-                <Link to={`/attendence/${params.row._id}`} style={{ color: "inherit" }}>
-                  View Attendence
-                </Link>
-              </MenuItem>
+              <MenuItem onClick={handleViewSalarySlipClick}>View Salary Slip</MenuItem>
+              <MenuItem onClick={downloadSalarySlip}>Download</MenuItem>
             </Menu>
           </Stack>
         );
       },
     },
   ];
+
+  function generatePdf() {
+    return (
+      <SalarySlip salaryData={selectedRowData} />
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -188,7 +224,7 @@ function Salary() {
                 rows={salaryData}
                 columns={initialColumns}
                 pageSize={5}
-                rowsPerPageOptions={[5]}  
+                rowsPerPageOptions={[5]}
                 autoHeight
                 components={{
                   Toolbar: GridToolbar,
@@ -208,13 +244,19 @@ function Salary() {
       </SoftBox>
 
       {/* Modal Pdf View */}
-      <Dialog fullWidth maxWidth='800px' sx={{
-        '& iframe' : {
-          height: '900px'
-        }
-      }} onClose={handleCloseDailog} open={open}>
+      <Dialog
+        fullWidth
+        maxWidth="800px"
+        sx={{
+          "& iframe": {
+            height: "900px",
+          },
+        }}
+        onClose={handleCloseDailog}
+        open={open}
+      >
         <PDFViewer onClose={handleCloseDailog} open={open}>
-          <SalarySlip salaryData={salaryData[0]}/>
+          <SalarySlip salaryData={selectedRowData} />
         </PDFViewer>
       </Dialog>
       <Footer />
