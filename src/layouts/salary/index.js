@@ -188,7 +188,7 @@ function Salary() {
                 rows={salaryData}
                 columns={initialColumns}
                 pageSize={5}
-                rowsPerPageOptions={[5]}
+                rowsPerPageOptions={[5]}  
                 autoHeight
                 components={{
                   Toolbar: GridToolbar,
@@ -208,7 +208,7 @@ function Salary() {
       </SoftBox>
 
       {/* Modal Pdf View */}
-      <Dialog fullWidth maxWidth='1200px' sx={{
+      <Dialog fullWidth maxWidth='800px' sx={{
         '& iframe' : {
           height: '900px'
         }
