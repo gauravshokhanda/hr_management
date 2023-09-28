@@ -10,7 +10,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-export default function EmployesTable() {
+export default function EmployesTable({setSelectedRowIds, selectedRowIds}) {
   const [employees, setEmployees] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openedMenuRow, setOpenedMenuRow] = useState(null);
@@ -68,11 +68,8 @@ export default function EmployesTable() {
       headerName: "User Image",
       width: 130,
       renderCell: (params) => {
-        console.log(params, "User image");
-        return (
-          <Avatar src={`${API_URL}/${params.row.image}`} alt={params.row.userName} />
-        )
-      }
+        return <Avatar src={`${API_URL}/${params.row.image}`} alt={params.row.userName} />;
+      },
     },
     {
       field: "firstName",
@@ -185,6 +182,14 @@ export default function EmployesTable() {
                   View Attendence
                 </Link>
               </MenuItem>
+              <MenuItem key="create-salary">
+                <Link
+                  to={`/salary/create-salary/${params.row._id}`}
+                  style={{ color: "inherit" }}
+                >
+                  Create Salary
+                </Link>
+              </MenuItem>
               <MenuItem>Delete Employee</MenuItem>
             </Menu>
           </Stack>
@@ -192,6 +197,7 @@ export default function EmployesTable() {
       },
     },
   ];
+
 
   return (
     <SoftBox>
@@ -205,6 +211,11 @@ export default function EmployesTable() {
           Toolbar: GridToolbar,
         }}
         getRowId={(row) => row._id}
+        checkboxSelection
+        rowSelectionModel={selectedRowIds}
+        onRowSelectionModelChange={(newSelectionModel) => {
+          setSelectedRowIds(newSelectionModel);
+        }}
       />
     </SoftBox>
   );

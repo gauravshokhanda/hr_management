@@ -12,7 +12,7 @@ import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 
-function CreateSalary() {
+export default function CreateSalary() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFromData] = useState({
@@ -98,6 +98,4 @@ function CreateSalary() {
       </SoftBox>
     </DashboardLayout>
   );
-}
-
-export default CreateSalary;
+};

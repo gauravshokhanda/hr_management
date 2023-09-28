@@ -71,6 +71,17 @@ function Salary() {
     }
   };
 
+  const getDetailPanelContent = (params) => {
+    // Customize the content you want to display when a row is expanded
+    return (
+      <div>
+        <p>Additional Information:</p>
+        <p>Salary: {params.row.salary}</p>
+        {/* Add more details here */}
+      </div>
+    );
+  };
+
   useEffect(() => {
     fetchData();
   }, [userId, data]);
@@ -82,6 +93,26 @@ function Salary() {
   }, [data, userId]);
 
   const initialColumns = [
+    {
+      field: "expand",
+      headerName: "",
+      sortable: false,
+      width: 50,
+      renderCell: (params) => {
+        // Debugging logs
+        console.log("Row object:", params.row);
+        console.log("Available methods:", Object.keys(params));
+      
+        return (
+          <div>
+            <button onClick={() => params.api.getRow(params.id).setExpanded(!params.api.getRow(params.id).isExpanded)}>
+              {params.api.getRow(params.id).isExpanded ? "-" : "+"}
+            </button>
+          </div>
+        );
+      },
+        
+    },
     {
       field: "employeeName",
       headerName: "Name",
@@ -144,6 +175,10 @@ function Salary() {
           generatePdf(params.row);
         };
 
+        const handleDeleteSalary = () => {
+          deleteSalary(params.row);
+        };
+
         return (
           <Stack spacing={2}>
             <SoftButton
@@ -167,16 +202,16 @@ function Salary() {
             >
               <MenuItem onClick={handleViewSalarySlipClick}>View Salary Slip</MenuItem>
               <MenuItem onClick={handleViewSalarySlipDownload}>Download Salary Slip</MenuItem>
-              {isAdmin ? (
-                <>
-                  <MenuItem>
-                    <Link to={`/salary/create-salary/${params.row.employeeId}`} style={{ color: "inherit" }}>
-                      Create Salary
-                    </Link>
-                  </MenuItem>
-                  <MenuItem onClick={handleViewSalarySlipDownload}>Delete Salary</MenuItem>
-                </>
-              ) : null}
+              {isAdmin
+                ? [
+                    <MenuItem key="delete-salary" onClick={handleDeleteSalary}>
+                      Edit Salary
+                    </MenuItem>,
+                    <MenuItem key="delete-salary" onClick={handleDeleteSalary}>
+                      Delete Salary
+                    </MenuItem>,
+                  ]
+                : null}
             </Menu>
           </Stack>
         );
@@ -191,6 +226,26 @@ function Salary() {
         saveAs(pdfBlob, `${rowData.employeeName}_salary_slip.pdf`);
       } catch (error) {
         console.error("Error generating PDF:", error);
+      }
+    }
+  };
+
+  const deleteSalary = async (rowData) => {
+    console.log(rowData, "Delete");
+
+    const deleteBodyData = {
+      employeeId: rowData.employeeId,
+      _id: rowData._id,
+    };
+
+    console.log(deleteBodyData, "Body Data");
+    if (rowData) {
+      try {
+        const response = await axios.delete(`${API_URL}/salary/delete-salary/`, {
+          data: deleteBodyData,
+        });
+      } catch (error) {
+        console.error("Error Deleting Salary:", error);
       }
     }
   };
@@ -225,6 +280,7 @@ function Salary() {
                 components={{
                   Toolbar: GridToolbar,
                 }}
+                
                 getRowId={(row) => row._id}
                 sx={{
                   "& .MuiDataGrid-footerContainer": {
