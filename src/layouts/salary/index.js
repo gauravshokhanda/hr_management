@@ -1,38 +1,68 @@
 import React, { useEffect, useState } from "react";
-import Paper from "@mui/material/Paper";
-import { DataGrid } from "@mui/x-data-grid";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import SoftBox from "components/SoftBox";
+import Grid from "@mui/material/Grid";
 import { useSelector } from "react-redux";
+import SoftBox from "components/SoftBox";
+import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
+import Footer from "examples/Footer";
 import axios from "axios";
 import { API_URL } from "config";
-import CustomRow from "./customRow.js";
-import SalarySlip from "layouts/salary/salary-slip";
-import { saveAs } from "file-saver";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { PDFDownloadLink, PDFViewer, pdf } from "@react-pdf/renderer";
 import { Box, Dialog, IconButton, Stack } from "@mui/material";
+import curved14 from "assets/images/curved-images/curved14.jpg";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import EditIcon from "@mui/icons-material/Edit";
 import SoftButton from "components/SoftButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import EditIcon from "@mui/icons-material/Edit";
-import Footer from "examples/Footer/index.js";
+import SalarySlip from "layouts/salary/salary-slip";
+import { saveAs } from "file-saver";
+import { PDFViewer, pdf } from "@react-pdf/renderer";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { Link } from "react-router-dom";
 
-export default function CollapsibleTable() {
-  const data = useSelector((state) => state.auth);
-
+function Salary() {
   const [salaryData, setSalaryData] = useState([]);
   const [userId, setUserId] = useState("");
-  const [openedMenuRow, setOpenedMenuRow] = useState(null);
+  const data = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
+  const [openedMenuRow, setOpenedMenuRow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRowData, setSelectedRowData] = useState(null);
-  const [tableOpen, setTableOpen] = useState(false);
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [employeeId, setEmployeeId] = useState("");
 
+  const toggleExpand = (row) => {
+    setEmployeeId(row.employeeId);
+    if (expandedRow === row._id) {
+      setExpandedRow(null);
+    } else {
+      setExpandedRow(row._id);
+    }
+  };
 
-  console.log(salaryData, "Salary Data");
+  console.log(employeeId, "Employee id");
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        isAdmin
+          ? `${API_URL}/salary/view/employees-salary`
+          : `${API_URL}/salary/view-salary/${userId}`,
+        {
+          headers: {
+            Authorization: `${data.token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("Successfully found user");
+        setSalaryData(isAdmin ? response.data : [response.data]);
+      }
+    } catch (error) {
+      console.log("Something went wrong " + error);
+    }
+  };
 
   const handleCloseDailog = () => {
     setOpen(!open);
@@ -50,63 +80,6 @@ export default function CollapsibleTable() {
     setOpenedMenuRow(null);
   };
 
-  const generatePdf = async (rowData) => {
-    if (rowData) {
-      try {
-        const pdfBlob = await pdf(<SalarySlip salaryData={rowData} />).toBlob();
-        saveAs(pdfBlob, `${rowData.employeeName}_salary_slip.pdf`);
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-      }
-    }
-  };
-
-  const deleteSalary = async (rowData) => {
-    console.log(rowData, "Delete");
-
-    const deleteBodyData = {
-      employeeId: rowData.employeeId,
-      _id: rowData._id,
-    };
-
-    console.log(deleteBodyData, "Body Data");
-    if (rowData) {
-      try {
-        const response = await axios.delete(`${API_URL}/salary/delete-salary/`, {
-          data: deleteBodyData,
-        });
-      } catch (error) {
-        console.error("Error Deleting Salary:", error);
-      }
-    }
-  };
-
-  const isAdmin = data?.user?.isAdmin || false;
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        isAdmin
-          ? `${API_URL}/salary/view/employees-salary`
-          : `${API_URL}/salary/view-salary/${userId}`,
-        {
-          headers: {
-            Authorization: `${data.token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        console.log("Successfully found user");
-        const responseData = isAdmin ? response.data : [response.data];
-        setSalaryData(responseData);
-
-      }
-    } catch (error) {
-      console.log("Something went wrong " + error);
-    }
-  };
-
   useEffect(() => {
     fetchData();
   }, [userId, data]);
@@ -119,26 +92,9 @@ export default function CollapsibleTable() {
 
   const initialColumns = [
     {
-      field: "expand",
-      headerName: "Expand",
-      width: 130,
-      renderCell: (params) => {
-        return (
-          <div>
-            <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!tableOpen)}>
-              {tableOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </div>
-        );
-      },
-    },
-    {
       field: "employeeName",
       headerName: "Name",
       width: 130,
-      renderCell: (params) => {
-        console.log("params:", params);
-      }
     },
     {
       field: "monthlySalary",
@@ -184,89 +140,272 @@ export default function CollapsibleTable() {
       field: "action",
       headerName: "Action",
       width: 160,
-      renderCell: (params) => {
-        const rowId = params.row._id;
-        const isOpen = openedMenuRow === rowId;
-
-        const handleViewSalarySlipClick = () => {
-          setSelectedRowData(params.row);
-          handleClickOpenDailog();
-        };
-
-        const handleViewSalarySlipDownload = () => {
-          generatePdf(params.row);
-        };
-
-        const handleDeleteSalary = () => {
-          deleteSalary(params.row);
-        };
-
-        return (
-          <Stack spacing={2}>
-            <SoftButton
-              aria-controls={isOpen ? "basic-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={isOpen ? "true" : undefined}
-              onClick={(event) => handleClick(event, rowId)}
-              iconOnly
-              variant="contained"
-            >
-              <EditIcon />
-            </SoftButton>
-            <Menu
-              id="basic-menu"
-              anchorEl={anchorEl}
-              open={isOpen}
-              onClose={handleClose}
-              MenuListProps={{
-                "aria-labelledby": "basic-button",
-              }}
-            >
-              <MenuItem onClick={handleViewSalarySlipClick}>View Salary Slip</MenuItem>
-              <MenuItem onClick={handleViewSalarySlipDownload}>Download Salary Slip</MenuItem>
-              {isAdmin
-                ? [
-                    <MenuItem key="delete-salary" onClick={handleDeleteSalary}>
-                      Edit Salary
-                    </MenuItem>,
-                    <MenuItem key="delete-salary" onClick={handleDeleteSalary}>
-                      Delete Salary
-                    </MenuItem>,
-                  ]
-                : null}
-            </Menu>
-          </Stack>
-        );
-      },
     },
   ];
 
-  console.log("initialColumns:", initialColumns);
+  const generatePdf = async (rowData) => {
+    if (rowData) {
+      try {
+        const pdfBlob = await pdf(<SalarySlip salaryData={rowData} />).toBlob();
+        saveAs(pdfBlob, `${rowData.employeeName}_salary_slip.pdf`);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      }
+    }
+  };
+
+  const deleteSalary = async (rowData) => {
+    console.log(rowData, "Delete");
+
+    const deleteBodyData = {
+      employeeId: rowData.employeeId,
+      _id: rowData._id,
+    };
+
+    console.log(deleteBodyData, "Body Data");
+    if (rowData) {
+      try {
+        const response = await axios.delete(`${API_URL}/salary/delete-salary/`, {
+          data: deleteBodyData,
+        });
+      } catch (error) {
+        console.error("Error Deleting Salary:", error);
+      }
+    }
+  };
+
+  const isAdmin = data?.user?.isAdmin || false;
+
+  const renderRow = (row) => {
+    const isOpen = openedMenuRow === row._id;
+
+    const handleViewSalarySlipClick = () => {
+      setSelectedRowData(row);
+      handleClickOpenDailog();
+    };
+
+    const handleViewSalarySlipDownload = () => {
+      generatePdf(row);
+    };
+
+    const handleDeleteSalary = () => {
+      deleteSalary(row);
+    };
+
+    return (
+      <TableRow key={row._id}>
+        {initialColumns.map((column) => {
+          if (column.field === "action") {
+            return (
+              <TableCell key={column.field}>
+                <Stack spacing={2}>
+                  <SoftButton
+                    aria-controls={isOpen ? "basic-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={isOpen ? "true" : undefined}
+                    onClick={(event) => handleClick(event, row._id)}
+                    iconOnly
+                    variant="contained"
+                  >
+                    <EditIcon />
+                  </SoftButton>
+                  <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={isOpen}
+                    onClose={handleClose}
+                    MenuListProps={{
+                      "aria-labelledby": "basic-button",
+                    }}
+                  >
+                    <MenuItem onClick={handleViewSalarySlipClick}>View Salary Slip</MenuItem>
+                    <MenuItem onClick={handleViewSalarySlipDownload}>Download Salary Slip</MenuItem>
+                    {isAdmin
+                      ? [
+                          <MenuItem key="create-salary">
+                            <Link
+                              to={`/salary/create-salary/${employeeId}`}
+                              style={{ color: "inherit" }}
+                            >
+                              Create Salary
+                            </Link>
+                          </MenuItem>,
+                          <MenuItem key="delete-salary" onClick={handleDeleteSalary}>
+                            Delete Salary
+                          </MenuItem>,
+                        ]
+                      : null}
+                  </Menu>
+                </Stack>
+              </TableCell>
+            );
+          } else {
+            return <TableCell key={column.field}>{row[column.field]}</TableCell>;
+          }
+        })}
+      </TableRow>
+    );
+  };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox mt={5} mb={3}>
-        <Paper style={{ width: "100%" }}>
-          <DataGrid
-            rows={salaryData}
-            columns={initialColumns}
-            pageSize={10}
-            autoHeight
-            getRowId={(row) => row._id}
-            components={{
-              Row: (initialColumns) => <CustomRow data={initialColumns.row} />,
-            }}
-            sx={{
-              "& .MuiDataGrid-footerContainer": {
-                "& .MuiInputBase-root": {
-                  width: "auto!Important",
-                },
-              },
-            }}
-          />
-        </Paper>
+        <Grid container justifyContent={"center"} spacing={3}>
+          <Grid item xs={12} md={12} xl={12}>
+            <Box
+              sx={{
+                borderRadius: "12px",
+                backgroundImage: `url(${curved14})`,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+                height: "300px",
+                width: "100%",
+                px: 2,
+                position: "relative",
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={12} xl={12}>
+            <SoftBox>
+              <TableContainer>
+                <Table>
+                  <TableHead sx={{ display: "table-header-group" }}>
+                    <TableRow>
+                      <TableCell></TableCell>
+                      {initialColumns.map((column) => (
+                        <TableCell key={column.field}>{column.headerName}</TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {salaryData.map((row) => (
+                      <React.Fragment key={row._id}>
+                        <TableRow>
+                          <TableCell>
+                            <IconButton
+                              aria-label="expand row"
+                              size="small"
+                              onClick={() => toggleExpand(row)}
+                            >
+                              {expandedRow === row._id ? (
+                                <KeyboardArrowUpIcon />
+                              ) : (
+                                <KeyboardArrowDownIcon />
+                              )}
+                            </IconButton>
+                          </TableCell>
+                          {initialColumns.map((column) => {
+                            if (column.field === "action") {
+                              const rowId = row._id;
+                              const isOpen = openedMenuRow === rowId;
+                              // const rowEmployeeId = row.employeeId;
+
+                              const handleViewSalarySlipClick = () => {
+                                setSelectedRowData(row);
+                                handleClickOpenDailog();
+                              };
+
+                              const handleViewSalarySlipDownload = () => {
+                                generatePdf(row);
+                              };
+
+                              const handleDeleteSalary = () => {
+                                deleteSalary(row);
+                              };
+
+                              return (
+                                <TableCell key={column.field}>
+                                  <Stack spacing={2}>
+                                    <SoftButton
+                                      aria-controls={isOpen ? "basic-menu" : undefined}
+                                      aria-haspopup="true"
+                                      aria-expanded={isOpen ? "true" : undefined}
+                                      onClick={(event) => handleClick(event, rowId)}
+                                      iconOnly
+                                      variant="contained"
+                                    >
+                                      <EditIcon />
+                                    </SoftButton>
+                                    <Menu
+                                      id="basic-menu"
+                                      anchorEl={anchorEl}
+                                      open={isOpen}
+                                      onClose={handleClose}
+                                      MenuListProps={{
+                                        "aria-labelledby": "basic-button",
+                                      }}
+                                    >
+                                      <MenuItem onClick={handleViewSalarySlipClick}>
+                                        View Salary Slip
+                                      </MenuItem>
+                                      <MenuItem onClick={handleViewSalarySlipDownload}>
+                                        Download Salary Slip
+                                      </MenuItem>
+                                      {isAdmin
+                                        ? [
+                                            <MenuItem key="create-salary">
+                                              <Link
+                                                to={`/salary/create-salary/${row.employeeId}`}
+                                                style={{ color: "inherit" }}
+                                              >
+                                                Create Salary
+                                              </Link>
+                                            </MenuItem>,
+                                            <MenuItem
+                                              key="delete-salary"
+                                              onClick={handleDeleteSalary}
+                                            >
+                                              Delete Salary
+                                            </MenuItem>,
+                                          ]
+                                        : null}
+                                    </Menu>
+                                  </Stack>
+                                </TableCell>
+                              );
+                            } else {
+                              return <TableCell key={column.field}>{row[column.field]}</TableCell>;
+                            }
+                          })}
+                        </TableRow>
+                        {expandedRow === row._id && (
+                          <TableRow>
+                            <TableCell colSpan={initialColumns.length + 1}>
+                              <SoftBox sx={{ boxShadow: 1, m: 2, py: 1, borderRadius: 2 }}>
+                                <Table>
+                                  <TableHead sx={{ display: "table-header-group" }}>
+                                    <TableRow>
+                                      {initialColumns.map((column) => (
+                                        <TableCell key={column.field}>
+                                          {column.headerName}
+                                        </TableCell>
+                                      ))}
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {salaryData.map((row) => (
+                                      <React.Fragment key={row._id}>
+                                        {renderRow(row)}
+                                      </React.Fragment>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </SoftBox>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </SoftBox>
+          </Grid>
+        </Grid>
       </SoftBox>
+
+      {/* Modal Pdf View */}
       <Dialog
         fullWidth
         maxWidth="800px"
@@ -286,3 +425,5 @@ export default function CollapsibleTable() {
     </DashboardLayout>
   );
 }
+
+export default Salary;
