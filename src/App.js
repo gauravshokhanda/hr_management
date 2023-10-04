@@ -3,12 +3,13 @@ import { useState, useEffect, useMemo } from "react";
 // react-router components
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
+import { clearUserAndToken } from "store/authSlice";
 
 // @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -43,9 +44,11 @@ export default function App() {
   const { pathname } = useLocation();
   const data = useSelector((state) => state.auth);
   const user = data.user;
+  const reduxDispatch = useDispatch();
 
   // Cache for the rtl
   const isAdmin = user ? user.isAdmin : false;
+  const isToken = data ? data.token : null;
 
   // Cache for the rtl
   useMemo(() => {
@@ -72,6 +75,13 @@ export default function App() {
       navigate("/sign-in");
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (!isToken) {
+      reduxDispatch(clearUserAndToken());
+      localStorage.clear();
+    }
+  });
 
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {

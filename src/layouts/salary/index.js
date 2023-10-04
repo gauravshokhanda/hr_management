@@ -6,8 +6,16 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "examples/Footer";
 import axios from "axios";
 import { API_URL } from "config";
-import { Box, Dialog, IconButton, Stack } from "@mui/material";
-import curved14 from "assets/images/curved-images/curved14.jpg";
+import {
+  Box,
+  Dialog,
+  IconButton,
+  Stack,
+  TableFooter,
+  TablePagination,
+  TableSortLabel,
+  TextField,
+} from "@mui/material";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import EditIcon from "@mui/icons-material/Edit";
 import SoftButton from "components/SoftButton";
@@ -20,9 +28,11 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Link } from "react-router-dom";
+import SoftInput from "components/SoftInput";
 
 function Salary() {
   const [salaryData, setSalaryData] = useState([]);
+  const [employeSalaryData, setEmployeSalaryData] = useState([]);
   const [userId, setUserId] = useState("");
   const data = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
@@ -31,6 +41,20 @@ function Salary() {
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
   const [employeeId, setEmployeeId] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0); // Reset to the first page when the number of rows per page changes
+  };
 
   const toggleExpand = (row) => {
     setEmployeeId(row.employeeId);
@@ -41,7 +65,64 @@ function Salary() {
     }
   };
 
-  console.log(employeeId, "Employee id");
+  const sortedSalaryData = [...salaryData].sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      if (aValue < bValue) return -1;
+      if (aValue > bValue) return 1;
+    } else {
+      if (aValue > bValue) return -1;
+      if (aValue < bValue) return 1;
+    }
+
+    return 0;
+  });
+
+  const filteredSalaryData = sortedSalaryData.filter((row) =>
+    row.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+    console.log("Search Query:", event.target.value); // Add this line
+  };
+
+  const handleSortClick = (columnField) => {
+    if (sortBy === columnField) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(columnField);
+      setSortOrder("asc");
+    }
+  };
+
+  const fetchEmployeeSalary = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/salary/view-salary/${employeeId}`);
+      if (response.status === 200) {
+        console.log("Succesfully found salary Record");
+        setEmployeSalaryData(response.data);
+      }
+    } catch (error) {
+      console.error(error, "There is some error");
+    }
+  };
+
+  const filterUniqueEmployees = (salaryData) => {
+    const uniqueEmployees = {};
+
+    for (let i = salaryData.length - 1; i >= 0; i--) {
+      const employee = salaryData[i];
+      if (!(employee.employeeId in uniqueEmployees)) {
+        uniqueEmployees[employee.employeeId] = employee;
+      }
+    }
+
+    return Object.values(uniqueEmployees);
+  };
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -57,12 +138,23 @@ function Salary() {
 
       if (response.status === 200) {
         console.log("Successfully found user");
-        setSalaryData(isAdmin ? response.data : [response.data]);
+        const uniqueEmployees = isAdmin ? response.data : [response.data];
+        const filteredEmployees = filterUniqueEmployees(uniqueEmployees);
+        setSalaryData(filteredEmployees);
+        console.log(response.data, "Response");
       }
     } catch (error) {
       console.log("Something went wrong " + error);
     }
   };
+
+  const paginateData = (data, page, rowsPerPage) => {
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return data.slice(startIndex, endIndex);
+  };
+
+  const paginatedSalaryData = paginateData(filteredSalaryData, page, rowsPerPage);
 
   const handleCloseDailog = () => {
     setOpen(!open);
@@ -83,6 +175,10 @@ function Salary() {
   useEffect(() => {
     fetchData();
   }, [userId, data]);
+
+  useEffect(() => {
+    fetchEmployeeSalary();
+  }, [employeeId]);
 
   useEffect(() => {
     if (data && data.user) {
@@ -253,33 +349,41 @@ function Salary() {
       <SoftBox mt={5} mb={3}>
         <Grid container justifyContent={"center"} spacing={3}>
           <Grid item xs={12} md={12} xl={12}>
-            <Box
-              sx={{
-                borderRadius: "12px",
-                backgroundImage: `url(${curved14})`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-                height: "300px",
-                width: "100%",
-                px: 2,
-                position: "relative",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={12} xl={12}>
             <SoftBox>
               <TableContainer>
                 <Table>
                   <TableHead sx={{ display: "table-header-group" }}>
                     <TableRow>
+                      <TableCell colSpan={12}>
+                        <SoftInput
+                          fullWidth
+                          placeholder="Search by Name"
+                          variant="outlined"
+                          value={searchQuery}
+                          onChange={handleSearch}
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
                       <TableCell></TableCell>
                       {initialColumns.map((column) => (
-                        <TableCell key={column.field}>{column.headerName}</TableCell>
+                        <TableCell
+                          key={column.field}
+                          onClick={() => handleSortClick(column.field)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <TableSortLabel
+                            active={sortBy === column.field}
+                            direction={sortBy === column.field ? sortOrder : "asc"}
+                          >
+                            {column.headerName}
+                          </TableSortLabel>
+                        </TableCell>
                       ))}
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {salaryData.map((row) => (
+                    {paginatedSalaryData.map((row) => (
                       <React.Fragment key={row._id}>
                         <TableRow>
                           <TableCell>
@@ -372,7 +476,7 @@ function Salary() {
                         {expandedRow === row._id && (
                           <TableRow>
                             <TableCell colSpan={initialColumns.length + 1}>
-                              <SoftBox sx={{ boxShadow: 1, m: 2, py: 1, borderRadius: 2 }}>
+                              <SoftBox sx={{ boxShadow: 1, m: 2, borderRadius: 3 }}>
                                 <Table>
                                   <TableHead sx={{ display: "table-header-group" }}>
                                     <TableRow>
@@ -384,7 +488,7 @@ function Salary() {
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
-                                    {salaryData.map((row) => (
+                                    {employeSalaryData.map((row) => (
                                       <React.Fragment key={row._id}>
                                         {renderRow(row)}
                                       </React.Fragment>
@@ -398,6 +502,26 @@ function Salary() {
                       </React.Fragment>
                     ))}
                   </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell colSpan={12}>
+                        <TablePagination
+                          rowsPerPageOptions={[5, 10, 25]}
+                          component="div"
+                          count={salaryData.length}
+                          rowsPerPage={rowsPerPage}
+                          page={page}
+                          onPageChange={handleChangePage}
+                          onRowsPerPageChange={handleChangeRowsPerPage}
+                          sx={{
+                            "& .css-1ui3wbn-MuiInputBase-root-MuiTablePagination-select": {
+                              width: "auto!important",
+                            },
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
                 </Table>
               </TableContainer>
             </SoftBox>
