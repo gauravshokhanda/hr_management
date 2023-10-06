@@ -14,7 +14,6 @@ import {
   TableFooter,
   TablePagination,
   TableSortLabel,
-  TextField,
 } from "@mui/material";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import EditIcon from "@mui/icons-material/Edit";
@@ -53,7 +52,7 @@ function Salary() {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
-    setPage(0); // Reset to the first page when the number of rows per page changes
+    setPage(0);
   };
 
   const toggleExpand = (row) => {

@@ -48,7 +48,6 @@ export default function App() {
 
   // Cache for the rtl
   const isAdmin = user ? user.isAdmin : false;
-  const isToken = data ? data.token : null;
 
   // Cache for the rtl
   useMemo(() => {
@@ -75,13 +74,6 @@ export default function App() {
       navigate("/sign-in");
     }
   }, [user, navigate]);
-
-  useEffect(() => {
-    if (!isToken) {
-      reduxDispatch(clearUserAndToken());
-      localStorage.clear();
-    }
-  });
 
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {
