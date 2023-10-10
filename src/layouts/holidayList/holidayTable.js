@@ -8,17 +8,26 @@ import { Link } from "react-router-dom";
 import SoftButton from "components/SoftButton";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 export default function HolidayTable({ isAdmin }) {
-
   console.log(isAdmin, "isAdmin");
   const [holidays, setHolidays] = useState([]);
+  const [deleteId, setDeleteId] = useState("");
+  const [deleteName, setDeleteName] = useState("");
+  const [open, setOpen] = React.useState(false);
 
-  console.log(holidays, "holidays table");
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const fetchData = async () => {
     try {
@@ -41,6 +50,33 @@ export default function HolidayTable({ isAdmin }) {
     } catch (error) {
       console.error("There is some issue " + error);
     }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleDeleteEvent = async (eve) => {
+    setDeleteId(eve._id);
+    setDeleteName(eve.title);
+    handleClickOpen();
+  };
+
+  const deleteEvent = async () => {
+    try {
+      const response = await axios.delete(`${API_URL}/holiday/holiday-list/${deleteId}`);
+
+      if (response.status === 200) {
+        fetchData();
+        console.log("Deleted successfully");
+      }
+    } catch (error) {
+      console.error("There is someee  error", error);
+    }
+
+    setDeleteId("");
+    deleteName("");
+    handleClose();
   };
 
   // Define columns as a separate constant
@@ -80,53 +116,73 @@ export default function HolidayTable({ isAdmin }) {
         </Typography>
       ),
     },
-    {
-      field: "action",
-      headerName: "Action",
-      width: 160,
-      renderCell: (params) => {
-        return (
-          <Stack spacing={2}>
-            <SoftButton
-              circular
-              iconOnly
-              color="error"
-              // onClick={() => handleDeleteEvent(params.row._id)}
-            >
-              <DeleteIcon />
-            </SoftButton>
-          </Stack>
-        );
-      },
-    },
+    isAdmin
+      ? {
+          field: "action",
+          headerName: "Action",
+          width: 160,
+          renderCell: (params) => {
+            return (
+              <Stack spacing={2}>
+                <SoftButton
+                  circular
+                  iconOnly
+                  color="error"
+                  onClick={() => handleDeleteEvent(params.row)}
+                >
+                  <DeleteIcon />
+                </SoftButton>
+              </Stack>
+            );
+          },
+        }
+      : {
+          field: null,
+        },
   ];
 
   return (
-    <SoftBox mt={5}>
-      <DataGrid
-        rows={holidays}
-        columns={initialColumns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-        autoHeight
-        components={{
-          Toolbar: GridToolbar,
-        }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-          },
-        }}
-        getRowId={(row) => row._id}
-        checkboxSelection
-        sx={{
-          "& .MuiDataGrid-footerContainer": {
-            "& .MuiInputBase-root": {
-              width: "auto!Important",
+    <>
+      <SoftBox mt={5}>
+        <DataGrid
+          rows={holidays}
+          columns={initialColumns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          autoHeight
+          components={{
+            Toolbar: GridToolbar,
+          }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
             },
-          },
-        }}
-      />
-    </SoftBox>
+          }}
+          getRowId={(row) => row._id}
+          checkboxSelection
+          sx={{
+            "& .MuiDataGrid-footerContainer": {
+              "& .MuiInputBase-root": {
+                width: "auto!Important",
+              },
+            },
+          }}
+        />
+      </SoftBox>
+      <Dialog maxWidth='xs' fullWidth open={open} onClose={handleClose}>
+        <DialogTitle>Delete event</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Do you want to delete {deleteName}!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <SoftButton onClick={handleClose}>Cancel</SoftButton>
+          <SoftButton color="error" onClick={deleteEvent}>
+            Delete
+          </SoftButton>     
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

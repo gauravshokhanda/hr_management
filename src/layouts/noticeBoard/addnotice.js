@@ -41,20 +41,26 @@ function NoticeBoard() {
 
   const { id } = useParams();
 
-  useEffect(async () => {
+  useEffect(() => {
+    let isMounted = true;
+
     if (id) {
       try {
-        const response = await axios.get(`${API_URL}/notices/notice/${id}`);
-
-        if (response.status === 200) {
-          const noticeData = response.data;
-          setFormData({ ...noticeData });
-        }
+        axios.get(`${API_URL}/notices/notice/${id}`).then((response) => {
+          if (isMounted && response.status === 200) {
+            const noticeData = response.data;
+            setFormData({ ...noticeData });
+          }
+        });
       } catch (error) {
         console.log(error);
       }
     }
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -90,7 +96,7 @@ function NoticeBoard() {
         formData.append("image", selectedImage, selectedImage.name);
       }
 
-      const response = await axios.post(`${API_URL}/notices/notice`, formData);
+      const response = await (id ? axios.put(`${API_URL}/notices/update/${id}`, formData) : axios.post(`${API_URL}/notices/notice`, formData));
 
       console.log("Notice saved successfully", response.data);
 
@@ -175,7 +181,7 @@ function NoticeBoard() {
                     }}
                   >
                     <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                      Add Notice
+                      {id ? "Update" :"Add"} Notice
                     </Typography>
                   </Box>
                 </Box>
@@ -234,12 +240,21 @@ function NoticeBoard() {
                           </label>
                         </Box>
                         <Box>
-                          {selectedImage && (
+                          {selectedImage ? (
                             <div>
                               <img
-                                src={setectedImgPath ? setectedImgPath : `${API_URL}/${formData.imgPath}`}
+                                src={setectedImgPath }
                                 alt="Selected"
-                                style={{ maxWidth: "100%" }}
+                                style={{ maxWidth: "400px" }}
+                              />
+                              <Typography variant="body1">{formData.imgPath}</Typography>
+                            </div>
+                          ) : (
+                            <div>
+                              <img
+                                src={API_URL + "/" + formData.imgPath}
+                                alt={formData.imgPath ? formData.heading : "Add image"}
+                                style={{ maxWidth: "400px" }}
                               />
                               <Typography variant="body1">{formData.imgPath}</Typography>
                             </div>
@@ -281,7 +296,7 @@ function NoticeBoard() {
                     </SoftBox>
                     <SoftBox mt={4} mb={1}>
                       <SoftButton variant="gradient" type="submit" color="dark">
-                        Add Notice
+                        {id ? "Update" : "Add"} Notice
                       </SoftButton>
                     </SoftBox>
                   </SoftBox>

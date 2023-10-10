@@ -201,6 +201,7 @@ function NoticeBoard({ signInTrue }) {
                                   </Typography>
                                 </Box>
                               </Stack>
+                              {user.isAdmin ? (
                               <Stack
                                 direction="row"
                                 justifyContent="start"
@@ -216,6 +217,7 @@ function NoticeBoard({ signInTrue }) {
                                   <DeleteIcon />
                                 </SoftButton>
                               </Stack>
+                              ) : null}
                             </Stack>
                             <Typography
                               variant="body1"

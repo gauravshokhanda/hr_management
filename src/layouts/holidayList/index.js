@@ -88,8 +88,7 @@ function HolidayList() {
         start: selectedDate.start.toISOString(),
         end: selectedDate.end.toISOString(),
         allDay: selectedDate.allDay,
-        holiday,
-      };
+        holiday,};
 
       try {
         // Make a POST request to save the event
@@ -324,7 +323,7 @@ function HolidayList() {
           </Modal>
         </>
       ) : (
-        <HolidayTable isAdmin={isAdmin}  />
+        <HolidayTable isAdmin={isAdmin} />
       )}
     </DashboardLayout>
   );
