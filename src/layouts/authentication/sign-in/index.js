@@ -9,13 +9,13 @@ import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import { useSoftUIController, dispatchSetToken, setUser } from "context";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
-// Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 import { Switch, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { setUserAndToken } from "../../../store/authSlice"; // Update the path
 import { clearUserAndToken } from "../../../store/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import jwtDecode from "jwt-decode";
 
 function SignIn() {
   const [rememberMe, setRememberMe] = useState(true);
@@ -32,6 +32,27 @@ function SignIn() {
   const data = useSelector((state) => state.auth);
 
   const user = data.user;
+
+  function isTokenExpired(token) {
+    if (!token) {
+      return true; 
+    }
+
+    const decodedToken = jwtDecode(token);
+
+    return decodedToken.exp < Date.now() / 1000;
+  }
+
+  
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+
+    if (isTokenExpired(storedToken)) {
+      dispatchRedux(clearUserAndToken());
+      localStorage.removeItem("token");
+      navigate('/sign-in')
+    }
+  }, [dispatchRedux]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

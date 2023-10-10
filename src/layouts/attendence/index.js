@@ -84,9 +84,6 @@ function Attendence() {
     socket.on("attendanceUpdate", (data) => {
       // Display a notification to the user when an update is received
       console.log("Received attendance update:", data);
-
-      // You can use a notification library (e.g., Snackbar, toast) to display notifications to the user
-      // Example: displayNotification(data.message);
     });
 
     return () => {
@@ -94,6 +91,7 @@ function Attendence() {
       socket.disconnect();
     };
   }, []);
+  
   const todayDate = new Date();
 
   const isTodayAttendance =

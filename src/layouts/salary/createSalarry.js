@@ -11,6 +11,7 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
+import moment from "moment";
 
 function CreateSalary() {
   const { id } = useParams();
@@ -19,6 +20,7 @@ function CreateSalary() {
     employeeId: "",
     totalWorkingDays: "",
     bonus: "",
+    creditMonth: "",
   });
 
   const handleChange = (event) => {
@@ -27,6 +29,7 @@ function CreateSalary() {
     setFromData((prevData) => ({
       ...prevData,
       employeeId: id,
+      creditMonth: moment().format('YYYY-MM-DDTHH:mm:ssZ'),
       [name]: type === "checkbox" ? checked : value,
     }));
   };

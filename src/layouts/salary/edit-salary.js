@@ -19,6 +19,7 @@ export default function CreateSalary() {
     employeeId: "",
     totalWorkingDays: "",
     bonus: "",
+    creditMonth: "",
   });
 
   const handleChange = (event) => {
@@ -61,7 +62,7 @@ export default function CreateSalary() {
                 <SoftBox pt={2} pb={3} px={3}>
                   <SoftBox component="form" role="form" onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
-                      <Grid item xs={6}>
+                      <Grid item xs={4}>
                         <SoftBox>
                           <SoftInput
                             name="totalWorkingDays"
@@ -72,7 +73,7 @@ export default function CreateSalary() {
                             />
                         </SoftBox>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={4}>
                         <SoftBox>
                           <SoftInput
                             name="bonus"
@@ -80,6 +81,17 @@ export default function CreateSalary() {
                             onChange={handleChange}
                             placeholder="Bonus"
                             type="number"
+                          />
+                        </SoftBox>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <SoftBox>
+                          <SoftInput
+                            name="creditMonth"
+                            value={formData.creditMonth}
+                            onChange={handleChange}
+                            placeholder="Salary Date"
+                            type="date"
                           />
                         </SoftBox>
                       </Grid>
