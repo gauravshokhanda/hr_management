@@ -31,7 +31,6 @@ import MuiAlert from "@mui/material/Alert";
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
 import { TornadoRounded } from "@mui/icons-material";
-import io from "socket.io-client";
 
 function Attendence() {
   const [buttonShow, setButtonShow] = useState(false);
@@ -46,7 +45,6 @@ function Attendence() {
   const [todayAttendence, setTodayAttendence] = useState("");
 
   const data = useSelector((state) => state.auth);
-  const socket = io(API_URL);
 
   const [checkInData, setCheckInData] = useState({
     date: "",
@@ -79,19 +77,7 @@ function Attendence() {
   };
 
   const user = data.user;
-  useEffect(() => {
-    // Listen for attendance updates from the server
-    socket.on("attendanceUpdate", (data) => {
-      // Display a notification to the user when an update is received
-      console.log("Received attendance update:", data);
-    });
 
-    return () => {
-      // Disconnect the Socket.io client when the component unmounts
-      socket.disconnect();
-    };
-  }, []);
-  
   const todayDate = new Date();
 
   const isTodayAttendance =
@@ -184,13 +170,6 @@ function Attendence() {
         if (response.status === 201) {
           fetchData();
           console.log(response.data, "Successfully submitted attendance");
-
-          // Emit a "checkin" event to notify all employees
-          // socket.emit("checkin", {
-          //   employeeName: user.employeeName, // Assuming you have user data available
-          //   date: checkInData.date,
-          //   checkIn: checkInData.checkIn,
-          // });
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
