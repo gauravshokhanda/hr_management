@@ -13,6 +13,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Loader from "loader";
 
 export default function HolidayTable({ isAdmin }) {
   console.log(isAdmin, "isAdmin");
@@ -20,6 +21,7 @@ export default function HolidayTable({ isAdmin }) {
   const [deleteId, setDeleteId] = useState("");
   const [deleteName, setDeleteName] = useState("");
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -46,6 +48,7 @@ export default function HolidayTable({ isAdmin }) {
         }));
 
         setHolidays(rowsWithSrNo);
+        setLoading(false);
       }
     } catch (error) {
       console.error("There is some issue " + error);
@@ -144,43 +147,45 @@ export default function HolidayTable({ isAdmin }) {
   return (
     <>
       <SoftBox mt={5}>
-        <DataGrid
-          rows={holidays}
-          columns={initialColumns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          autoHeight
-          components={{
-            Toolbar: GridToolbar,
-          }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-            },
-          }}
-          getRowId={(row) => row._id}
-          checkboxSelection
-          sx={{
-            "& .MuiDataGrid-footerContainer": {
-              "& .MuiInputBase-root": {
-                width: "auto!Important",
+        {loading ? (
+          <Loader />
+        ) : (
+          <DataGrid
+            rows={holidays}
+            columns={initialColumns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            autoHeight
+            components={{
+              Toolbar: GridToolbar,
+            }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
               },
-            },
-          }}
-        />
+            }}
+            getRowId={(row) => row._id}
+            checkboxSelection
+            sx={{
+              "& .MuiDataGrid-footerContainer": {
+                "& .MuiInputBase-root": {
+                  width: "auto!Important",
+                },
+              },
+            }}
+          />
+        )}
       </SoftBox>
-      <Dialog maxWidth='xs' fullWidth open={open} onClose={handleClose}>
+      <Dialog maxWidth="xs" fullWidth open={open} onClose={handleClose}>
         <DialogTitle>Delete event</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Do you want to delete {deleteName}!
-          </DialogContentText>
+          <DialogContentText>Do you want to delete {deleteName}!</DialogContentText>
         </DialogContent>
         <DialogActions>
           <SoftButton onClick={handleClose}>Cancel</SoftButton>
           <SoftButton color="error" onClick={deleteEvent}>
             Delete
-          </SoftButton>     
+          </SoftButton>
         </DialogActions>
       </Dialog>
     </>

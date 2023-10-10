@@ -32,6 +32,7 @@ import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
 import { TornadoRounded } from "@mui/icons-material";
 import io from "socket.io-client";
+import Loader from "loader";
 
 function Attendence() {
   const [buttonShow, setButtonShow] = useState(false);
@@ -44,6 +45,8 @@ function Attendence() {
   const [open, setOpen] = useState(false);
   const [attendanceId, setAttendanceId] = useState("");
   const [todayAttendence, setTodayAttendence] = useState("");
+  const [loading, setLoading] = useState(true);
+
 
   const data = useSelector((state) => state.auth);
   const socket = io(API_URL);
@@ -91,7 +94,7 @@ function Attendence() {
       socket.disconnect();
     };
   }, []);
-  
+
   const todayDate = new Date();
 
   const isTodayAttendance =
@@ -162,6 +165,7 @@ function Attendence() {
           setAttendance(response.data);
           setAttendanceId(lastAttendance._id);
           setTodayAttendence(lastAttendance);
+          setLoading(false);
         }
       } catch (error) {
         console.error("There is some issue " + error);
@@ -491,30 +495,34 @@ function Attendence() {
         </MuiAlert>
       </Snackbar>
       <SoftBox py={3}>
-        <DataGrid
-          rows={attendance}
-          columns={initialColumns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          autoHeight
-          sortModel={[
-            {
-              field: "date",
-              sort: "desc",
-            },
-          ]}
-          components={{
-            Toolbar: GridToolbar,
-          }}
-          getRowId={(row) => row._id}
-          sx={{
-            "& .MuiDataGrid-footerContainer": {
-              "& .MuiInputBase-root": {
-                width: "auto!Important",
+        {loading ? (
+          <Loader />
+        ) : (
+          <DataGrid
+            rows={attendance}
+            columns={initialColumns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            autoHeight
+            sortModel={[
+              {
+                field: "date",
+                sort: "desc",
               },
-            },
-          }}
-        />
+            ]}
+            components={{
+              Toolbar: GridToolbar,
+            }}
+            getRowId={(row) => row._id}
+            sx={{
+              "& .MuiDataGrid-footerContainer": {
+                "& .MuiInputBase-root": {
+                  width: "auto!Important",
+                },
+              },
+            }}
+          />
+        )}
       </SoftBox>
       <Footer />
 

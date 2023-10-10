@@ -9,11 +9,13 @@ import SoftButton from "components/SoftButton";
 import EditIcon from "@mui/icons-material/Edit";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Loader from "loader";
 
-export default function EmployesTable({setSelectedRowIds, selectedRowIds}) {
+export default function EmployesTable({ setSelectedRowIds, selectedRowIds }) {
   const [employees, setEmployees] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openedMenuRow, setOpenedMenuRow] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   console.log(employees, "employees table");
 
@@ -54,6 +56,7 @@ export default function EmployesTable({setSelectedRowIds, selectedRowIds}) {
         }));
 
         setEmployees(rowsWithSrNo);
+        setLoading(false);
       }
     } catch (error) {
       console.error("There is some issue " + error);
@@ -183,10 +186,7 @@ export default function EmployesTable({setSelectedRowIds, selectedRowIds}) {
                 </Link>
               </MenuItem>
               <MenuItem key="create-salary">
-                <Link
-                  to={`/salary/create-salary/${params.row._id}`}
-                  style={{ color: "inherit" }}
-                >
+                <Link to={`/salary/create-salary/${params.row._id}`} style={{ color: "inherit" }}>
                   Create Salary
                 </Link>
               </MenuItem>
@@ -198,37 +198,40 @@ export default function EmployesTable({setSelectedRowIds, selectedRowIds}) {
     },
   ];
 
-
   return (
     <SoftBox>
-      <DataGrid
-        rows={employees}
-        columns={initialColumns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-        autoHeight
-        components={{
-          Toolbar: GridToolbar,
-        }}
-        getRowId={(row) => row._id}
-        checkboxSelection
-        rowSelectionModel={selectedRowIds}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-          },
-        }}
-        onRowSelectionModelChange={(newSelectionModel) => {
-          setSelectedRowIds(newSelectionModel);
-        }}
-        sx={{
-          "& .MuiDataGrid-footerContainer": {
-            "& .MuiInputBase-root": {
-              width: "auto!Important",
+      {loading ? (
+        <Loader />
+      ) : (
+        <DataGrid
+          rows={employees}
+          columns={initialColumns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          autoHeight
+          components={{
+            Toolbar: GridToolbar,
+          }}
+          getRowId={(row) => row._id}
+          checkboxSelection
+          rowSelectionModel={selectedRowIds}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
             },
-          },
-        }}
-      />
+          }}
+          onRowSelectionModelChange={(newSelectionModel) => {
+            setSelectedRowIds(newSelectionModel);
+          }}
+          sx={{
+            "& .MuiDataGrid-footerContainer": {
+              "& .MuiInputBase-root": {
+                width: "auto!Important",
+              },
+            },
+          }}
+        />
+      )}
     </SoftBox>
   );
 }
