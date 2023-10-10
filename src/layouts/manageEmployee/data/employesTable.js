@@ -213,8 +213,20 @@ export default function EmployesTable({setSelectedRowIds, selectedRowIds}) {
         getRowId={(row) => row._id}
         checkboxSelection
         rowSelectionModel={selectedRowIds}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
         onRowSelectionModelChange={(newSelectionModel) => {
           setSelectedRowIds(newSelectionModel);
+        }}
+        sx={{
+          "& .MuiDataGrid-footerContainer": {
+            "& .MuiInputBase-root": {
+              width: "auto!Important",
+            },
+          },
         }}
       />
     </SoftBox>

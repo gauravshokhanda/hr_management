@@ -1,9 +1,9 @@
 .custom-holiday-cell {
-    background-color: rgb(148, 245, 148);
+    background-color: #ffb7aa !important;
     font-weight: bold;
 }
 .fc-day-sun:not(.fc-col-header-cell){
-    background-color: rgb(255, 183, 170);
+    background-color: #ffb7aa;
 }
 .fc-day-sat:not(.fc-col-header-cell){
     background-color: rgb(255, 183, 170);

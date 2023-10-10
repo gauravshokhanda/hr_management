@@ -21,9 +21,10 @@ import { grey } from "@mui/material/colors";
 import "swiper/css";
 import { API_URL } from "config";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
 import SoftInput from "components/SoftInput";
+import { useParams } from "react-router-dom";
 
 const CARD_PROPERTY = {
   borderRadius: 3,
@@ -37,6 +38,23 @@ function NoticeBoard() {
     imgPath: "",
     tags: [],
   });
+
+  const { id } = useParams();
+
+  useEffect(async () => {
+    if (id) {
+      try {
+        const response = await axios.get(`${API_URL}/notices/notice/${id}`);
+
+        if (response.status === 200) {
+          const noticeData = response.data;
+          setFormData({ ...noticeData });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -106,7 +124,7 @@ function NoticeBoard() {
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      console.log(file, 'Selected image');
+      console.log(file, "Selected image");
       setSelectedImage(file);
       setSelectedImgPath(URL.createObjectURL(file));
       const imageName = file.name;
@@ -116,8 +134,8 @@ function NoticeBoard() {
       }));
     }
   };
-  
-  console.log(selectedImage, 'Imagew');
+
+  console.log(selectedImage, "Imagew");
 
   const handleChangeSelect = (event) => {
     const {
@@ -219,7 +237,7 @@ function NoticeBoard() {
                           {selectedImage && (
                             <div>
                               <img
-                                src={setectedImgPath}
+                                src={setectedImgPath ? setectedImgPath : `${API_URL}/${formData.imgPath}`}
                                 alt="Selected"
                                 style={{ maxWidth: "100%" }}
                               />
@@ -238,6 +256,7 @@ function NoticeBoard() {
                         multiple
                         name="tags"
                         value={personName}
+                        sx={{ "& .MuiSelect-select ": { width: "100%!important" } }}
                         onChange={handleChangeSelect}
                         input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                         renderValue={(selected) => (

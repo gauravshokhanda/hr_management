@@ -80,8 +80,9 @@ function Salary() {
   });
 
   const filteredSalaryData = sortedSalaryData.filter((row) =>
-    row.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  row && row.employeeName && typeof row.employeeName === "string" &&
+  row.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
+);
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -137,7 +138,7 @@ function Salary() {
 
       if (response.status === 200) {
         console.log("Successfully found user");
-        const uniqueEmployees = isAdmin ? response.data : [response.data];
+        const uniqueEmployees = isAdmin ? response.data : response.data;
         const filteredEmployees = filterUniqueEmployees(uniqueEmployees);
         setSalaryData(filteredEmployees);
         console.log(response.data, "Response");
@@ -146,6 +147,9 @@ function Salary() {
       console.log("Something went wrong " + error);
     }
   };
+
+
+
 
   const paginateData = (data, page, rowsPerPage) => {
     const startIndex = page * rowsPerPage;

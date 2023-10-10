@@ -27,6 +27,8 @@ import SoftButton from "components/SoftButton";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const CARD_PROPERTY = {
   borderRadius: 3,
@@ -58,7 +60,7 @@ function NoticeBoard({ signInTrue }) {
   useEffect(() => {
     fetchData();
   }, []);
-  
+
   function formatDate(dateString) {
     const date = new Date(dateString);
     const options = { weekday: "long", month: "long", day: "numeric" };
@@ -177,19 +179,43 @@ function NoticeBoard({ signInTrue }) {
                             />
                             <Stack
                               direction="row"
-                              justifyContent="start"
+                              justifyContent="space-between"
                               alignItems="center"
                               spacing={2}
                             >
-                              <Avatar {...stringAvatar(item.heading)} />
-                              <Box>
-                                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                                  {item.heading}
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                                  {item.noticeDate ? formatDate(item.noticeDate) : "Date not found"}
-                                </Typography>
-                              </Box>
+                              <Stack
+                                direction="row"
+                                justifyContent="start"
+                                alignItems="center"
+                                spacing={2}
+                              >
+                                <Avatar {...stringAvatar(item.heading)} />
+                                <Box>
+                                  <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                                    {item.heading}
+                                  </Typography>
+                                  <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                                    {item.noticeDate
+                                      ? formatDate(item.noticeDate)
+                                      : "Date not found"}
+                                  </Typography>
+                                </Box>
+                              </Stack>
+                              <Stack
+                                direction="row"
+                                justifyContent="start"
+                                alignItems="center"
+                                spacing={2}
+                              >
+                                <Link to={`/notice/add-notice/${item._id}`}>
+                                  <SoftButton color="info" circular iconOnly>
+                                    <EditIcon />
+                                  </SoftButton>
+                                </Link>
+                                <SoftButton color="error" circular iconOnly>
+                                  <DeleteIcon />
+                                </SoftButton>
+                              </Stack>
                             </Stack>
                             <Typography
                               variant="body1"

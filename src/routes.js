@@ -65,7 +65,7 @@ const routes = [
     noCollapse: true,
   },
   {
-    type: "collapse",
+    type: "hidden",
     name: "Billing",
     key: "billing",
     route: "/billing",
@@ -115,7 +115,7 @@ const routes = [
     type: "hidden",
     name: "Add-Notice",
     key: "add-notice",
-    route: "/notice/add-notice",
+    route: "/notice/add-notice/:id?",
     component: <AddNotice />,
     adminOnly: true,
   },

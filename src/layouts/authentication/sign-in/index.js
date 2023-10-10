@@ -7,7 +7,6 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
-import { useSoftUIController, dispatchSetToken, setUser } from "context";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 import { Switch, Typography } from "@mui/material";
@@ -21,10 +20,8 @@ function SignIn() {
   const [rememberMe, setRememberMe] = useState(true);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [controller, dispatch] = useSoftUIController();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
   const dispatchRedux = useDispatch();
@@ -33,26 +30,19 @@ function SignIn() {
 
   const user = data.user;
 
-  function isTokenExpired(token) {
-    if (!token) {
-      return true; 
-    }
 
+  const token = localStorage.getItem("token");
+
+  if (token) {
     const decodedToken = jwtDecode(token);
-
-    return decodedToken.exp < Date.now() / 1000;
+    const currentTime = Date.now() / 1000; 
+  
+    if (decodedToken.exp < currentTime) {
+      console.log("Token is expired");
+      dispatchRedux(clearUserAndToken());
+    }
   }
 
-  
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-
-    if (isTokenExpired(storedToken)) {
-      dispatchRedux(clearUserAndToken());
-      localStorage.removeItem("token");
-      navigate('/sign-in')
-    }
-  }, [dispatchRedux]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -71,14 +61,11 @@ function SignIn() {
 
       if (response.status === 200) {
         console.log("Successfully login");
-        setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
         setError("");
         console.log("Error cleared:", error);
         navigate("/attendence", { replace: true });
-        dispatchSetToken(dispatch, response.data.token);
         dispatchRedux(setUserAndToken({ user: response.data.user, token: response.data.token }));
-        setUser(dispatch, response.data.user);
         localStorage.removeItem("hasSeenDialog");
       }
     } catch (error) {
@@ -88,6 +75,7 @@ function SignIn() {
       }
     }
   };
+
 
   return (
     <CoverLayout

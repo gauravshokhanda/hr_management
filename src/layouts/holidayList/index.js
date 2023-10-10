@@ -21,6 +21,8 @@ import moment from "moment";
 import HolidayTable from "./holidayTable";
 import "./cell.css";
 import SoftButton from "components/SoftButton";
+import { useSelector } from "react-redux";
+
 
 function HolidayList() {
   const [weekendsVisible, setWeekendsVisible] = useState(true);
@@ -33,6 +35,10 @@ function HolidayList() {
   const [holiday, setIsHoliday] = useState(false);
   const [showTable, setShowTable] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
+
+  const data = useSelector((state) => state.auth);
+
+  const isAdmin = data?.user?.isAdmin || false;
 
   const calendarRef = useRef(null);
 
@@ -56,6 +62,23 @@ function HolidayList() {
     setShowTable(false);
   };
 
+  const fetchEvents = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/holiday/holiday-list`);
+
+      if (response.status === 200) {
+        const eventData = response.data;
+
+        setCurrentEvents((prevEvents) => [...prevEvents, ...eventData]);
+      }
+    } catch (error) {
+      console.error("There is some error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
   const handleCreateEvent = async () => {
     const calendarApi = calendarRef.current.getApi();
 
@@ -73,6 +96,7 @@ function HolidayList() {
         const response = await axios.post(`${API_URL}/holiday/holiday-list`, newEvent);
 
         if (response.status === 200) {
+          fetchEvents();
           const data = response.data;
 
           // Update the currentEvents state with the new event using the callback form
@@ -100,23 +124,7 @@ function HolidayList() {
     }
   };
 
-  const fetchEvents = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/holiday/holiday-list`);
-
-      if (response.status === 200) {
-        const eventData = response.data;
-
-        setCurrentEvents((prevEvents) => [...prevEvents, ...eventData]);
-      }
-    } catch (error) {
-      console.error("There is some error", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+ 
 
   const handleEventDrop = async (dropInfo) => {
     const event = dropInfo.event;
@@ -132,6 +140,7 @@ function HolidayList() {
       const response = await axios.put(`${API_URL}/holiday/holiday-list/${event.id}`, updatedEvent);
 
       if (response.status === 200) {
+        fetchEvents();
         console.log("Event updated successfully");
       } else {
         console.error("Failed to update event:", response.statusText);
@@ -150,6 +159,7 @@ function HolidayList() {
       const response = await axios.delete(`${API_URL}/holiday/holiday-list/${id}`);
 
       if (response.status === 200) {
+        fetchEvents();
         console.log("Deleted successfully");
       }
     } catch (error) {
@@ -185,7 +195,7 @@ function HolidayList() {
     extendedProps: {
       holiday: event.holiday ? true : false,
     },
-    color: event.holiday ? "green" : "",
+    color: event.holiday ? "#ff5537" : "green",
     textColor: event.holiday ? "#000" : "#000",
     id: event._id,
   }));
@@ -210,10 +220,10 @@ function HolidayList() {
         </Typography>
         <SoftBox display="flex" gap="20px">
           <SoftButton color={showTable ? "secondary" : null} onClick={changeTable}>
-            Table
+          Calendar
           </SoftButton>
           <SoftButton color={showCalendar ? "secondary" : null} onClick={changeCalendar}>
-            Calendar
+            Table
           </SoftButton>
         </SoftBox>
       </SoftBox>
@@ -229,17 +239,17 @@ function HolidayList() {
                 right: "dayGridMonth,timeGridWeek,timeGridDay",
               }}
               initialView="dayGridMonth"
-              editable={true}
-              selectable={true}
+              selectable={isAdmin ? true : false}
               selectMirror={true}
               dayMaxEvents={true}
               eventDisplay="box"
               weekends={weekendsVisible}
               events={transformedEvents}
               select={handleDateSelect}
-              eventClick={handleEventClick}
+              eventClick={isAdmin ? handleEventClick : null}
               dayCellClassNames={customDayCellClassNames}
               eventDrop={handleEventDrop}
+              editable={isAdmin ? true : false}
             />
           </SoftBox>
           <Footer />
@@ -314,7 +324,7 @@ function HolidayList() {
           </Modal>
         </>
       ) : (
-        <HolidayTable handleDeleteEvent />
+        <HolidayTable isAdmin={isAdmin}  />
       )}
     </DashboardLayout>
   );

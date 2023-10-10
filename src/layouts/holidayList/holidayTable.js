@@ -9,7 +9,9 @@ import SoftButton from "components/SoftButton";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function HolidayTable({ handleDeleteEvent }) {
+export default function HolidayTable({ isAdmin }) {
+
+  console.log(isAdmin, "isAdmin");
   const [holidays, setHolidays] = useState([]);
 
   console.log(holidays, "holidays table");
@@ -89,7 +91,7 @@ export default function HolidayTable({ handleDeleteEvent }) {
               circular
               iconOnly
               color="error"
-              onClick={() => handleDeleteEvent(params.row._id)}
+              // onClick={() => handleDeleteEvent(params.row._id)}
             >
               <DeleteIcon />
             </SoftButton>
@@ -110,8 +112,20 @@ export default function HolidayTable({ handleDeleteEvent }) {
         components={{
           Toolbar: GridToolbar,
         }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
         getRowId={(row) => row._id}
         checkboxSelection
+        sx={{
+          "& .MuiDataGrid-footerContainer": {
+            "& .MuiInputBase-root": {
+              width: "auto!Important",
+            },
+          },
+        }}
       />
     </SoftBox>
   );
