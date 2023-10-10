@@ -183,8 +183,16 @@ function Attendence() {
             Authorization: `${localStorage.getItem("token")}`,
           },
         });
-        if (response.status === 200) {
-          console.log(response, "Succesfully submitted attendence");
+        if (response.status === 201) {
+          fetchData();
+          console.log(response.data, "Successfully submitted attendance");
+
+          // Emit a "checkin" event to notify all employees
+          // socket.emit("checkin", {
+          //   employeeName: user.employeeName, // Assuming you have user data available
+          //   date: checkInData.date,
+          //   checkIn: checkInData.checkIn,
+          // });
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
@@ -201,6 +209,7 @@ function Attendence() {
           },
         });
         if (response.status === 200) {
+          fetchData();
           console.log(response, "Succesfully submitted attendence");
         }
       } catch (error) {
@@ -217,6 +226,7 @@ function Attendence() {
           },
         });
         if (response.status === 200) {
+          fetchData();
           console.log(response, "Succesfully submitted attendence");
         }
       } catch (error) {
@@ -233,6 +243,7 @@ function Attendence() {
           },
         });
         if (response.status === 200) {
+          fetchData();
           console.log(response, "Succesfully submitted attendence");
         }
       } catch (error) {
