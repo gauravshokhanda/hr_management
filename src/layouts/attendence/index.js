@@ -49,7 +49,6 @@ function Attendence() {
 
 
   const data = useSelector((state) => state.auth);
-  const socket = io(API_URL);
 
   const [checkInData, setCheckInData] = useState({
     date: "",
@@ -188,13 +187,6 @@ function Attendence() {
         if (response.status === 201) {
           fetchData();
           console.log(response.data, "Successfully submitted attendance");
-
-          // Emit a "checkin" event to notify all employees
-          // socket.emit("checkin", {
-          //   employeeName: user.employeeName, // Assuming you have user data available
-          //   date: checkInData.date,
-          //   checkIn: checkInData.checkIn,
-          // });
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
