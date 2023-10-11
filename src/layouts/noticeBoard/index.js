@@ -9,6 +9,14 @@ import {
   Avatar,
   Stack,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import SoftBox from "components/SoftBox";
@@ -43,6 +51,59 @@ NoticeBoard.propTypes = {
 function NoticeBoard({ signInTrue }) {
   const [notice, setNotice] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
+  const [deleteName, setDeleteName] = useState("");
+  const [buttonLoading, setButtonLoading] = useState(false);  
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+
+  const displayNotification = (message, alertType) => {
+    setNotificationMessage(message);
+    setNotificationOpen(true);
+    setSeverity(alertType);
+  };
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const deleteNotice = async (notice) => {
+    handleClickOpen();
+    setDeleteId(notice._id);
+    setDeleteName(notice.heading);
+    console.log(notice, "Delete");
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const deleteEvent = async () => {
+    setButtonLoading(true);
+    try {
+      const response = await axios.delete(`${API_URL}/notices/delete-notice/${deleteId}`);
+
+      if (response.status === 200) {
+        fetchData();
+        console.log("Deleted successfully");
+        setButtonLoading(false);
+        const message = "Successfully Delete Notice";
+        const alertType = "success";
+        displayNotification(message, alertType);
+        setDeleteId("");
+        setDeleteName("");
+        handleClose();
+      }
+    } catch (error) {
+      console.error("There is someee  error", error);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -184,7 +245,8 @@ function NoticeBoard({ signInTrue }) {
                                   ml: 0,
                                   mt: 0,
                                   mb: 3,
-                                  height: "350px",
+                                  height: "400px",
+                                  // objectFit: "contain",
                                 }}
                               />
                               <Stack
@@ -227,7 +289,12 @@ function NoticeBoard({ signInTrue }) {
                                         <EditIcon />
                                       </SoftButton>
                                     </Link>
-                                    <SoftButton color="error" circular iconOnly>
+                                    <SoftButton
+                                      onClick={() => deleteNotice(item)}
+                                      color="error"
+                                      circular
+                                      iconOnly
+                                    >
                                       <DeleteIcon />
                                     </SoftButton>
                                   </Stack>
@@ -252,6 +319,33 @@ function NoticeBoard({ signInTrue }) {
         </SoftBox>
       </SoftBox>
       {signInTrue ? null : <Footer />}
+
+      {/* Delete MOdal */}
+      <Dialog maxWidth="xs" fullWidth open={open} onClose={handleClose}>
+        <DialogTitle>Delete event</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Do you want to delete {deleteName}!</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <SoftButton onClick={handleClose}>Cancel</SoftButton>
+          <SoftButton disabled={buttonLoading} color="error" onClick={deleteEvent}>
+            Delete
+            {buttonLoading ? <CircularProgress color="secondary" sx={{ ml: 2 }} size={22} /> : null}
+          </SoftButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </DashboardLayout>
   );
 }

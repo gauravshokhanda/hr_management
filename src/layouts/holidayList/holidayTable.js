@@ -3,7 +3,7 @@ import SoftBox from "components/SoftBox";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Avatar, Box, Chip, Stack, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Chip, CircularProgress, Snackbar, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import SoftButton from "components/SoftButton";
 import moment from "moment";
@@ -20,8 +20,12 @@ export default function HolidayTable({ isAdmin }) {
   const [holidays, setHolidays] = useState([]);
   const [deleteId, setDeleteId] = useState("");
   const [deleteName, setDeleteName] = useState("");
-  const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);  
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -30,6 +34,17 @@ export default function HolidayTable({ isAdmin }) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const displayNotification = (message, alertType) => {
+    setNotificationMessage(message);
+    setNotificationOpen(true);
+    setSeverity(alertType);
+  };
+
 
   const fetchData = async () => {
     try {
@@ -66,20 +81,26 @@ export default function HolidayTable({ isAdmin }) {
   };
 
   const deleteEvent = async () => {
+    setButtonLoading(true);
     try {
       const response = await axios.delete(`${API_URL}/holiday/holiday-list/${deleteId}`);
 
       if (response.status === 200) {
         fetchData();
-        console.log("Deleted successfully");
+        setDeleteId("");
+        setDeleteName("");
+        handleClose();
+        const message = "Successfully Delete Notice";
+        const alertType = "success";
+        displayNotification(message, alertType);
+        setDeleteId("");
+        setDeleteName("");
+        handleClose();
       }
     } catch (error) {
       console.error("There is someee  error", error);
     }
 
-    setDeleteId("");
-    deleteName("");
-    handleClose();
   };
 
   // Define columns as a separate constant
@@ -176,6 +197,8 @@ export default function HolidayTable({ isAdmin }) {
           />
         )}
       </SoftBox>
+
+      {/* Delete MOdal */}
       <Dialog maxWidth="xs" fullWidth open={open} onClose={handleClose}>
         <DialogTitle>Delete event</DialogTitle>
         <DialogContent>
@@ -183,11 +206,24 @@ export default function HolidayTable({ isAdmin }) {
         </DialogContent>
         <DialogActions>
           <SoftButton onClick={handleClose}>Cancel</SoftButton>
-          <SoftButton color="error" onClick={deleteEvent}>
+          <SoftButton disabled={buttonLoading} color="error" onClick={deleteEvent}>
             Delete
+            {buttonLoading ? <CircularProgress color="secondary" sx={{ ml: 2 }} size={22} /> : null}
           </SoftButton>
         </DialogActions>
       </Dialog>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

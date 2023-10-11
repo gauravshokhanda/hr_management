@@ -4,7 +4,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import NoticeBoard from "layouts/noticeBoard";
-import { DialogContent, Stack } from "@mui/material";
+import { Alert, DialogContent, Stack } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { API_URL } from "config";
 import axios from "axios";
@@ -13,6 +13,7 @@ import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import LoadingButton from '@mui/lab/LoadingButton';
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -26,12 +27,10 @@ import Footer from "examples/Footer";
 // Hr Management Dashboard React base styles
 import typography from "assets/theme/base/typography";
 import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 // Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
 import { TornadoRounded } from "@mui/icons-material";
-import io from "socket.io-client";
 import Loader from "loader";
 
 function Attendence() {
@@ -46,7 +45,12 @@ function Attendence() {
   const [attendanceId, setAttendanceId] = useState("");
   const [todayAttendence, setTodayAttendence] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const [buttonLoading, setButtonLoading] = useState({
+    checkInLoading: false,
+    breakInLoading: false,
+    breakEndLoading: false,
+    checkOutLoading: false,
+  });
 
   const data = useSelector((state) => state.auth);
 
@@ -55,14 +59,18 @@ function Attendence() {
     checkIn: "",
     status: "",
   });
+
   const [breakInData, setBreakInData] = useState({
     attendanceId: "",
     breakStart: "",
   });
+
   const [breakOutData, setBreakOutData] = useState({
     attendanceId: "",
     breakEnd: "",
+
   });
+
   const [checkOutData, setCheckOutData] = useState({
     attendanceId: "",
     checkOut: "",
@@ -70,10 +78,13 @@ function Attendence() {
 
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
 
-  const displayNotification = (message) => {
+  const displayNotification = (message, alertType) => {
     setNotificationMessage(message);
+    console.log(alertType);
     setNotificationOpen(true);
+    setSeverity(alertType);
   };
 
   const handleCloseNotification = () => {
@@ -81,18 +92,6 @@ function Attendence() {
   };
 
   const user = data.user;
-  useEffect(() => {
-    // Listen for attendance updates from the server
-    socket.on("attendanceUpdate", (data) => {
-      // Display a notification to the user when an update is received
-      console.log("Received attendance update:", data);
-    });
-
-    return () => {
-      // Disconnect the Socket.io client when the component unmounts
-      socket.disconnect();
-    };
-  }, []);
 
   const todayDate = new Date();
 
@@ -187,9 +186,15 @@ function Attendence() {
         if (response.status === 201) {
           fetchData();
           console.log(response.data, "Successfully submitted attendance");
+          
+          
+          setButtonLoading({checkInLoading:false});
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
+        const message = "Internal server error";
+        const alertType = "error";
+        displayNotification(message, alertType);
       }
     }
   };
@@ -205,9 +210,16 @@ function Attendence() {
         if (response.status === 200) {
           fetchData();
           console.log(response, "Succesfully submitted attendence");
+          const message = "Successfully Break In";
+          const alertType = "success";
+          displayNotification(message, alertType);
+          setButtonLoading({breakInLoading:false});
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
+        const message = "Internal server error";
+        const alertType = "error";
+        displayNotification(message, alertType);
       }
     }
   };
@@ -222,9 +234,16 @@ function Attendence() {
         if (response.status === 200) {
           fetchData();
           console.log(response, "Succesfully submitted attendence");
+          const message = "Successfully Break Out";
+          const alertType = "success";
+          displayNotification(message, alertType);
+          setButtonLoading({breakEndLoading:false});
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
+        const message = "Internal server error";
+        const alertType = "error";
+        displayNotification(message, alertType);
       }
     }
   };
@@ -239,14 +258,23 @@ function Attendence() {
         if (response.status === 200) {
           fetchData();
           console.log(response, "Succesfully submitted attendence");
+          const message = "Successfully Check Out";
+          const alertType = "success";
+          displayNotification(message, alertType);
+          setButtonLoading({checkOutLoading:false});
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
+        const message = "Internal server error";
+        const alertType = "error";
+        displayNotification(message, alertType);
       }
     }
   };
 
   const handleCheckIn = () => {
+    setButtonLoading({checkInLoading:true});
+
     setCheckInData((prevData) => ({
       ...prevData,
       date: new Date(),
@@ -256,6 +284,7 @@ function Attendence() {
     }));
   };
   const handleBreakIn = () => {
+    setButtonLoading({breakInLoading:true});
     setBreakInData((prevData) => ({
       ...prevData,
       attendanceId: attendanceId,
@@ -264,6 +293,7 @@ function Attendence() {
   };
 
   const handleBreakOut = () => {
+    setButtonLoading({breakEndLoading:true});
     setBreakOutData((prevData) => ({
       ...prevData,
       attendanceId: attendanceId,
@@ -272,6 +302,7 @@ function Attendence() {
   };
 
   const handleCheckOut = () => {
+    setButtonLoading({checkOutLoading:true});
     setCheckOutData((prevData) => ({
       ...prevData,
       attendanceId: attendanceId,
@@ -332,45 +363,45 @@ function Attendence() {
       },
     },
     {
+      headerName: "Break Time",
+      width: 360,
+      renderCell: (params) => {
+        const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
+        const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
+        
+        console.log(breakStarts, "Start ");
+        console.log(breakEnds, "End");
+        
+        if (breakStarts && breakEnds) {
+          const formattedBreakTimes = [];
+          
+          for (let i = 0; i < breakStarts.length; i++) {
+            const breakStartTime = moment(breakStarts[i]).format("LT");
+            const breakEndTime = breakEnds.length > i ? moment(breakEnds[i]).format("LT") : null;
+            
+            formattedBreakTimes.push(`${breakStartTime} - ${breakEndTime}`);
+          }
+          
+          return (
+            <Stack direction="row" spacing={2}>
+              {formattedBreakTimes.slice(0, 2).map((breakTime, index) => (
+                <Chip key={index} label={breakTime} />
+                ))}
+              {formattedBreakTimes.length > 2 && <Chip label={`...`} />}
+            </Stack>
+          );
+        }
+        
+        return "N/A"; // Handle the case where breakStarts or breakEnds are missing
+      },
+    },
+    {
       field: "checkOut",
       headerName: "Checkout Time",
       width: 150,
       renderCell: (params) => {
         const time = params.row.checkOut;
         return time ? moment(time).format("LT") : "";
-      },
-    },
-    {
-      headerName: "Break Time",
-      width: 360,
-      renderCell: (params) => {
-        const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
-        const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
-
-        console.log(breakStarts, "Start ");
-        console.log(breakEnds, "End");
-
-        if (breakStarts && breakEnds) {
-          const formattedBreakTimes = [];
-
-          for (let i = 0; i < breakStarts.length; i++) {
-            const breakStartTime = moment(breakStarts[i]).format("LT");
-            const breakEndTime = breakEnds.length > i ? moment(breakEnds[i]).format("LT") : null;
-
-            formattedBreakTimes.push(`${breakStartTime} - ${breakEndTime}`);
-          }
-
-          return (
-            <Stack direction="row" spacing={2}>
-              {formattedBreakTimes.slice(0, 2).map((breakTime, index) => (
-                <Chip key={index} label={breakTime} />
-              ))}
-              {formattedBreakTimes.length > 2 && <Chip label={`...`} />}
-            </Stack>
-          );
-        }
-
-        return "N/A"; // Handle the case where breakStarts or breakEnds are missing
       },
     },
     {
@@ -437,55 +468,45 @@ function Attendence() {
             </SoftTypography>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
-            <SoftButton
+            <LoadingButton
               disabled={!checkInBtn}
               variant="contained"
               color="info"
               onClick={handleCheckIn}
+              loading={buttonLoading.checkInLoading}
             >
               Check In
-            </SoftButton>
-            <SoftButton
+            </LoadingButton>
+            <LoadingButton
               disabled={!breakInBtn}
               variant="contained"
               color="warning"
               onClick={handleBreakIn}
+              loading={buttonLoading.breakInLoading}
             >
               Break In
-            </SoftButton>
-            <SoftButton
+            </LoadingButton>
+            <LoadingButton
               disabled={!breakEndBtn}
               variant="contained"
-              color="warning"
+              color="inherit"
               onClick={handleBreakOut}
+              loading={buttonLoading.breakEndLoading}
             >
               Break Out
-            </SoftButton>
-            <SoftButton
+            </LoadingButton>
+            <LoadingButton
               disabled={!checkOutBtn}
               variant="contained"
               color="success"
               onClick={handleCheckOut}
+              loading={buttonLoading.checkOutLoading}
             >
               Check Out
-            </SoftButton>
+            </LoadingButton>
           </SoftBox>
         </SoftBox>
       )}
-      <Snackbar
-        open={notificationOpen}
-        autoHideDuration={5000} // Adjust the duration as needed
-        onClose={handleCloseNotification}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={handleCloseNotification}
-          severity="info" // Adjust the severity as needed
-        >
-          {notificationMessage}
-        </MuiAlert>
-      </Snackbar>
       <SoftBox py={3}>
         {loading ? (
           <Loader />
@@ -539,6 +560,18 @@ function Attendence() {
           <NoticeBoard signInTrue={signInTrue} />
         </DialogContent>
       </Dialog>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </DashboardLayout>
   );
 }

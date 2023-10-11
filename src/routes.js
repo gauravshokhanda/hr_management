@@ -57,8 +57,8 @@ const routes = [
   {
     type: "collapse",
     name: "Employee",
-    key: "manageEmployee",
-    route: "/manageEmployee",
+    key: "manage-Employee",
+    route: "/manage-employee",
     icon: <Office size="12px" />,
     component: <Employee />,
     adminOnly: true,

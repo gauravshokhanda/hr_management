@@ -8,7 +8,7 @@ import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
-import curved9 from "assets/images/curved-images/curved-6.jpg";
+import curved9 from "assets/images/curved-images/curved-6.png";
 import { Switch, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { setUserAndToken } from "../../../store/authSlice"; // Update the path
@@ -82,6 +82,7 @@ function SignIn() {
       title={user ? `Welcome ${user.userName}` : 'Welcome Back'}
       description={user ? "" : "Enter your email and password to sign in"}
       image={curved9}
+      sx={{backGroundSize: 'cover'}}
     >
       {!user ? (
         <SoftBox component="form" onSubmit={handleSubmit} role="form">

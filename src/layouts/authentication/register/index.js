@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Checkbox from "@mui/material/Checkbox";
-import { Box, Button, Grid, Input, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, Grid, Input, Snackbar, Typography } from "@mui/material";
 import axios from "axios";
 import { API_URL } from "../../../config";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -16,6 +16,29 @@ import PropTypes from "prop-types";
 function Register() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const displayNotification = (message, alertType) => {
+    setNotificationMessage(message);
+    setNotificationOpen(true);
+    setSeverity(alertType);
+  };
 
   useEffect(() => {
     // Check if 'id' is available and fetch employee data if it exists
@@ -80,6 +103,7 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setButtonLoading(true);
 
     try {
       const formDataToSend = new FormData();
@@ -97,30 +121,34 @@ function Register() {
       formDataToSend.append("accountNumber", formData.accountNumber);
       formDataToSend.append("ifscCode", formData.ifscCode);
 
-      if (id) {
-        await axios.put(`${API_URL}/employes/update/${id}`, formDataToSend);
-      } else {
-        await axios.post(`${API_URL}/employes/register`, formDataToSend);
+      const response = await (id
+        ? axios.put(`${API_URL}/employes/update/${id}`, formDataToSend)
+        : axios.post(`${API_URL}/employes/register`, formDataToSend));
+
+      if (response.status === 200 || response.status === 200) {
+        console.log(`Employee ${id ? "updated" : "registered"} successfully`);
+        
+        const message = `Successfully ${id ? "Updated" : "Register"} employee`;
+        const alertType = "success";
+        displayNotification(message, alertType);
+        setFormData({
+          firstName: "",
+          lastName: "",
+          userName: "",
+          password: "",
+          isAdmin: false,
+          isStaff: false,
+          salary: "",
+          userEmail: "",
+          image: "",
+          accountNumber: "",
+          ifscCode: "",
+        });
+        
+        setSelectedImage(null);
+        setButtonLoading(false);
+        navigate("/manage-employee", { replace: true });
       }
-
-      console.log(`Employee ${id ? "updated" : "registered"} successfully`);
-      navigate("/attendance", { replace: true });
-
-      setFormData({
-        firstName: "",
-        lastName: "",
-        userName: "",
-        password: "",
-        isAdmin: false,
-        isStaff: false,
-        salary: "",
-        userEmail: "",
-        image: "",
-        accountNumber: "",
-        ifscCode: "",
-      });
-
-      setSelectedImage(null);
     } catch (error) {
       console.error("Registration failed", error);
     }
@@ -137,6 +165,11 @@ function Register() {
             selectedImage={selectedImage}
             handleImageChange={handleImageChange}
             id={id}
+            notificationOpen={notificationOpen}
+            handleCloseNotification={handleCloseNotification}
+            severity={severity}
+            notificationMessage={notificationMessage}
+            buttonLoading={buttonLoading}
           />
         </DashboardLayout>
       ) : (
@@ -147,6 +180,11 @@ function Register() {
           selectedImage={selectedImage}
           handleImageChange={handleImageChange}
           id={id}
+          notificationOpen={notificationOpen}
+          handleCloseNotification={handleCloseNotification}
+          severity={severity}
+          notificationMessage={notificationMessage}
+          buttonLoading={buttonLoading}
         />
       )}
     </>
@@ -160,6 +198,11 @@ function RegisterWrapper({
   selectedImage,
   handleImageChange,
   id,
+  notificationOpen,
+  handleCloseNotification,
+  severity,
+  notificationMessage,
+  buttonLoading,
 }) {
   return (
     <SoftBox>
@@ -342,7 +385,7 @@ function RegisterWrapper({
                               <img
                                 src={URL.createObjectURL(selectedImage)}
                                 alt="Selected"
-                                style={{ maxWidth: "100%" }}
+                                style={{ width: "400px", height: "250px", objectFit: "cover" }}
                               />
                               <Typography variant="body1">{selectedImage.name}</Typography>
                             </div>
@@ -354,8 +397,16 @@ function RegisterWrapper({
                 </Grid>
 
                 <SoftBox mt={4} mb={1} display="flex" justifyContent="end">
-                  <SoftButton variant="gradient" type="submit" color="dark">
+                  <SoftButton
+                    disabled={buttonLoading}
+                    variant="gradient"
+                    type="submit"
+                    color="dark"
+                  >
                     Register
+                    {buttonLoading ? (
+                      <CircularProgress color="secondary" sx={{ ml: 2 }} size={22} />
+                    ) : null}
                   </SoftButton>
                 </SoftBox>
               </SoftBox>
@@ -363,6 +414,18 @@ function RegisterWrapper({
           </Card>
         </Grid>
       </Grid>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </SoftBox>
   );
 }
@@ -381,12 +444,17 @@ RegisterWrapper.propTypes = {
     userEmail: PropTypes.string,
     accountNumber: PropTypes.string,
     ifscCode: PropTypes.string,
+    severity: PropTypes.string,
+    notificationMessage: PropTypes.string,
+    notificationOpen: PropTypes.bool,
+    buttonLoading: PropTypes.bool,
   }).isRequired,
   handleChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   selectedImage: PropTypes.object,
   handleImageChange: PropTypes.func.isRequired,
-  id:PropTypes.func.isRequired,
+  handleCloseNotification: PropTypes.func.isRequired,
+  id: PropTypes.func.isRequired,
 };
 
 export default Register;
