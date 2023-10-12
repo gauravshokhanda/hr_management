@@ -13,6 +13,7 @@ import { Box, Card, CardMedia, Typography } from "@mui/material";
 import curved14 from "assets/images/curved-images/curved14.jpg";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Loader from "loader";
+import { useParams } from "react-router-dom";
 
 function Overview() {
   const [userData, setUserData] = useState([]);
@@ -20,10 +21,12 @@ function Overview() {
   const [loading, setLoading] = useState(true);
   const data = useSelector((state) => state.auth);
 
+  const { id } = useParams();
+
   // In your fetchData function
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/employes/view/${userId}`, {
+      const response = await axios.get(`${API_URL}/employes/view/${id ? id : userId}`, {
         headers: {
           Authorization: `${data.token}`,
         },

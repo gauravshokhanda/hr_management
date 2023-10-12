@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Checkbox from "@mui/material/Checkbox";
-import { Alert, Box, Button, CircularProgress, Grid, Input, Snackbar, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  Input,
+  Snackbar,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import { API_URL } from "../../../config";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -12,31 +21,23 @@ import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import PropTypes from "prop-types";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 function Register() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
   const [severity, setSeverity] = useState("");
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleCloseNotification = () => {
     setNotificationOpen(false);
   };
 
   const displayNotification = (message, alertType) => {
-    setNotificationMessage(message);
     setNotificationOpen(true);
+    setNotificationMessage(message);
     setSeverity(alertType);
   };
 
@@ -120,14 +121,15 @@ function Register() {
       formDataToSend.append("userEmail", formData.userEmail);
       formDataToSend.append("accountNumber", formData.accountNumber);
       formDataToSend.append("ifscCode", formData.ifscCode);
+      formDataToSend.append("dateOfJoining", formData.dateOfJoining);
 
       const response = await (id
         ? axios.put(`${API_URL}/employes/update/${id}`, formDataToSend)
         : axios.post(`${API_URL}/employes/register`, formDataToSend));
 
-      if (response.status === 200 || response.status === 200) {
+      if (response.status === 201 || response.status === 200) {
         console.log(`Employee ${id ? "updated" : "registered"} successfully`);
-        
+
         const message = `Successfully ${id ? "Updated" : "Register"} employee`;
         const alertType = "success";
         displayNotification(message, alertType);
@@ -144,12 +146,18 @@ function Register() {
           accountNumber: "",
           ifscCode: "",
         });
-        
+
         setSelectedImage(null);
         setButtonLoading(false);
-        navigate("/manage-employee", { replace: true });
+        setTimeout(() => {
+          navigate("/manage-employee", { replace: true });
+        }, 1000);
       }
     } catch (error) {
+      const message = `Internal server error`;
+      const alertType = "error";
+      displayNotification(message, alertType);
+      setButtonLoading(false);
       console.error("Registration failed", error);
     }
   };
@@ -209,7 +217,14 @@ function RegisterWrapper({
       <Grid container justifyContent={`center`}>
         <Grid item xs={12}>
           <Card>
-            <SoftBox px={3} pt={3} pb={1}>
+            <SoftBox px={3} pt={3} pb={1} display='flex' alignItems='center' gap='12px'>
+              {id ? (
+                <Link to={`/manage-employee`}>
+                  <SoftButton color='info' circular iconOnly>
+                    <KeyboardBackspaceIcon />
+                  </SoftButton>
+                </Link>
+              ) : null}
               <SoftTypography variant="h3" fontWeight="bold">
                 {id ? "Edit Employee" : "Register"}
               </SoftTypography>

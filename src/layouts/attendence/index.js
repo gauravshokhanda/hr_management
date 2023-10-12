@@ -5,7 +5,7 @@ import Toolbar from "@mui/material/Toolbar";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import NoticeBoard from "layouts/noticeBoard";
 import { Alert, DialogContent, Stack } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -13,7 +13,7 @@ import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { useSelector } from "react-redux";
 import moment from "moment";
-import LoadingButton from '@mui/lab/LoadingButton';
+import LoadingButton from "@mui/lab/LoadingButton";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -25,12 +25,10 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // Hr Management Dashboard React base styles
-import typography from "assets/theme/base/typography";
 import Snackbar from "@mui/material/Snackbar";
 // Data
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
-import { TornadoRounded } from "@mui/icons-material";
 import Loader from "loader";
 
 function Attendence() {
@@ -52,6 +50,10 @@ function Attendence() {
     checkOutLoading: false,
   });
 
+  const { employeeAttendanceId } = useParams();
+
+  console.log(employeeAttendanceId, "sduhffui");
+
   const data = useSelector((state) => state.auth);
 
   const [checkInData, setCheckInData] = useState({
@@ -68,7 +70,6 @@ function Attendence() {
   const [breakOutData, setBreakOutData] = useState({
     attendanceId: "",
     breakEnd: "",
-
   });
 
   const [checkOutData, setCheckOutData] = useState({
@@ -100,64 +101,69 @@ function Attendence() {
   const isCheckIn = isTodayAttendance && todayAttendence.checkIn;
   const isBreakStart = isTodayAttendance ? todayAttendence.breakStart : [];
   const isBreakEnd = isTodayAttendance ? todayAttendence.breakEnd : [];
-  const isCheckOut = isTodayAttendance && todayAttendence.checkOut;
+  const isCheckOut = todayAttendence && todayAttendence.checkOut;
+
+  console.log(isCheckOut, "Out");
 
   useEffect(() => {
-    // Disable all buttons initially
-    setCheckInBtn(true);
-    setBreakInBtn(false);
-    setBreakEndBtn(false);
-    setCheckOutBtn(false);
+    // By default, all buttons are disabled
+    let checkInEnabled = true;
+    let breakInEnabled = false;
+    let breakEndEnabled = false;
+    let checkOutEnabled = false;
 
     if (!isCheckIn && isTodayAttendance) {
-      setCheckInBtn(true);
+      checkInEnabled = true;
     }
 
     if (isCheckIn) {
-      setCheckInBtn(false);
-      setCheckOutBtn(true);
+      checkOutEnabled = true;
+      checkInEnabled = false;
       if (isBreakStart.length === isBreakEnd.length) {
-        setBreakInBtn(true);
+        breakInEnabled = true;
       }
     }
-  }, [isCheckIn, isTodayAttendance, isBreakStart.length, isBreakEnd.length]);
 
-  useEffect(() => {
-    if (isCheckIn && isBreakStart.length === isBreakEnd.length) {
-      setBreakInBtn(true);
-      setBreakEndBtn(false);
-    }
-  }, [isCheckIn, isBreakStart.length, isBreakEnd.length]);
-
-  useEffect(() => {
     if (isBreakEnd.length < isBreakStart.length) {
-      setCheckOutBtn(true);
-      setBreakEndBtn(true);
-      setBreakInBtn(false);
+      breakEndEnabled = true;
+      breakInEnabled = false;
     }
-  }, [isBreakStart.length, isBreakEnd.length]);
 
-  useEffect(() => {
-    if (!isCheckOut && isTodayAttendance) {
-      setCheckOutBtn(true);
+    if (isCheckOut === null || isCheckOut) {
+      if (isBreakStart.length > 0 && isBreakEnd.length === 0) {
+        breakInEnabled = false;
+        breakEndEnabled = true;
+      } else if (isBreakStart.length === 0 && isBreakEnd.length > 0) {
+        breakEndEnabled = false;
+        breakInEnabled = true;
+      }
     }
-    if (isCheckOut && isTodayAttendance) {
-      setCheckInBtn(false);
-      setBreakInBtn(false);
-      setBreakEndBtn(false);
-      setCheckOutBtn(false);
+
+    if (isCheckOut !== null && isTodayAttendance && isCheckOut) {
+      breakEndEnabled = false;
+      breakInEnabled = false;
     }
-  }, [isCheckOut, isTodayAttendance]);
+
+    setCheckInBtn(checkInEnabled);
+    setBreakInBtn(breakInEnabled);
+    setBreakEndBtn(breakEndEnabled);
+    setCheckOutBtn(checkOutEnabled);
+  }, [isCheckIn, isTodayAttendance, isBreakStart, isBreakEnd, isCheckOut]);
+
+  // Rest of your component code...
 
   const fetchData = async () => {
     if (user) {
       try {
-        const response = await axios.get(`${API_URL}/attendance/view/${user._id}`, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await axios.get(
+          `${API_URL}/attendance/view/${employeeAttendanceId ? employeeAttendanceId : user._id}`,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (response.status === 200) {
           const lastAttendance = response.data.slice(-1)[0];
           setAttendance(response.data);
@@ -175,6 +181,12 @@ function Attendence() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (attendance.length === 0) {
+      setLoading(false);
+    }
+  }, []);
+
   const submitCheckIn = async () => {
     if (user) {
       try {
@@ -186,9 +198,8 @@ function Attendence() {
         if (response.status === 201) {
           fetchData();
           console.log(response.data, "Successfully submitted attendance");
-          
-          
-          setButtonLoading({checkInLoading:false});
+
+          setButtonLoading({ checkInLoading: false });
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
@@ -213,7 +224,7 @@ function Attendence() {
           const message = "Successfully Break In";
           const alertType = "success";
           displayNotification(message, alertType);
-          setButtonLoading({breakInLoading:false});
+          setButtonLoading({ breakInLoading: false });
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
@@ -237,7 +248,7 @@ function Attendence() {
           const message = "Successfully Break Out";
           const alertType = "success";
           displayNotification(message, alertType);
-          setButtonLoading({breakEndLoading:false});
+          setButtonLoading({ breakEndLoading: false });
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
@@ -261,7 +272,7 @@ function Attendence() {
           const message = "Successfully Check Out";
           const alertType = "success";
           displayNotification(message, alertType);
-          setButtonLoading({checkOutLoading:false});
+          setButtonLoading({ checkOutLoading: false });
         }
       } catch (error) {
         console.log(error, "There is some error in submitting data");
@@ -273,7 +284,7 @@ function Attendence() {
   };
 
   const handleCheckIn = () => {
-    setButtonLoading({checkInLoading:true});
+    setButtonLoading({ checkInLoading: true });
 
     setCheckInData((prevData) => ({
       ...prevData,
@@ -284,7 +295,7 @@ function Attendence() {
     }));
   };
   const handleBreakIn = () => {
-    setButtonLoading({breakInLoading:true});
+    setButtonLoading({ breakInLoading: true });
     setBreakInData((prevData) => ({
       ...prevData,
       attendanceId: attendanceId,
@@ -293,7 +304,7 @@ function Attendence() {
   };
 
   const handleBreakOut = () => {
-    setButtonLoading({breakEndLoading:true});
+    setButtonLoading({ breakEndLoading: true });
     setBreakOutData((prevData) => ({
       ...prevData,
       attendanceId: attendanceId,
@@ -302,12 +313,20 @@ function Attendence() {
   };
 
   const handleCheckOut = () => {
-    setButtonLoading({checkOutLoading:true});
-    setCheckOutData((prevData) => ({
-      ...prevData,
+    setButtonLoading({ checkOutLoading: true });
+
+    const date = todayAttendence.checkOut
+      ? todayAttendence.checkOut === null
+        ? ""
+        : moment(todayAttendence.checkOut)
+      : "";
+
+    const newCheckOutData = {
       attendanceId: attendanceId,
-      checkOut: new Date(),
-    }));
+      checkOut: moment.isMoment(date) ? null : new Date(),
+    };
+
+    setCheckOutData(newCheckOutData);
   };
 
   useEffect(() => {
@@ -329,7 +348,7 @@ function Attendence() {
   }, [breakOutData]);
 
   useEffect(() => {
-    if (checkOutData.checkOut) {
+    if (checkOutData.checkOut || checkOutData.checkOut === null) {
       submitCheckOut();
     }
   }, [checkOutData]);
@@ -368,30 +387,28 @@ function Attendence() {
       renderCell: (params) => {
         const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
         const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
-        
-        console.log(breakStarts, "Start ");
-        console.log(breakEnds, "End");
-        
+
         if (breakStarts && breakEnds) {
           const formattedBreakTimes = [];
-          
+
           for (let i = 0; i < breakStarts.length; i++) {
             const breakStartTime = moment(breakStarts[i]).format("LT");
-            const breakEndTime = breakEnds.length > i ? moment(breakEnds[i]).format("LT") : null;
-            
+            const breakEndTime =
+              breakEnds.length > i ? moment(breakEnds[i]).format("LT") : "Pending";
+
             formattedBreakTimes.push(`${breakStartTime} - ${breakEndTime}`);
           }
-          
+
           return (
             <Stack direction="row" spacing={2}>
               {formattedBreakTimes.slice(0, 2).map((breakTime, index) => (
                 <Chip key={index} label={breakTime} />
-                ))}
-              {formattedBreakTimes.length > 2 && <Chip label={`...`} />}
+              ))}
+              {formattedBreakTimes.length > 2 && <Chip key={"dot"} label={`...`} />}
             </Stack>
           );
         }
-        
+
         return "N/A"; // Handle the case where breakStarts or breakEnds are missing
       },
     },
@@ -498,11 +515,21 @@ function Attendence() {
             <LoadingButton
               disabled={!checkOutBtn}
               variant="contained"
-              color="success"
+              color={
+                todayAttendence.checkOut
+                  ? todayAttendence.checkOut === null
+                    ? "error"
+                    : "primary"
+                  : "error"
+              }
               onClick={handleCheckOut}
               loading={buttonLoading.checkOutLoading}
             >
-              Check Out
+              {todayAttendence.checkOut
+                ? todayAttendence.checkOut === null
+                  ? "Check Out"
+                  : "Un Check Out"
+                : "Check Out"}
             </LoadingButton>
           </SoftBox>
         </SoftBox>

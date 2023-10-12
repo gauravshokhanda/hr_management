@@ -54,7 +54,7 @@ function NoticeBoard({ signInTrue }) {
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState("");
   const [deleteName, setDeleteName] = useState("");
-  const [buttonLoading, setButtonLoading] = useState(false);  
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
   const [severity, setSeverity] = useState("");
@@ -236,19 +236,21 @@ function NoticeBoard({ signInTrue }) {
                         {notice.map((item) => {
                           return (
                             <SwiperSlide key={item._id}>
-                              <CardMedia
-                                component="img"
-                                image={`${API_URL}/${item.imgPath}`}
-                                sx={{
-                                  borderRadius: 3,
-                                  width: "100%",
-                                  ml: 0,
-                                  mt: 0,
-                                  mb: 3,
-                                  height: "400px",
-                                  // objectFit: "contain",
-                                }}
-                              />
+                              {item.imgPath === null ? null : (
+                                <CardMedia
+                                  component="img"
+                                  image={`${API_URL}/${item.imgPath}`}
+                                  sx={{
+                                    borderRadius: 3,
+                                    width: "100%",
+                                    ml: 0,
+                                    mt: 0,
+                                    mb: 3,
+                                    height: "400px",
+                                    // objectFit: "contain",
+                                  }}
+                                />
+                              )}
                               <Stack
                                 direction="row"
                                 justifyContent="space-between"
@@ -302,7 +304,7 @@ function NoticeBoard({ signInTrue }) {
                               </Stack>
                               <Typography
                                 variant="body1"
-                                sx={{ my: 2, overflowY: "auto", height: "250px" }}
+                                sx={{ my: 2, overflowY: "auto", height: "200px" }}
                               >
                                 {item.description}
                               </Typography>
