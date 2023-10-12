@@ -11,6 +11,9 @@ import {
   MenuItem,
   Chip,
   TextField,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import SoftBox from "components/SoftBox";
@@ -24,7 +27,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import SoftButton from "components/SoftButton";
 import SoftInput from "components/SoftInput";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { LoadingButton } from "@mui/lab";
 
 const CARD_PROPERTY = {
   borderRadius: 3,
@@ -38,6 +42,24 @@ function NoticeBoard() {
     imgPath: "",
     tags: [],
   });
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+
+
+  const navigate = useNavigate();
+
+  const displayNotification = (message, alertType) => {
+    setNotificationMessage(message);
+    console.log(alertType);
+    setNotificationOpen(true);
+    setSeverity(alertType);
+  };
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
 
   const { id } = useParams();
 
@@ -79,6 +101,7 @@ function NoticeBoard() {
   };
 
   const handleSubmit = async (e) => {
+    setButtonLoading(true);
     e.preventDefault();
 
     try {
@@ -96,22 +119,36 @@ function NoticeBoard() {
         formData.append("image", selectedImage, selectedImage.name);
       }
 
-      const response = await (id ? axios.put(`${API_URL}/notices/update/${id}`, formData) : axios.post(`${API_URL}/notices/notice`, formData));
+      const response = await (id
+        ? axios.put(`${API_URL}/notices/update/${id}`, formData)
+        : axios.post(`${API_URL}/notices/notice`, formData));
 
-      console.log("Notice saved successfully", response.data);
+      if (response.status === 201 || response.status === 200) {
+        console.log("Notice saved successfully", response.data);
 
-      setFormData({
-        heading: "",
-        description: "",
-        imgPath: "",
-        tags: [],
-      });
+        setFormData({
+          heading: "",
+          description: "",
+          imgPath: "",
+          tags: [],
+        });
 
-      setSelectedImage("");
-
-      setPersonName([]);
+        setSelectedImage("");
+        setPersonName([]);
+        const message = `Successfully ${id ? "updated" : "added"} Post`;
+        const alertType = "success";
+        displayNotification(message, alertType);
+        setButtonLoading(false);
+        navigate('/notice'); 
+      }
     } catch (error) {
       console.error("Notice saved failed", error);
+      if (error.response.status === 500 || error.code === "ERR_NETWORK") {
+        const message = "Internal server error";
+        const alertType = "error";
+        displayNotification(message, alertType);
+        setButtonLoading(false);
+      }
     }
   };
 
@@ -181,7 +218,7 @@ function NoticeBoard() {
                     }}
                   >
                     <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                      {id ? "Update" :"Add"} Notice
+                      {id ? "Update" : "Add"} Notice
                     </Typography>
                   </Box>
                 </Box>
@@ -243,7 +280,7 @@ function NoticeBoard() {
                           {selectedImage ? (
                             <div>
                               <img
-                                src={setectedImgPath }
+                                src={setectedImgPath}
                                 alt="Selected"
                                 style={{ maxWidth: "400px" }}
                               />
@@ -251,12 +288,16 @@ function NoticeBoard() {
                             </div>
                           ) : (
                             <div>
-                              <img
-                                src={API_URL + "/" + formData.imgPath}
-                                alt={formData.imgPath ? formData.heading : "Add image"}
-                                style={{ maxWidth: "400px" }}
-                              />
-                              <Typography variant="body1">{formData.imgPath}</Typography>
+                              {formData.imgPath && (
+                                <>
+                                  <img
+                                    src={API_URL + "/" + formData.imgPath}
+                                    alt={formData.imgPath ? formData.heading : "Add image"}
+                                    style={{ maxWidth: "400px" }}
+                                  />
+                                  <Typography variant="body1">{formData.imgPath}</Typography>
+                                </>
+                              )}
                             </div>
                           )}
                         </Box>
@@ -295,9 +336,15 @@ function NoticeBoard() {
                       </Select>
                     </SoftBox>
                     <SoftBox mt={4} mb={1}>
-                      <SoftButton variant="gradient" type="submit" color="dark">
+                      <LoadingButton
+                        loading={buttonLoading}
+                        loadingIndicatorEnd
+                        variant="contained"
+                        type="submit"
+                        color="primary"
+                      >
                         {id ? "Update" : "Add"} Notice
-                      </SoftButton>
+                      </LoadingButton>
                     </SoftBox>
                   </SoftBox>
                 </SoftBox>
@@ -306,6 +353,18 @@ function NoticeBoard() {
           </Grid>
         </SoftBox>
       </SoftBox>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
       <Footer />
     </DashboardLayout>
   );

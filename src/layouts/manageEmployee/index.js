@@ -38,7 +38,7 @@ function Employee() {
           {addEmployee ? (
             <Card>
               <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-                <SoftTypography variant="h6">Authors table</SoftTypography>
+                <SoftTypography variant="h6">Emmployee table</SoftTypography>
                 <SoftBox>
                   {selectedRowIds.length > 0 ? (
                     <SoftButton

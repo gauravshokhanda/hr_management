@@ -28,6 +28,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Link } from "react-router-dom";
 import SoftInput from "components/SoftInput";
+import Loader from "loader";
 
 function Salary() {
   const [salaryData, setSalaryData] = useState([]);
@@ -45,6 +46,7 @@ function Salary() {
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -79,10 +81,13 @@ function Salary() {
     return 0;
   });
 
-  const filteredSalaryData = sortedSalaryData.filter((row) =>
-  row && row.employeeName && typeof row.employeeName === "string" &&
-  row.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
-);
+  const filteredSalaryData = sortedSalaryData.filter(
+    (row) =>
+      row &&
+      row.employeeName &&
+      typeof row.employeeName === "string" &&
+      row.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -142,14 +147,12 @@ function Salary() {
         const filteredEmployees = filterUniqueEmployees(uniqueEmployees);
         setSalaryData(filteredEmployees);
         console.log(response.data, "Response");
+        setLoading(false);
       }
     } catch (error) {
       console.log("Something went wrong " + error);
     }
   };
-
-
-
 
   const paginateData = (data, page, rowsPerPage) => {
     const startIndex = page * rowsPerPage;
@@ -353,180 +356,186 @@ function Salary() {
         <Grid container justifyContent={"center"} spacing={3}>
           <Grid item xs={12} md={12} xl={12}>
             <SoftBox>
-              <TableContainer>
-                <Table>
-                  <TableHead sx={{ display: "table-header-group" }}>
-                    <TableRow>
-                      <TableCell colSpan={12}>
-                        <SoftInput
-                          fullWidth
-                          placeholder="Search by Name"
-                          variant="outlined"
-                          value={searchQuery}
-                          onChange={handleSearch}
-                        />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell></TableCell>
-                      {initialColumns.map((column) => (
-                        <TableCell
-                          key={column.field}
-                          onClick={() => handleSortClick(column.field)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <TableSortLabel
-                            active={sortBy === column.field}
-                            direction={sortBy === column.field ? sortOrder : "asc"}
-                          >
-                            {column.headerName}
-                          </TableSortLabel>
+              {loading ? (
+                <Loader />
+              ) : (
+                <TableContainer>
+                  <Table>
+                    <TableHead sx={{ display: "table-header-group" }}>
+                      <TableRow>
+                        <TableCell colSpan={12}>
+                          <SoftInput
+                            fullWidth
+                            placeholder="Search by Name"
+                            variant="outlined"
+                            value={searchQuery}
+                            onChange={handleSearch}
+                          />
                         </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {paginatedSalaryData.map((row) => (
-                      <React.Fragment key={row._id}>
-                        <TableRow>
-                          <TableCell>
-                            <IconButton
-                              aria-label="expand row"
-                              size="small"
-                              onClick={() => toggleExpand(row)}
+                      </TableRow>
+                      <TableRow>
+                        <TableCell></TableCell>
+                        {initialColumns.map((column) => (
+                          <TableCell
+                            key={column.field}
+                            onClick={() => handleSortClick(column.field)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <TableSortLabel
+                              active={sortBy === column.field}
+                              direction={sortBy === column.field ? sortOrder : "asc"}
                             >
-                              {expandedRow === row._id ? (
-                                <KeyboardArrowUpIcon />
-                              ) : (
-                                <KeyboardArrowDownIcon />
-                              )}
-                            </IconButton>
+                              {column.headerName}
+                            </TableSortLabel>
                           </TableCell>
-                          {initialColumns.map((column) => {
-                            if (column.field === "action") {
-                              const rowId = row._id;
-                              const isOpen = openedMenuRow === rowId;
-                              // const rowEmployeeId = row.employeeId;
-
-                              const handleViewSalarySlipClick = () => {
-                                setSelectedRowData(row);
-                                handleClickOpenDailog();
-                              };
-
-                              const handleViewSalarySlipDownload = () => {
-                                generatePdf(row);
-                              };
-
-                              const handleDeleteSalary = () => {
-                                deleteSalary(row);
-                              };
-
-                              return (
-                                <TableCell key={column.field}>
-                                  <Stack spacing={2}>
-                                    <SoftButton
-                                      aria-controls={isOpen ? "basic-menu" : undefined}
-                                      aria-haspopup="true"
-                                      aria-expanded={isOpen ? "true" : undefined}
-                                      onClick={(event) => handleClick(event, rowId)}
-                                      iconOnly
-                                      variant="contained"
-                                    >
-                                      <EditIcon />
-                                    </SoftButton>
-                                    <Menu
-                                      id="basic-menu"
-                                      anchorEl={anchorEl}
-                                      open={isOpen}
-                                      onClose={handleClose}
-                                      MenuListProps={{
-                                        "aria-labelledby": "basic-button",
-                                      }}
-                                    >
-                                      <MenuItem onClick={handleViewSalarySlipClick}>
-                                        View Salary Slip
-                                      </MenuItem>
-                                      <MenuItem onClick={handleViewSalarySlipDownload}>
-                                        Download Salary Slip
-                                      </MenuItem>
-                                      {isAdmin
-                                        ? [
-                                            <MenuItem key="create-salary">
-                                              <Link
-                                                to={`/salary/create-salary/${row.employeeId}`}
-                                                style={{ color: "inherit" }}
-                                              >
-                                                Create Salary
-                                              </Link>
-                                            </MenuItem>,
-                                            <MenuItem
-                                              key="delete-salary"
-                                              onClick={handleDeleteSalary}
-                                            >
-                                              Delete Salary
-                                            </MenuItem>,
-                                          ]
-                                        : null}
-                                    </Menu>
-                                  </Stack>
-                                </TableCell>
-                              );
-                            } else {
-                              return <TableCell key={column.field}>{row[column.field]}</TableCell>;
-                            }
-                          })}
-                        </TableRow>
-                        {expandedRow === row._id && (
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {paginatedSalaryData.map((row) => (
+                        <React.Fragment key={row._id}>
                           <TableRow>
-                            <TableCell colSpan={initialColumns.length + 1}>
-                              <SoftBox sx={{ boxShadow: 1, m: 2, borderRadius: 3 }}>
-                                <Table>
-                                  <TableHead sx={{ display: "table-header-group" }}>
-                                    <TableRow>
-                                      {initialColumns.map((column) => (
-                                        <TableCell key={column.field}>
-                                          {column.headerName}
-                                        </TableCell>
-                                      ))}
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    {employeSalaryData.map((row) => (
-                                      <React.Fragment key={row._id}>
-                                        {renderRow(row)}
-                                      </React.Fragment>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </SoftBox>
+                            <TableCell>
+                              <IconButton
+                                aria-label="expand row"
+                                size="small"
+                                onClick={() => toggleExpand(row)}
+                              >
+                                {expandedRow === row._id ? (
+                                  <KeyboardArrowUpIcon />
+                                ) : (
+                                  <KeyboardArrowDownIcon />
+                                )}
+                              </IconButton>
                             </TableCell>
+                            {initialColumns.map((column) => {
+                              if (column.field === "action") {
+                                const rowId = row._id;
+                                const isOpen = openedMenuRow === rowId;
+                                // const rowEmployeeId = row.employeeId;
+
+                                const handleViewSalarySlipClick = () => {
+                                  setSelectedRowData(row);
+                                  handleClickOpenDailog();
+                                };
+
+                                const handleViewSalarySlipDownload = () => {
+                                  generatePdf(row);
+                                };
+
+                                const handleDeleteSalary = () => {
+                                  deleteSalary(row);
+                                };
+
+                                return (
+                                  <TableCell key={column.field}>
+                                    <Stack spacing={2}>
+                                      <SoftButton
+                                        aria-controls={isOpen ? "basic-menu" : undefined}
+                                        aria-haspopup="true"
+                                        aria-expanded={isOpen ? "true" : undefined}
+                                        onClick={(event) => handleClick(event, rowId)}
+                                        iconOnly
+                                        variant="contained"
+                                      >
+                                        <EditIcon />
+                                      </SoftButton>
+                                      <Menu
+                                        id="basic-menu"
+                                        anchorEl={anchorEl}
+                                        open={isOpen}
+                                        onClose={handleClose}
+                                        MenuListProps={{
+                                          "aria-labelledby": "basic-button",
+                                        }}
+                                      >
+                                        <MenuItem onClick={handleViewSalarySlipClick}>
+                                          View Salary Slip
+                                        </MenuItem>
+                                        <MenuItem onClick={handleViewSalarySlipDownload}>
+                                          Download Salary Slip
+                                        </MenuItem>
+                                        {isAdmin
+                                          ? [
+                                              <MenuItem key="create-salary">
+                                                <Link
+                                                  to={`/salary/create-salary/${row.employeeId}`}
+                                                  style={{ color: "inherit" }}
+                                                >
+                                                  Create Salary
+                                                </Link>
+                                              </MenuItem>,
+                                              <MenuItem
+                                                key="delete-salary"
+                                                onClick={handleDeleteSalary}
+                                              >
+                                                Delete Salary
+                                              </MenuItem>,
+                                            ]
+                                          : null}
+                                      </Menu>
+                                    </Stack>
+                                  </TableCell>
+                                );
+                              } else {
+                                return (
+                                  <TableCell key={column.field}>{row[column.field]}</TableCell>
+                                );
+                              }
+                            })}
                           </TableRow>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </TableBody>
-                  <TableFooter>
-                    <TableRow>
-                      <TableCell colSpan={12}>
-                        <TablePagination
-                          rowsPerPageOptions={[5, 10, 25]}
-                          component="div"
-                          count={salaryData.length}
-                          rowsPerPage={rowsPerPage}
-                          page={page}
-                          onPageChange={handleChangePage}
-                          onRowsPerPageChange={handleChangeRowsPerPage}
-                          sx={{
-                            "& .css-1ui3wbn-MuiInputBase-root-MuiTablePagination-select": {
-                              width: "auto!important",
-                            },
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  </TableFooter>
-                </Table>
-              </TableContainer>
+                          {expandedRow === row._id && (
+                            <TableRow>
+                              <TableCell colSpan={initialColumns.length + 1}>
+                                <SoftBox sx={{ boxShadow: 1, m: 2, borderRadius: 3 }}>
+                                  <Table>
+                                    <TableHead sx={{ display: "table-header-group" }}>
+                                      <TableRow>
+                                        {initialColumns.map((column) => (
+                                          <TableCell key={column.field}>
+                                            {column.headerName}
+                                          </TableCell>
+                                        ))}
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      {employeSalaryData.map((row) => (
+                                        <React.Fragment key={row._id}>
+                                          {renderRow(row)}
+                                        </React.Fragment>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </SoftBox>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </TableBody>
+                    <TableFooter>
+                      <TableRow>
+                        <TableCell colSpan={12}>
+                          <TablePagination
+                            rowsPerPageOptions={[5, 10, 25]}
+                            component="div"
+                            count={salaryData.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            sx={{
+                              "& .css-1ui3wbn-MuiInputBase-root-MuiTablePagination-select": {
+                                width: "auto!important",
+                              },
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    </TableFooter>
+                  </Table>
+                </TableContainer>
+              )}
             </SoftBox>
           </Grid>
         </Grid>

@@ -22,7 +22,7 @@ import HolidayTable from "./holidayTable";
 import "./cell.css";
 import SoftButton from "components/SoftButton";
 import { useSelector } from "react-redux";
-
+import Loader from "loader";
 
 function HolidayList() {
   const [weekendsVisible, setWeekendsVisible] = useState(true);
@@ -35,6 +35,7 @@ function HolidayList() {
   const [holiday, setIsHoliday] = useState(false);
   const [showTable, setShowTable] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const data = useSelector((state) => state.auth);
 
@@ -68,8 +69,8 @@ function HolidayList() {
 
       if (response.status === 200) {
         const eventData = response.data;
-
         setCurrentEvents((prevEvents) => [...prevEvents, ...eventData]);
+        setLoading(false);
       }
     } catch (error) {
       console.error("There is some error", error);
@@ -88,7 +89,8 @@ function HolidayList() {
         start: selectedDate.start.toISOString(),
         end: selectedDate.end.toISOString(),
         allDay: selectedDate.allDay,
-        holiday,};
+        holiday,
+      };
 
       try {
         // Make a POST request to save the event
@@ -122,8 +124,6 @@ function HolidayList() {
       }
     }
   };
-
- 
 
   const handleEventDrop = async (dropInfo) => {
     const event = dropInfo.event;
@@ -215,11 +215,11 @@ function HolidayList() {
       <DashboardNavbar />
       <SoftBox mt={5} display="flex" alignItems="center" justifyContent="space-between">
         <Typography variant="h3" fontWeight={700}>
-          Holiday {showTable ? "Table" : "Calendar"}
+          Holiday {showTable ? "Calendar" : "Table"}
         </Typography>
         <SoftBox display="flex" gap="20px">
           <SoftButton color={showTable ? "secondary" : null} onClick={changeTable}>
-          Calendar
+            Calendar
           </SoftButton>
           <SoftButton color={showCalendar ? "secondary" : null} onClick={changeCalendar}>
             Table
@@ -229,27 +229,31 @@ function HolidayList() {
       {showTable ? (
         <>
           <SoftBox mt={5} mb={3}>
-            <FullCalendar
-              ref={calendarRef}
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay",
-              }}
-              initialView="dayGridMonth"
-              selectable={isAdmin ? true : false}
-              selectMirror={true}
-              dayMaxEvents={true}
-              eventDisplay="box"
-              weekends={weekendsVisible}
-              events={transformedEvents}
-              select={handleDateSelect}
-              eventClick={isAdmin ? handleEventClick : null}
-              dayCellClassNames={customDayCellClassNames}
-              eventDrop={handleEventDrop}
-              editable={isAdmin ? true : false}
-            />
+            {loading ? (
+              <Loader />
+            ) : (
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay",
+                }}
+                initialView="dayGridMonth"
+                selectable={isAdmin ? true : false}
+                selectMirror={true}
+                dayMaxEvents={true}
+                eventDisplay="box"
+                weekends={weekendsVisible}
+                events={transformedEvents}
+                select={handleDateSelect}
+                eventClick={isAdmin ? handleEventClick : null}
+                dayCellClassNames={customDayCellClassNames}
+                eventDrop={handleEventDrop}
+                editable={isAdmin ? true : false}
+              />
+            )}
           </SoftBox>
           <Footer />
           <Modal open={deleteEventModalOpen} onClose={closeDeleteEventModal}>

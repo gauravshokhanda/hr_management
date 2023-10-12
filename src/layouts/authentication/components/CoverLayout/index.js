@@ -23,7 +23,6 @@ function CoverLayout({ color, header, title, description, image, top, children }
         container
         justifyContent="center"
         sx={{
-          minHeight: "75vh",
           margin: 0,
         }}
       >
@@ -66,8 +65,10 @@ function CoverLayout({ color, header, title, description, image, top, children }
               height="100%"
               sx={{
                 backgroundImage: `url(${image})`,
-                backgroundSize: "cover",
                 transform: "skewX(10deg)",
+                backgroundSize: "60%",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "bottom center"
               }}
             />
           </SoftBox>
