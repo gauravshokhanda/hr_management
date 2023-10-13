@@ -23,7 +23,7 @@ import SoftButton from "components/SoftButton";
 import PropTypes from "prop-types";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
-function Register() {
+function Register({ backButton, setAddEmployee }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -178,6 +178,8 @@ function Register() {
             severity={severity}
             notificationMessage={notificationMessage}
             buttonLoading={buttonLoading}
+            backButton={backButton}
+            setAddEmployee={setAddEmployee}
           />
         </DashboardLayout>
       ) : (
@@ -193,6 +195,8 @@ function Register() {
           severity={severity}
           notificationMessage={notificationMessage}
           buttonLoading={buttonLoading}
+          backButton={backButton}
+          setAddEmployee={setAddEmployee}
         />
       )}
     </>
@@ -211,19 +215,33 @@ function RegisterWrapper({
   severity,
   notificationMessage,
   buttonLoading,
+  backButton,
+  setAddEmployee,
 }) {
   return (
     <SoftBox>
       <Grid container justifyContent={`center`}>
         <Grid item xs={12}>
           <Card>
-            <SoftBox px={3} pt={3} pb={1} display='flex' alignItems='center' gap='12px'>
+            <SoftBox px={3} pt={3} pb={1} display="flex" alignItems="center" gap="12px">
               {id ? (
                 <Link to={`/manage-employee`}>
-                  <SoftButton color='info' circular iconOnly>
+                  <SoftButton color="info" circular iconOnly>
                     <KeyboardBackspaceIcon />
                   </SoftButton>
                 </Link>
+              ) : null}
+              {backButton ? (
+                <SoftButton
+                  onClick={() => {
+                    setAddEmployee(true);
+                  }}
+                  color="info"
+                  circular
+                  iconOnly
+                >
+                  <KeyboardBackspaceIcon />
+                </SoftButton>
               ) : null}
               <SoftTypography variant="h3" fontWeight="bold">
                 {id ? "Edit Employee" : "Register"}
@@ -463,6 +481,7 @@ RegisterWrapper.propTypes = {
     notificationMessage: PropTypes.string,
     notificationOpen: PropTypes.bool,
     buttonLoading: PropTypes.bool,
+    backButton: PropTypes.bool,
   }).isRequired,
   handleChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -470,6 +489,7 @@ RegisterWrapper.propTypes = {
   handleImageChange: PropTypes.func.isRequired,
   handleCloseNotification: PropTypes.func.isRequired,
   id: PropTypes.func.isRequired,
+  setAddEmployee: PropTypes.func.isRequired,
 };
 
 export default Register;
