@@ -43,6 +43,8 @@ function Overview() {
 
   const { id } = useParams();
 
+  const isAdmin = data?.user?.isAdmin || false;
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -114,8 +116,8 @@ function Overview() {
     accountNumber: userData.accountNumber,
     ifscCode: userData.ifscCode,
     userEmail: userData.userEmail,
-    isAdmin:userData.isAdmin,
-    isStaff:userData.isStaff, 
+    isAdmin: userData.isAdmin,
+    isStaff: userData.isStaff,
   };
 
   const handleSubmit = async (e) => {
@@ -328,19 +330,21 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               User Id
                             </Typography>
-                            <SoftButton
-                              onClick={() => {
-                                setEdit(true);
-                              }}
-                              color="info"
-                              circular
-                              iconOnly
-                            >
-                              <EditIcon />
-                            </SoftButton>
+                            {isAdmin && (
+                              <SoftButton
+                                onClick={() => {
+                                  setEdit(true);
+                                }}
+                                color="info"
+                                circular
+                                iconOnly
+                              >
+                                <EditIcon />
+                              </SoftButton>
+                            )}
                           </Box>
 
-                          {edit ? (
+                          {edit && data.user.isAdmin ? (
                             <SoftInput
                               name="_id"
                               type="text"

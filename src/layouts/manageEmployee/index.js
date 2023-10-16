@@ -11,23 +11,46 @@ import Footer from "examples/Footer";
 import EmployesTable from "./data/employesTable";
 import axios from "axios";
 import { API_URL } from "config";
+import { Alert, CircularProgress, Snackbar } from "@mui/material";
 
 // Define the Employee component
 function Employee() {
   const [addEmployee, setAddEmployee] = useState(true);
   const [selectedRowIds, setSelectedRowIds] = useState([]);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const displayNotification = (message, alertType) => {
+    setNotificationOpen(true);
+    setNotificationMessage(message);
+    setSeverity(alertType);
+  };
 
   const createSalaryAll = async () => {
+    setButtonLoading(true);
     try {
       const response = await axios.post(`${API_URL}/salary/calculate-salaries`, {
         employeeIds: selectedRowIds,
       });
 
       if (response.status === 200) {
+        setButtonLoading(false);
+        const message = `Successfully Calculated salary`;
+        const alertType = "success";
+        displayNotification(message, alertType);
         console.log("Successfully credit salary");
       }
     } catch (error) {
       console.log("Error: ", error);
+      const message = `Internal server error`;
+      const alertType = "error";
+      displayNotification(message, alertType);
     }
   };
 
@@ -48,11 +71,15 @@ function Employee() {
                       variant="contained"
                       color="success"
                       sx={{ mr: 2 }}
+                      disabled={buttonLoading}
                       onClick={() => {
                         createSalaryAll();
                       }}
                     >
-                      Create Salary
+                      Create Salary{" "}
+                      {buttonLoading ? (
+                        <CircularProgress sx={{ ml: 1 }} color="inherit" size={14} />
+                      ) : null}
                     </SoftButton>
                   ) : null}
                   <SoftButton
@@ -79,14 +106,29 @@ function Employee() {
                 <EmployesTable
                   selectedRowIds={selectedRowIds}
                   setSelectedRowIds={setSelectedRowIds}
+                  displayNotification={displayNotification}
+                  setButtonLoading={setButtonLoading}
+                  buttonLoading={buttonLoading}
                 />
               </SoftBox>
             </Card>
           ) : (
-            <Register backButton={backButton} setAddEmployee={setAddEmployee}/>
+            <Register backButton={backButton} setAddEmployee={setAddEmployee} />
           )}
         </SoftBox>
       </SoftBox>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
       <Footer />
     </DashboardLayout>
   );

@@ -109,6 +109,7 @@ function NoticeBoard({ signInTrue }) {
     try {
       const response = await axios.get(`${API_URL}/notices/list`);
       if (response.data.length === 0) {
+        setLoading(false);
         console.log("Please add notice");
       } else if (response.status === 200) {
         setLoading(false);

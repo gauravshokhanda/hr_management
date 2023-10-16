@@ -479,61 +479,69 @@ function Attendence() {
         <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
             <Avatar
-              src={`${API_URL}/${employeeAttendanceId ? (todayAttendence.employeeImage ? todayAttendence.employeeImage : "") : user.image}`}
+              src={`${API_URL}/${
+                employeeAttendanceId
+                  ? todayAttendence.employeeImage
+                    ? todayAttendence.employeeImage
+                    : ""
+                  : user.image
+              }`}
               sx={{ width: "60px", height: "60px", "& img": { height: "100%!important" } }}
             />
             <SoftTypography sx={{ textTransform: "capitalize" }} variant="h6">
               {employeeAttendanceId ? todayAttendence.employeeName : user.userName}
             </SoftTypography>
           </SoftBox>
-          <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
-            <LoadingButton
-              disabled={!checkInBtn}
-              variant="contained"
-              color="info"
-              onClick={handleCheckIn}
-              loading={buttonLoading.checkInLoading}
-            >
-              Check In
-            </LoadingButton>
-            <LoadingButton
-              disabled={!breakInBtn}
-              variant="contained"
-              color="warning"
-              onClick={handleBreakIn}
-              loading={buttonLoading.breakInLoading}
-            >
-              Break In
-            </LoadingButton>
-            <LoadingButton
-              disabled={!breakEndBtn}
-              variant="contained"
-              color="inherit"
-              onClick={handleBreakOut}
-              loading={buttonLoading.breakEndLoading}
-            >
-              Break Out
-            </LoadingButton>
-            <LoadingButton
-              disabled={!checkOutBtn}
-              variant="contained"
-              color={
-                todayAttendence.checkOut
+          {!employeeAttendanceId && (
+            <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
+              <LoadingButton
+                disabled={!checkInBtn}
+                variant="contained"
+                color="info"
+                onClick={handleCheckIn}
+                loading={buttonLoading.checkInLoading}
+              >
+                Check In
+              </LoadingButton>
+              <LoadingButton
+                disabled={!breakInBtn}
+                variant="contained"
+                color="warning"
+                onClick={handleBreakIn}
+                loading={buttonLoading.breakInLoading}
+              >
+                Break In
+              </LoadingButton>
+              <LoadingButton
+                disabled={!breakEndBtn}
+                variant="contained"
+                color="inherit"
+                onClick={handleBreakOut}
+                loading={buttonLoading.breakEndLoading}
+              >
+                Break Out
+              </LoadingButton>
+              <LoadingButton
+                disabled={!checkOutBtn}
+                variant="contained"
+                color={
+                  todayAttendence.checkOut
+                    ? todayAttendence.checkOut === null
+                      ? "error"
+                      : "primary"
+                    : "error"
+                }
+                onClick={handleCheckOut}
+                loading={buttonLoading.checkOutLoading}
+              >
+                {todayAttendence.checkOut
                   ? todayAttendence.checkOut === null
-                    ? "error"
-                    : "primary"
-                  : "error"
-              }
-              onClick={handleCheckOut}
-              loading={buttonLoading.checkOutLoading}
-            >
-              {todayAttendence.checkOut
-                ? todayAttendence.checkOut === null
-                  ? "Check Out"
-                  : "Un Check Out"
-                : "Check Out"}
-            </LoadingButton>
-          </SoftBox>
+                    ? "Check Out"
+                    : "Un Check Out"
+                  : "Check Out"}
+              </LoadingButton>
+            </SoftBox>
+          )}
         </SoftBox>
       )}
       <SoftBox py={3}>
