@@ -52,7 +52,7 @@ function Attendence() {
 
   const { employeeAttendanceId } = useParams();
 
-  console.log(employeeAttendanceId, "sduhffui");
+  console.log(employeeAttendanceId, "Employee id");
 
   const data = useSelector((state) => state.auth);
 
@@ -291,7 +291,7 @@ function Attendence() {
       date: new Date(),
       status: "present",
       checkIn: new Date(),
-      employeeId: user._id,
+      employeeId: employeeAttendanceId ? employeeAttendanceId : user._id,
     }));
   };
   const handleBreakIn = () => {
@@ -470,6 +470,8 @@ function Attendence() {
     localStorage.setItem("hasSeenDialog", "true");
   };
 
+  console.log(todayAttendence, "attendance");
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -477,11 +479,11 @@ function Attendence() {
         <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
             <Avatar
-              src={`${API_URL}/${user.image}`}
+              src={`${API_URL}/${employeeAttendanceId ? (todayAttendence.employeeImage ? todayAttendence.employeeImage : "") : user.image}`}
               sx={{ width: "60px", height: "60px", "& img": { height: "100%!important" } }}
             />
             <SoftTypography sx={{ textTransform: "capitalize" }} variant="h6">
-              {user.userName}
+              {employeeAttendanceId ? todayAttendence.employeeName : user.userName}
             </SoftTypography>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
