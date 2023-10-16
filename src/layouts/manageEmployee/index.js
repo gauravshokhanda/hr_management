@@ -19,8 +19,10 @@ function Employee() {
 
   const createSalaryAll = async () => {
     try {
-      const response = await axios.post(`${API_URL}/salary/calculate-salaries`, {employeeIds : selectedRowIds});
-  
+      const response = await axios.post(`${API_URL}/salary/calculate-salaries`, {
+        employeeIds: selectedRowIds,
+      });
+
       if (response.status === 200) {
         console.log("Successfully credit salary");
       }
@@ -28,7 +30,8 @@ function Employee() {
       console.log("Error: ", error);
     }
   };
-  
+
+  const backButton = true;
 
   return (
     <DashboardLayout>
@@ -44,7 +47,7 @@ function Employee() {
                     <SoftButton
                       variant="contained"
                       color="success"
-                      sx={{mr: 2}}
+                      sx={{ mr: 2 }}
                       onClick={() => {
                         createSalaryAll();
                       }}
@@ -80,7 +83,7 @@ function Employee() {
               </SoftBox>
             </Card>
           ) : (
-            <Register />
+            <Register backButton={backButton} setAddEmployee={setAddEmployee}/>
           )}
         </SoftBox>
       </SoftBox>

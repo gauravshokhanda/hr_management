@@ -62,6 +62,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const route = useLocation().pathname.split("/").slice(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };

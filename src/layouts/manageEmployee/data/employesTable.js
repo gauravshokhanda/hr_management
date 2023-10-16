@@ -190,6 +190,11 @@ export default function EmployesTable({ setSelectedRowIds, selectedRowIds }) {
                   Create Salary
                 </Link>
               </MenuItem>
+              <MenuItem key="create-salary">
+                <Link to={`/profile/${params.row._id}`} style={{ color: "inherit" }}>
+                  View Profile
+                </Link>
+              </MenuItem>
               <MenuItem>Delete Employee</MenuItem>
             </Menu>
           </Stack>

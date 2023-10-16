@@ -30,7 +30,7 @@ export default function EmployeeDetail() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/employes/${id}/attendance`, {
+      const response = await axios.get(`${API_URL}/attendance/view/${id}`, {
         headers: {
           Authorization: `${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
@@ -51,6 +51,8 @@ export default function EmployeeDetail() {
       console.error("There is some issue " + error);
     }
   };
+
+  console.log(attendance, "atttendence");
   
 
   const initialColumns = [

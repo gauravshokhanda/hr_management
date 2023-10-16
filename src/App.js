@@ -35,6 +35,7 @@ import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "contex
 
 // Images
 import brand from "assets/images/logo-ct.png";
+import jwtDecode from "jwt-decode";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -81,6 +82,19 @@ export default function App() {
       setOnMouseEnter(false);
     }
   };
+
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000; 
+  
+    if (decodedToken.exp < currentTime) {
+      console.log("Token is expired");
+      reduxDispatch(clearUserAndToken());
+    }
+  }
+
 
   const filteredRoutes = isAdmin
     ? routes // If user is an admin, all routes are accessible
