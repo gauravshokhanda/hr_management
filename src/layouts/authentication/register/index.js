@@ -108,9 +108,9 @@ function Register({ backButton, setAddEmployee }) {
 
     try {
       const formDataToSend = new FormData();
-      if (selectedImage) {
         formDataToSend.append("image", selectedImage, selectedImage.name);
-      }
+      // if (selectedImage) {
+      // }
       formDataToSend.append("firstName", formData.firstName);
       formDataToSend.append("lastName", formData.lastName);
       formDataToSend.append("userName", formData.userName);
