@@ -29,7 +29,7 @@ function CreateSalary() {
     setFromData((prevData) => ({
       ...prevData,
       employeeId: id,
-      creditMonth: moment().format('YYYY-MM-DDTHH:mm:ssZ'),
+      creditMonth: moment().format("YYYY-MM-DDTHH:mm:ssZ"),
       [name]: type === "checkbox" ? checked : value,
     }));
   };
@@ -38,8 +38,8 @@ function CreateSalary() {
     try {
       const response = await axios.post(`${API_URL}/salary/create-salary`, formData, {
         headers: {
-          'Authorization': `${localStorage.getItem("token")}`,
-          "Content-Type": 'application/json',
+          Authorization: `${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
       });
       if (response.status === 200) {
@@ -63,7 +63,7 @@ function CreateSalary() {
               </SoftBox>
               {id ? (
                 <SoftBox pt={2} pb={3} px={3}>
-                  <SoftBox component="form" role="form" onSubmit={handleSubmit}>
+                  <SoftBox component="form">
                     <Grid container spacing={3}>
                       <Grid item xs={6}>
                         <SoftBox>
@@ -73,7 +73,7 @@ function CreateSalary() {
                             onChange={handleChange}
                             placeholder="Total Working Days"
                             type="number"
-                            />
+                          />
                         </SoftBox>
                       </Grid>
                       <Grid item xs={6}>
@@ -89,7 +89,7 @@ function CreateSalary() {
                       </Grid>
                     </Grid>
                     <SoftBox mt={4} mb={1} display="flex" justifyContent="end">
-                      <SoftButton variant="gradient" type="submit" color="dark">
+                      <SoftButton variant="gradient" onClick={handleSubmit} color="dark">
                         Create Salary
                       </SoftButton>
                     </SoftBox>
