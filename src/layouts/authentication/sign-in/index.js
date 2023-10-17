@@ -9,7 +9,7 @@ import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 import curved9 from "assets/images/curved-images/curved-6.png";
-import { Switch, Typography } from "@mui/material";
+import { Alert, CircularProgress, Snackbar, Switch, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { setUserAndToken } from "../../../store/authSlice"; // Update the path
 import { clearUserAndToken } from "../../../store/authSlice";
@@ -21,6 +21,11 @@ function SignIn() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+
   const navigate = useNavigate();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
@@ -30,10 +35,20 @@ function SignIn() {
 
   const user = data.user;
 
+  const displayNotification = (message, alertType) => {
+    setNotificationMessage(message);
+    setNotificationOpen(true);
+    setSeverity(alertType);
+  };
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setButtonLoading(true);
     try {
       if (!userName || !password) {
         setError("Username and password are required");
@@ -47,7 +62,10 @@ function SignIn() {
       });
 
       if (response.status === 200) {
-        console.log("Successfully login");
+        setButtonLoading(false);
+        const message = "Successfully Login";
+        const alertType = "success";
+        displayNotification(message, alertType);
         localStorage.setItem("token", response.data.token);
         setError("");
         console.log("Error cleared:", error);
@@ -57,6 +75,10 @@ function SignIn() {
       }
     } catch (error) {
       console.error(error, "There is some issue");
+      setButtonLoading(false);
+      const message = "Internal server error";
+      const alertType = "error";
+      displayNotification(message, alertType);
       if (error.response.status === 401) {
         setError("Please Enter Correct Username or Password");
       }
@@ -69,7 +91,7 @@ function SignIn() {
       title={user ? `Welcome ${user.userName}` : 'Welcome Back'}
       description={user ? "" : "Enter your email and password to sign in"}
       image={curved9}
-      sx={{backGroundSize: 'cover'}}
+      sx={{ backGroundSize: 'cover' }}
     >
       {!user ? (
         <SoftBox component="form" onSubmit={handleSubmit} role="form">
@@ -126,8 +148,9 @@ function SignIn() {
             </SoftTypography>
           </SoftBox>
           <SoftBox mt={4} mb={1}>
-            <SoftButton type="submit" variant="gradient" color="info" fullWidth>
+            <SoftButton type="submit" disabled={buttonLoading} variant="gradient" color="info" fullWidth>
               sign in
+              {buttonLoading ? <CircularProgress color="secondary" sx={{ ml: 2 }} size={22} /> : null}
             </SoftButton>
           </SoftBox>
         </SoftBox>
@@ -146,6 +169,18 @@ function SignIn() {
           </Link>
         </SoftBox>
       )}
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </CoverLayout>
   );
 }
