@@ -43,6 +43,8 @@ function Overview() {
 
   const { id } = useParams();
 
+  const isAdmin = data?.user?.isAdmin || false;
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -113,6 +115,9 @@ function Overview() {
     image: userData.image,
     accountNumber: userData.accountNumber,
     ifscCode: userData.ifscCode,
+    userEmail: userData.userEmail,
+    isAdmin: userData.isAdmin,
+    isStaff: userData.isStaff,
   };
 
   const handleSubmit = async (e) => {
@@ -124,16 +129,23 @@ function Overview() {
       formDataToSend.append("firstName", userDataForm.firstName);
       formDataToSend.append("lastName", userDataForm.lastName);
       formDataToSend.append("userName", userDataForm.userName);
+      formDataToSend.append("userEmail", userDataForm.userEmail);
       formDataToSend.append("image", userDataForm.image);
       formDataToSend.append("accountNumber", userDataForm.accountNumber);
       formDataToSend.append("ifscCode", userDataForm.ifscCode);
+      formDataToSend.append("isAdmin", userDataForm.isAdmin);
+      formDataToSend.append("isStaff", userDataForm.isStaff);
+      formDataToSend.append("salary", userDataForm.salary);
 
       // Append the image as binary data
       if (selectedImage) {
         formDataToSend.append("image", selectedImage, selectedImage.name);
       }
 
-      const response = await axios.put(`${API_URL}/employes/update/${userId}`, formDataToSend);
+      const response = await axios.put(
+        `${API_URL}/employes/update/${id ? id : userId}`,
+        formDataToSend
+      );
 
       if (response.status === 201 || response.status === 200) {
         console.log("User update successfully", response.data);
@@ -150,6 +162,8 @@ function Overview() {
         const alertType = "success";
         displayNotification(message, alertType);
         setButtonLoading(false);
+        fetchData();
+        setEdit(false);
       }
     } catch (error) {
       console.error("Notice saved failed", error);
@@ -193,7 +207,7 @@ function Overview() {
                   Profile Details
                 </Typography>
                 {edit ? (
-                  <SoftButton disabled={buttonLoading} color="info">
+                  <SoftButton disabled={buttonLoading} onClick={handleSubmit} color="info">
                     Update{" "}
                     {buttonLoading ? (
                       <CircularProgress sx={{ ml: 1 }} color="inherit" size={14} />
@@ -228,7 +242,30 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               Full Name
                             </Typography>
-                            <SoftButton color="info" circular iconOnly>
+                          </Box>
+                          <Typography variant="subtitle1" color="#a9a9a9" fontWeight={400}>
+                            {userData.firstName + " " + userData.lastName}
+                          </Typography>
+                        </SoftBox>
+                        <SoftBox sx={contentStyle}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="h5" fontWeight={500}>
+                              Last Name
+                            </Typography>
+                            <SoftButton
+                              onClick={() => {
+                                setEdit(true);
+                              }}
+                              color="info"
+                              circular
+                              iconOnly
+                            >
                               <EditIcon />
                             </SoftButton>
                           </Box>
@@ -237,12 +274,12 @@ function Overview() {
                             <SoftInput
                               name="firstName"
                               type="text"
-                              value={userData.firstName}
+                              value={userData.lastName}
                               onChange={handleChange}
                             />
                           ) : (
                             <Typography variant="subtitle1" color="#a9a9a9" fontWeight={400}>
-                              {userData.firstName + " " + userData.lastName}
+                              {userData.lastName}
                             </Typography>
                           )}
                         </SoftBox>
@@ -257,7 +294,14 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               User Name
                             </Typography>
-                            <SoftButton color="info" circular iconOnly>
+                            <SoftButton
+                              onClick={() => {
+                                setEdit(true);
+                              }}
+                              color="info"
+                              circular
+                              iconOnly
+                            >
                               <EditIcon />
                             </SoftButton>
                           </Box>
@@ -286,12 +330,21 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               User Id
                             </Typography>
-                            <SoftButton color="info" circular iconOnly>
-                              <EditIcon />
-                            </SoftButton>
+                            {isAdmin && (
+                              <SoftButton
+                                onClick={() => {
+                                  setEdit(true);
+                                }}
+                                color="info"
+                                circular
+                                iconOnly
+                              >
+                                <EditIcon />
+                              </SoftButton>
+                            )}
                           </Box>
 
-                          {edit ? (
+                          {edit && data.user.isAdmin ? (
                             <SoftInput
                               name="_id"
                               type="text"
@@ -315,7 +368,14 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               User Account Number
                             </Typography>
-                            <SoftButton color="info" circular iconOnly>
+                            <SoftButton
+                              onClick={() => {
+                                setEdit(true);
+                              }}
+                              color="info"
+                              circular
+                              iconOnly
+                            >
                               <EditIcon />
                             </SoftButton>
                           </Box>
@@ -344,9 +404,52 @@ function Overview() {
                             }}
                           >
                             <Typography variant="h5" fontWeight={500}>
+                              First Name
+                            </Typography>
+                            <SoftButton
+                              onClick={() => {
+                                setEdit(true);
+                              }}
+                              color="info"
+                              circular
+                              iconOnly
+                            >
+                              <EditIcon />
+                            </SoftButton>
+                          </Box>
+
+                          {edit ? (
+                            <SoftInput
+                              name="firstName"
+                              type="text"
+                              value={userData.firstName}
+                              onChange={handleChange}
+                            />
+                          ) : (
+                            <Typography variant="subtitle1" color="#a9a9a9" fontWeight={400}>
+                              {userData.firstName}
+                            </Typography>
+                          )}
+                        </SoftBox>
+                        <SoftBox sx={contentStyle}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="h5" fontWeight={500}>
                               User Email
                             </Typography>
-                            <SoftButton color="info" circular iconOnly>
+                            <SoftButton
+                              onClick={() => {
+                                setEdit(true);
+                              }}
+                              color="info"
+                              circular
+                              iconOnly
+                            >
                               <EditIcon />
                             </SoftButton>
                           </Box>
@@ -375,7 +478,9 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               User Salary
                             </Typography>
-                            {/* <SoftButton color="info" circular iconOnly>
+                            {/* <SoftButton onClick={() => {
+                          setEdit(true);
+                        }} color="info" circular iconOnly>
                               <EditIcon />
                             </SoftButton> */}
                           </Box>
@@ -394,7 +499,14 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               User IFSC Code
                             </Typography>
-                            <SoftButton color="info" circular iconOnly>
+                            <SoftButton
+                              onClick={() => {
+                                setEdit(true);
+                              }}
+                              color="info"
+                              circular
+                              iconOnly
+                            >
                               <EditIcon />
                             </SoftButton>
                           </Box>

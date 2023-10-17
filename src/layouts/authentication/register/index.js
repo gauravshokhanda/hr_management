@@ -395,7 +395,7 @@ function RegisterWrapper({
                       >
                         <Box>
                           <Typography sx={{ mb: 1 }} variant="h5">
-                            Upload User Image
+                            {id ? "Update" : "Upload"} User Image
                           </Typography>
                           <Input
                             name="image"
@@ -413,7 +413,7 @@ function RegisterWrapper({
                           </label>
                         </Box>
                         <Box>
-                          {selectedImage && (
+                          {selectedImage ? (
                             <div>
                               <img
                                 src={URL.createObjectURL(selectedImage)}
@@ -421,6 +421,19 @@ function RegisterWrapper({
                                 style={{ width: "400px", height: "250px", objectFit: "cover" }}
                               />
                               <Typography variant="body1">{selectedImage.name}</Typography>
+                            </div>
+                          ) : (
+                            <div>
+                              {formData.image && (
+                                <>
+                                  <img
+                                    src={API_URL + "/" + formData.image}
+                                    alt={formData.image ? formData.heading : "Add image"}
+                                    style={{ maxWidth: "400px" }}
+                                  />
+                                  <Typography variant="body1">{formData.image}</Typography>
+                                </>
+                              )}
                             </div>
                           )}
                         </Box>

@@ -38,7 +38,8 @@ function CreateSalary() {
     try {
       const response = await axios.post(`${API_URL}/salary/create-salary`, formData, {
         headers: {
-          Authorization: `${localStorage.getItem("token")}`,
+          'Authorization': `${localStorage.getItem("token")}`,
+          "Content-Type": 'application/json',
         },
       });
       if (response.status === 200) {

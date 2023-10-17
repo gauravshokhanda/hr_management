@@ -3,7 +3,7 @@ import SoftBox from "components/SoftBox";
 import { API_URL } from "config";
 import axios from "axios";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Avatar, Chip, Stack } from "@mui/material";
+import { Avatar, Chip, CircularProgress, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import SoftButton from "components/SoftButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -11,7 +11,13 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Loader from "loader";
 
-export default function EmployesTable({ setSelectedRowIds, selectedRowIds }) {
+export default function EmployesTable({
+  setSelectedRowIds,
+  selectedRowIds,
+  displayNotification,
+  buttonLoading,
+  setButtonLoading,
+}) {
   const [employees, setEmployees] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openedMenuRow, setOpenedMenuRow] = useState(null);
@@ -60,6 +66,31 @@ export default function EmployesTable({ setSelectedRowIds, selectedRowIds }) {
       }
     } catch (error) {
       console.error("There is some issue " + error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setButtonLoading(true);
+    try {
+      const response = await axios.delete(`${API_URL}/employes/delete-employee/${id}`, {
+        headers: {
+          'Authorization': `${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.status === 200) {
+        setButtonLoading(false);
+        const message = `Successfully Delete employee`;
+        const alertType = "success";
+        displayNotification(message, alertType);
+        fetchData();
+      }
+    } catch (error) {
+      console.error("There is some error :", error);
+      const message = `Internal server error`;
+      const alertType = "error";
+      displayNotification(message, alertType);
+      setButtonLoading(false);
     }
   };
 
@@ -195,7 +226,17 @@ export default function EmployesTable({ setSelectedRowIds, selectedRowIds }) {
                   View Profile
                 </Link>
               </MenuItem>
-              <MenuItem>Delete Employee</MenuItem>
+              <MenuItem
+                disabled={buttonLoading}
+                onClick={() => {
+                  handleDelete(params.row._id);
+                }}
+              >
+                Delete Employee
+                {buttonLoading ? (
+                  <CircularProgress sx={{ ml: 1 }} color="inherit" size={14} />
+                ) : null}
+              </MenuItem>
             </Menu>
           </Stack>
         );

@@ -172,7 +172,7 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(filteredRoutes)}
-          <Route path="*" element={<Navigate to="/attendence" />} />
+          <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -197,7 +197,7 @@ export default function App() {
       {/* {isAdmin ? } */}
       <Routes>
         {getRoutes(filteredRoutes)}
-        <Route path="*" element={<Navigate to="/attendence" />} />
+        <Route path="*" element={<Navigate to="/404" />} />
       </Routes>
     </ThemeProvider>
   );

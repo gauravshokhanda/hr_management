@@ -22,6 +22,7 @@ import CreditCard from "examples/Icons/CreditCard";
 import BackHandIcon from '@mui/icons-material/BackHand';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PageNotFound from "404";
 
 const routes = [
   {
@@ -139,20 +140,20 @@ const routes = [
     component: <AddNotice />,
     adminOnly: true,
   },
-  // {
-  //   type: "hidden",
-  //   name: "Employees",
-  //   key: "employee",
-  //   route: "/attendence/:id",
-  //   component: <EmployeeDetail />,
-  //   adminOnly: false,
-  // },
   {
     type: "hidden",
     name: "Create Salary",
     key: "createSalary",
     route: "/salary/create-salary/:id",
     component: <CreateSalary />,
+    adminOnly: false,
+  },
+  {
+    type: "hidden",
+    name: "Not Found",
+    key: "notFound",
+    route: "/404",
+    component: <PageNotFound />,
     adminOnly: false,
   },
 ];
