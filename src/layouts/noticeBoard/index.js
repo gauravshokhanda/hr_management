@@ -183,7 +183,7 @@ function NoticeBoard({ signInTrue }) {
       <SoftBox py={3}>
         <SoftBox mb={3}>
           <Grid container justifyContent="center" spacing={3}>
-            <Grid item xs={12} lg={8}>
+            <Grid item lg={12} xl={8}>
               <Card sx={CARD_PROPERTY}>
                 <Box
                   sx={{
@@ -260,9 +260,9 @@ function NoticeBoard({ signInTrue }) {
                                   />
                                 )}
                                 <Stack
-                                  direction="row"
+                                  direction={{sm: 'column', md: 'row'}}
                                   justifyContent="space-between"
-                                  alignItems="center"
+                                  alignItems={{sm: 'start', md: 'center'}}
                                   spacing={2}
                                 >
                                   <Stack
