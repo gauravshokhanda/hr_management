@@ -13,6 +13,7 @@ import SoftBox from "components/SoftBox";
 import DefaultNavbarLink from "examples/Navbars/DefaultNavbar/DefaultNavbarLink";
 
 function DefaultNavbarMobile({ open, close }) {
+
   const { width } = open && open.getBoundingClientRect();
 
   return (

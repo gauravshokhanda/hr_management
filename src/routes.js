@@ -146,7 +146,7 @@ const routes = [
     key: "createSalary",
     route: "/salary/create-salary/:id",
     component: <CreateSalary />,
-    adminOnly: false,
+    adminOnly: true,
   },
   {
     type: "hidden",

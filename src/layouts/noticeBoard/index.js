@@ -50,7 +50,7 @@ NoticeBoard.propTypes = {
 
 function NoticeBoard({ signInTrue }) {
   const [notice, setNotice] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState("");
   const [deleteName, setDeleteName] = useState("");
@@ -106,6 +106,7 @@ function NoticeBoard({ signInTrue }) {
   };
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/notices/list`);
       if (response.data.length === 0) {
@@ -182,7 +183,7 @@ function NoticeBoard({ signInTrue }) {
       <SoftBox py={3}>
         <SoftBox mb={3}>
           <Grid container justifyContent="center" spacing={3}>
-            <Grid item xs={12} lg={8}>
+            <Grid item lg={12} xl={8}>
               <Card sx={CARD_PROPERTY}>
                 <Box
                   sx={{
@@ -204,7 +205,7 @@ function NoticeBoard({ signInTrue }) {
                       Notice Board
                     </Typography>
                   </Box>
-                  {user.isAdmin ? (
+                  {user?.isAdmin ? (
                     <Link to="/notice/add-notice" underline="none" color="primary">
                       <SoftButton variant="gradient" color="dark">
                         <AddIcon />
@@ -219,100 +220,107 @@ function NoticeBoard({ signInTrue }) {
                     <Loader />
                   ) : (
                     <Box className="swiper-container" style={{}}>
-                      <Swiper
-                        autoplay={true}
-                        direction="vertical"
-                        slidesPerView={1}
-                        spaceBetween={20}
-                        grabCursor={true}
-                        mousewheel={true}
-                        pagination={{
-                          clickable: true,
-                        }}
-                        modules={[Pagination]}
-                        // autoHeight={true}
-                        style={{ height: "700px" }}
-                        className="swiper-wrapper"
-                      >
-                        {notice.map((item) => {
-                          return (
-                            <SwiperSlide key={item._id}>
-                              {item.imgPath === null ? null : (
-                                <CardMedia
-                                  component="img"
-                                  image={`${API_URL}/${item.imgPath}`}
-                                  sx={{
-                                    borderRadius: 3,
-                                    width: "100%",
-                                    ml: 0,
-                                    mt: 0,
-                                    mb: 3,
-                                    height: "400px",
-                                    // objectFit: "contain",
-                                  }}
-                                />
-                              )}
-                              <Stack
-                                direction="row"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                spacing={2}
-                              >
+                      {notice.length === 0 ? (
+                        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                          There is no notice
+                        </Typography>
+                      ) : (
+
+                        <Swiper
+                          autoplay={true}
+                          direction="vertical"
+                          slidesPerView={1}
+                          spaceBetween={20}
+                          grabCursor={true}
+                          mousewheel={true}
+                          pagination={{
+                            clickable: true,
+                          }}
+                          modules={[Pagination]}
+                          // autoHeight={true}
+                          style={{ height: "700px" }}
+                          className="swiper-wrapper"
+                        >
+                          {notice.map((item) => {
+                            return (
+                              <SwiperSlide key={item._id}>
+                                {item.imgPath === null ? null : (
+                                  <CardMedia
+                                    component="img"
+                                    image={`${API_URL}/${item.imgPath}`}
+                                    sx={{
+                                      borderRadius: 3,
+                                      width: "100%",
+                                      ml: 0,
+                                      mt: 0,
+                                      mb: 3,
+                                      height: "400px",
+                                      // objectFit: "contain",
+                                    }}
+                                  />
+                                )}
                                 <Stack
-                                  direction="row"
-                                  justifyContent="start"
-                                  alignItems="center"
+                                  direction={{sm: 'column', md: 'row'}}
+                                  justifyContent="space-between"
+                                  alignItems={{sm: 'start', md: 'center'}}
                                   spacing={2}
                                 >
-                                  <Avatar {...stringAvatar(item.heading)} />
-                                  <Box>
-                                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                                      {item.heading}
-                                    </Typography>
-                                    <Typography
-                                      variant="body1"
-                                      color="text.secondary"
-                                      sx={{ mb: 1 }}
-                                    >
-                                      {item.noticeDate
-                                        ? formatDate(item.noticeDate)
-                                        : "Date not found"}
-                                    </Typography>
-                                  </Box>
-                                </Stack>
-                                {user.isAdmin ? (
                                   <Stack
                                     direction="row"
                                     justifyContent="start"
                                     alignItems="center"
                                     spacing={2}
                                   >
-                                    <Link to={`/notice/add-notice/${item._id}`}>
-                                      <SoftButton color="info" circular iconOnly>
-                                        <EditIcon />
-                                      </SoftButton>
-                                    </Link>
-                                    <SoftButton
-                                      onClick={() => deleteNotice(item)}
-                                      color="error"
-                                      circular
-                                      iconOnly
-                                    >
-                                      <DeleteIcon />
-                                    </SoftButton>
+                                    <Avatar {...stringAvatar(item.heading)} />
+                                    <Box>
+                                      <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                                        {item.heading}
+                                      </Typography>
+                                      <Typography
+                                        variant="body1"
+                                        color="text.secondary"
+                                        sx={{ mb: 1 }}
+                                      >
+                                        {item.noticeDate
+                                          ? formatDate(item.noticeDate)
+                                          : "Date not found"}
+                                      </Typography>
+                                    </Box>
                                   </Stack>
-                                ) : null}
-                              </Stack>
-                              <Typography
-                                variant="body1"
-                                sx={{ my: 2, overflowY: "auto", height: "200px" }}
-                              >
-                                {item.description}
-                              </Typography>
-                            </SwiperSlide>
-                          );
-                        })}
-                      </Swiper>
+                                  {user?.isAdmin ? (
+                                    <Stack
+                                      direction="row"
+                                      justifyContent="start"
+                                      alignItems="center"
+                                      spacing={2}
+                                    >
+                                      <Link to={`/notice/add-notice/${item._id}`}>
+                                        <SoftButton color="info" circular iconOnly>
+                                          <EditIcon />
+                                        </SoftButton>
+                                      </Link>
+                                      <SoftButton
+                                        onClick={() => deleteNotice(item)}
+                                        color="error"
+                                        circular
+                                        iconOnly
+                                      >
+                                        <DeleteIcon />
+                                      </SoftButton>
+                                    </Stack>
+                                  ) : null}
+                                </Stack>
+                                <Typography
+                                  variant="body1"
+                                  sx={{ my: 2, overflowY: "auto", height: "200px" }}
+                                >
+                                  {item.description}
+                                </Typography>
+                              </SwiperSlide>
+                            );
+                          })}
+                        </Swiper>
+                      )}
                     </Box>
                   )}
                 </CardContent>

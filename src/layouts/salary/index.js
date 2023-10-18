@@ -7,13 +7,17 @@ import Footer from "examples/Footer";
 import axios from "axios";
 import { API_URL } from "config";
 import {
+  Alert,
   Box,
+  CircularProgress,
   Dialog,
   IconButton,
+  Snackbar,
   Stack,
   TableFooter,
   TablePagination,
   TableSortLabel,
+  Typography,
 } from "@mui/material";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,6 +33,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Link } from "react-router-dom";
 import SoftInput from "components/SoftInput";
 import Loader from "loader";
+import moment from "moment";
 
 function Salary() {
   const [salaryData, setSalaryData] = useState([]);
@@ -47,6 +52,20 @@ function Salary() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const displayNotification = (message, alertType) => {
+    setNotificationOpen(true);
+    setNotificationMessage(message);
+    setSeverity(alertType);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -204,6 +223,29 @@ function Salary() {
       width: 130,
     },
     {
+      field: "creditMonth",
+      headerName: "Credit Month",
+      width: 130,
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 160,
+    },
+  ];
+
+  const expandColumns = [
+    {
+      field: "employeeName",
+      headerName: "Name",
+      width: 130,
+    },
+    {
+      field: "monthlySalary",
+      headerName: "Salary",
+      width: 130,
+    },
+    {
       field: "totalWorkingDays",
       headerName: "Working Days",
       width: 130,
@@ -239,6 +281,11 @@ function Salary() {
       width: 130,
     },
     {
+      field: "creditMonth",
+      headerName: "Credit Month",
+      width: 130,
+    },
+    {
       field: "action",
       headerName: "Action",
       width: 160,
@@ -257,7 +304,7 @@ function Salary() {
   };
 
   const deleteSalary = async (rowData) => {
-    console.log(rowData, "Delete");
+    setButtonLoading(true);
 
     const deleteBodyData = {
       employeeId: rowData.employeeId,
@@ -270,7 +317,18 @@ function Salary() {
         const response = await axios.delete(`${API_URL}/salary/delete-salary/`, {
           data: deleteBodyData,
         });
+        if (response.status === 200) {
+          const message = `Successfully deleted salary`;
+          const alertType = "success";
+          displayNotification(message, alertType);
+          setButtonLoading(false);
+          fetchData();
+        }
       } catch (error) {
+        const message = `Internal server error`;
+        const alertType = "error";
+        displayNotification(message, alertType);
+        setButtonLoading(false);
         console.error("Error Deleting Salary:", error);
       }
     }
@@ -296,7 +354,7 @@ function Salary() {
 
     return (
       <TableRow key={row._id}>
-        {initialColumns.map((column) => {
+        {expandColumns.map((column) => {
           if (column.field === "action") {
             return (
               <TableCell key={column.field}>
@@ -341,6 +399,8 @@ function Salary() {
                 </Stack>
               </TableCell>
             );
+          } else if (column.field === "creditMonth") {
+            return <TableCell key={column.field}>{moment(row.creditMonth).format("LL")}</TableCell>;
           } else {
             return <TableCell key={column.field}>{row[column.field]}</TableCell>;
           }
@@ -468,13 +528,27 @@ function Salary() {
                                               <MenuItem
                                                 key="delete-salary"
                                                 onClick={handleDeleteSalary}
+                                                disabled={buttonLoading}
                                               >
                                                 Delete Salary
+                                                {buttonLoading ? (
+                                                  <CircularProgress
+                                                    sx={{ ml: 1 }}
+                                                    color="inherit"
+                                                    size={14}
+                                                  />
+                                                ) : null}
                                               </MenuItem>,
                                             ]
                                           : null}
                                       </Menu>
                                     </Stack>
+                                  </TableCell>
+                                );
+                              } else if (column.field === "creditMonth") {
+                                return (
+                                  <TableCell key={column.field}>
+                                    {moment(row.creditMonth).format("LL")}
                                   </TableCell>
                                 );
                               } else {
@@ -486,12 +560,12 @@ function Salary() {
                           </TableRow>
                           {expandedRow === row._id && (
                             <TableRow>
-                              <TableCell colSpan={initialColumns.length + 1}>
+                              <TableCell colSpan={expandColumns.length + 1}>
                                 <SoftBox sx={{ boxShadow: 1, m: 2, borderRadius: 3 }}>
                                   <Table>
                                     <TableHead sx={{ display: "table-header-group" }}>
                                       <TableRow>
-                                        {initialColumns.map((column) => (
+                                        {expandColumns.map((column) => (
                                           <TableCell key={column.field}>
                                             {column.headerName}
                                           </TableCell>
@@ -557,6 +631,18 @@ function Salary() {
           <SalarySlip salaryData={selectedRowData} />
         </PDFViewer>
       </Dialog>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
       <Footer />
     </DashboardLayout>
   );
