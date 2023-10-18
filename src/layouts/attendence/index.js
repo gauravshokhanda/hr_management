@@ -476,7 +476,13 @@ function Attendence() {
     <DashboardLayout>
       <DashboardNavbar />
       {user && (
-        <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+        <Stack
+          display="flex"
+          justifyContent="space-between"
+          alignItems={{ xs: "start", md: "center" }}
+          direction={{ xs: "column", md: "row" }}
+          gap={{ xs: "16px", md: "0" }}
+        >
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
             <Avatar
               src={`${API_URL}/${
@@ -493,7 +499,7 @@ function Attendence() {
             </SoftTypography>
           </SoftBox>
           {!employeeAttendanceId && (
-            <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
+            <SoftBox display="flex" flexWrap='wrap' alignItems="center" sx={{ gap: "12px" }}>
               <LoadingButton
                 disabled={!checkInBtn}
                 variant="contained"
@@ -542,7 +548,7 @@ function Attendence() {
               </LoadingButton>
             </SoftBox>
           )}
-        </SoftBox>
+        </Stack>
       )}
       <SoftBox py={3}>
         {loading ? (

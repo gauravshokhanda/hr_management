@@ -7,9 +7,12 @@ import Footer from "examples/Footer";
 import axios from "axios";
 import { API_URL } from "config";
 import {
+  Alert,
   Box,
+  CircularProgress,
   Dialog,
   IconButton,
+  Snackbar,
   Stack,
   TableFooter,
   TablePagination,
@@ -47,6 +50,20 @@ function Salary() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const displayNotification = (message, alertType) => {
+    setNotificationOpen(true);
+    setNotificationMessage(message);
+    setSeverity(alertType);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -257,7 +274,7 @@ function Salary() {
   };
 
   const deleteSalary = async (rowData) => {
-    console.log(rowData, "Delete");
+    setButtonLoading(true);
 
     const deleteBodyData = {
       employeeId: rowData.employeeId,
@@ -270,7 +287,18 @@ function Salary() {
         const response = await axios.delete(`${API_URL}/salary/delete-salary/`, {
           data: deleteBodyData,
         });
+        if (response.status === 200) {
+          const message = `Successfully deleted salary`;
+          const alertType = "success";
+          displayNotification(message, alertType);
+          setButtonLoading(false);
+          fetchData();
+        }
       } catch (error) {
+        const message = `Internal server error`;
+        const alertType = "error";
+        displayNotification(message, alertType);
+        setButtonLoading(false);
         console.error("Error Deleting Salary:", error);
       }
     }
@@ -468,8 +496,16 @@ function Salary() {
                                               <MenuItem
                                                 key="delete-salary"
                                                 onClick={handleDeleteSalary}
+                                                disabled={buttonLoading}
                                               >
                                                 Delete Salary
+                                                {buttonLoading ? (
+                                                  <CircularProgress
+                                                    sx={{ ml: 1 }}
+                                                    color="inherit"
+                                                    size={14}
+                                                  />
+                                                ) : null}
                                               </MenuItem>,
                                             ]
                                           : null}
@@ -557,6 +593,18 @@ function Salary() {
           <SalarySlip salaryData={selectedRowData} />
         </PDFViewer>
       </Dialog>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={severity} sx={{ width: "100%" }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
       <Footer />
     </DashboardLayout>
   );

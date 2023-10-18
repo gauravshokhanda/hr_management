@@ -227,10 +227,10 @@ function Overview() {
                     justifyContent="center"
                     flexDirection="column"
                     display="flex"
-                    gap={0.5}
+                    gap={2}
                   >
                     <Grid container spacing={2}>
-                      <Grid item xs={6}>
+                      <Grid item xs={12} sm={6}>
                         <SoftBox sx={contentStyle}>
                           <Box
                             sx={{
@@ -394,7 +394,7 @@ function Overview() {
                           )}
                         </SoftBox>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={12} sm={6}>
                         <SoftBox sx={contentStyle}>
                           <Box
                             sx={{
@@ -478,11 +478,6 @@ function Overview() {
                             <Typography variant="h5" fontWeight={500}>
                               User Salary
                             </Typography>
-                            {/* <SoftButton onClick={() => {
-                          setEdit(true);
-                        }} color="info" circular iconOnly>
-                              <EditIcon />
-                            </SoftButton> */}
                           </Box>
                           <Typography variant="subtitle1" color="#a9a9a9" fontWeight={400}>
                             {userData.salary}

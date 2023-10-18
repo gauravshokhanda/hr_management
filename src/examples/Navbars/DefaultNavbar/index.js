@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 // react-router components
@@ -27,7 +26,10 @@ function DefaultNavbar({ transparent, light, action }) {
   const [mobileNavbar, setMobileNavbar] = useState(false);
   const [mobileView, setMobileView] = useState(false);
 
-  const openMobileNavbar = ({ currentTarget }) => setMobileNavbar(currentTarget.parentNode);
+  const openMobileNavbar = ({ currentTarget }) => {
+    console.log("Clicked");
+    setMobileNavbar(currentTarget.parentNode);
+  };
   const closeMobileNavbar = () => setMobileNavbar(false);
 
   useEffect(() => {
@@ -54,6 +56,7 @@ function DefaultNavbar({ transparent, light, action }) {
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", displayMobileNavbar);
   }, []);
+
 
   return (
     <Container>
@@ -83,7 +86,12 @@ function DefaultNavbar({ transparent, light, action }) {
           </SoftTypography>
         </SoftBox>
         <SoftBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
-          <DefaultNavbarLink icon="donut_large" name="attendence" route="/attendence" light={light} />
+          <DefaultNavbarLink
+            icon="donut_large"
+            name="attendence"
+            route="/attendence"
+            light={light}
+          />
           <DefaultNavbarLink icon="person" name="profile" route="/profile" light={light} />
           <DefaultNavbarLink
             icon="account_circle"

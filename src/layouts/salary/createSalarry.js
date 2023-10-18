@@ -12,6 +12,7 @@ import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import moment from "moment";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 function CreateSalary() {
   const { id } = useParams();
@@ -86,6 +87,7 @@ function CreateSalary() {
 
   return (
     <DashboardLayout>
+      <DashboardNavbar />
       <SoftBox>
         <Grid container justifyContent={`center`}>
           <Grid item xs={12}>

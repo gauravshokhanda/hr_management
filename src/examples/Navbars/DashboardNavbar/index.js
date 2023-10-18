@@ -45,6 +45,7 @@ import {
   setMiniSidenav,
   setOpenConfigurator,
 } from "context";
+
 import { useDispatch, useSelector } from "react-redux";
 // Images
 import team2 from "assets/images/team-2.jpg";
@@ -56,7 +57,7 @@ import { API_URL } from "config";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
-  const [controller] = useSoftUIController();
+  const [controller, dispatch] = useSoftUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
@@ -70,10 +71,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
     setAnchorEl(null);
   };
 
-  const dispatch = useDispatch();
+  const dispatchRedux = useDispatch();
 
   const handleClickLogout = () => {
-    dispatch(clearUserAndToken());
+    dispatchRedux(clearUserAndToken());
     localStorage.clear(); 
     window.location.reload();
   };

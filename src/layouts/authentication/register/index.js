@@ -10,6 +10,7 @@ import {
   Grid,
   Input,
   Snackbar,
+  Stack,
   Typography,
 } from "@mui/material";
 import axios from "axios";
@@ -250,7 +251,7 @@ function RegisterWrapper({
             <SoftBox pt={2} pb={3} px={3}>
               <SoftBox component="form" role="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="firstName"
@@ -260,7 +261,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="lastName"
@@ -270,7 +271,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="userName"
@@ -280,7 +281,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="userEmail"
@@ -291,7 +292,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="salary"
@@ -302,7 +303,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="accountNumber"
@@ -313,7 +314,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="ifscCode"
@@ -323,7 +324,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="password"
@@ -334,7 +335,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <SoftBox>
                       <SoftInput
                         name="dateOfJoining"
@@ -345,7 +346,7 @@ function RegisterWrapper({
                       />
                     </SoftBox>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <Grid container>
                       <Grid item xs={6}>
                         <label>
@@ -383,14 +384,16 @@ function RegisterWrapper({
                   </Grid>
                   <Grid item xs={12}>
                     <SoftBox>
-                      <Box
+                      <Stack
+                      display={'flex'}
+                      alignItems={{sm: 'start', md: 'center'}}
+                      flexDirection={{sm:'column', md: 'row'}}
+                      spacing={2}
+                      justifyContent={'space-between'}
                         sx={{
                           padding: "20px",
                           border: "0.0625rem solid #d2d6da",
                           borderRadius: "0.5rem!important",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "22px",
                         }}
                       >
                         <Box>
@@ -412,13 +415,13 @@ function RegisterWrapper({
                             </Button>
                           </label>
                         </Box>
-                        <Box>
+                        <Box maxWidth={400}>
                           {selectedImage ? (
                             <div>
                               <img
                                 src={URL.createObjectURL(selectedImage)}
                                 alt="Selected"
-                                style={{ width: "400px", height: "250px", objectFit: "cover" }}
+                                style={{ width: "100%", height: "250px", objectFit: "cover" }}
                               />
                               <Typography variant="body1">{selectedImage.name}</Typography>
                             </div>
@@ -429,7 +432,7 @@ function RegisterWrapper({
                                   <img
                                     src={API_URL + "/" + formData.image}
                                     alt={formData.image ? formData.heading : "Add image"}
-                                    style={{ maxWidth: "400px" }}
+                                    style={{ maxWidth: "100%" }}
                                   />
                                   <Typography variant="body1">{formData.image}</Typography>
                                 </>
@@ -437,7 +440,7 @@ function RegisterWrapper({
                             </div>
                           )}
                         </Box>
-                      </Box>
+                      </Stack>
                     </SoftBox>
                   </Grid>
                 </Grid>

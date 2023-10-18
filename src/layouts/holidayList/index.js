@@ -16,7 +16,7 @@ import SoftInput from "components/SoftInput";
 import SoftTypography from "components/SoftTypography";
 import axios from "axios";
 import { API_URL } from "config";
-import { Switch, Typography } from "@mui/material";
+import { Stack, Switch, Typography } from "@mui/material";
 import moment from "moment";
 import HolidayTable from "./holidayTable";
 import "./cell.css";
@@ -213,7 +213,7 @@ function HolidayList() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <SoftBox mt={5} display="flex" alignItems="center" justifyContent="space-between">
+      <Stack mt={5} display="flex" alignItems={{sm: 'start', md: 'center'}} spacing={2} justifyContent="space-between" flexDirection={{sm: 'column', md: 'row'}}>
         <Typography variant="h3" fontWeight={700}>
           Holiday {showTable ? "Calendar" : "Table"}
         </Typography>
@@ -225,7 +225,7 @@ function HolidayList() {
             Table
           </SoftButton>
         </SoftBox>
-      </SoftBox>
+      </Stack>
       {showTable ? (
         <>
           <SoftBox mt={5} mb={3}>
