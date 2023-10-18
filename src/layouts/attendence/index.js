@@ -566,9 +566,9 @@ function Attendence() {
                 sort: "desc",
               },
             ]}
-            components={{
-              Toolbar: GridToolbar,
-            }}
+            // components={{
+            //   Toolbar: GridToolbar,
+            // }}
             getRowId={(row) => row._id}
             sx={{
               "& .MuiDataGrid-footerContainer": {

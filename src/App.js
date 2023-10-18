@@ -16,7 +16,7 @@ import SoftBox from "components/SoftBox";
 
 // Hr Management Dashboard React examples
 import Sidenav from "examples/Sidenav";
-import Configurator from "examples/Configurator";
+// import Configurator from "examples/Configurator";
 
 // Hr Management Dashboard React themes
 import theme from "assets/theme";
@@ -165,11 +165,11 @@ export default function App() {
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
             />
-            <Configurator />
-            {configsButton}
+            {/* <Configurator /> */}
+            {/* {configsButton} */}
           </>
         )}
-        {layout === "vr" && <Configurator />}
+        {layout === "vr"}
         <Routes>
           {getRoutes(filteredRoutes)}
           <Route path="*" element={<Navigate to="/404" />} />
@@ -189,11 +189,11 @@ export default function App() {
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
-          <Configurator />
-          {configsButton}
+          {/* <Configurator /> */}
+          {/* {configsButton} */}
         </>
       )}
-      {layout === "vr" && <Configurator />}
+      {layout === "vr"}
       {/* {isAdmin ? } */}
       <Routes>
         {getRoutes(filteredRoutes)}

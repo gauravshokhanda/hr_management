@@ -599,7 +599,7 @@ function Salary() {
                             onPageChange={handleChangePage}
                             onRowsPerPageChange={handleChangeRowsPerPage}
                             sx={{
-                              "& .css-1ui3wbn-MuiInputBase-root-MuiTablePagination-select": {
+                              "& .MuiInputBase-root": {
                                 width: "auto!important",
                               },
                             }}

@@ -13,20 +13,8 @@ import SoftTypography from "components/SoftTypography";
 // Hr Management Dashboard React base styles
 import typography from "assets/theme/base/typography";
 
-function Footer({ company, links }) {
-  const { href, name } = company;
+function Footer() {
   const { size } = typography;
-
-  const renderLinks = () =>
-    links.map((link) => (
-      <SoftBox key={link.name} component="li" px={2} lineHeight={1}>
-        <Link href={link.href} target="_blank">
-          <SoftTypography variant="button" fontWeight="regular" color="text">
-            {link.name}
-          </SoftTypography>
-        </Link>
-      </SoftBox>
-    ));
 
   return (
     <SoftBox
@@ -35,7 +23,7 @@ function Footer({ company, links }) {
       flexDirection={{ xs: "column", lg: "row" }}
       justifyContent="space-between"
       alignItems="center"
-      px={1.5}
+      px={1.5}    
     >
       <SoftBox
         display="flex"
@@ -44,21 +32,14 @@ function Footer({ company, links }) {
         flexWrap="wrap"
         color="text"
         fontSize={size.sm}
-        px={1.5}
+        px={1.5}        
       >
-        &copy; {new Date().getFullYear()}, made with
-        <SoftBox fontSize={size.md} color="text" mb={-0.5} mx={0.25}>
-          <Icon color="inherit" fontSize="inherit">
-            favorite
-          </Icon>
-        </SoftBox>
-        by
-        <Link href={href} target="_blank">
+       Crafted By
+        <Link href={'#'} target="_blank">
           <SoftTypography variant="button" fontWeight="medium">
-            &nbsp;{name}&nbsp;
+            &nbsp;Leavecode Technologies Private Limited &nbsp;
           </SoftTypography>
         </Link>
-        for a better web.
       </SoftBox>
       <SoftBox
         component="ul"
@@ -77,22 +58,11 @@ function Footer({ company, links }) {
           },
         })}
       >
-        {renderLinks()}
       </SoftBox>
     </SoftBox>
   );
 }
 
-// Setting default values for the props of Footer
-Footer.defaultProps = {
-  company: { href: "#", name: "HR Mangement" },
-  links: [
-    { href: "#", name: "HR Mangement" },
-    { href: "#", name: "About Us" },
-    { href: "#", name: "Blog" },
-    { href: "#", name: "License" },
-  ],
-};
 
 // Typechecking props for the Footer
 Footer.propTypes = {
