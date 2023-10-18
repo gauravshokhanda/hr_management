@@ -385,8 +385,8 @@ function Attendence() {
       headerName: "Break Time",
       width: 360,
       renderCell: (params) => {
-        const breakStarts = params.row.breakStart; // Assuming there can be multiple breakStarts
-        const breakEnds = params.row.breakEnd; // Assuming there can be multiple breakEnds
+        const breakStarts = params.row.breakStart;
+        const breakEnds = params.row.breakEnd;
 
         if (breakStarts && breakEnds) {
           const formattedBreakTimes = [];

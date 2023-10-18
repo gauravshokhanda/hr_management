@@ -17,6 +17,7 @@ import {
   TableFooter,
   TablePagination,
   TableSortLabel,
+  Typography,
 } from "@mui/material";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import EditIcon from "@mui/icons-material/Edit";
@@ -32,6 +33,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Link } from "react-router-dom";
 import SoftInput from "components/SoftInput";
 import Loader from "loader";
+import moment from "moment";
 
 function Salary() {
   const [salaryData, setSalaryData] = useState([]);
@@ -221,12 +223,16 @@ function Salary() {
       width: 130,
     },
     {
+      field: "creditMonth",
+      headerName: "Credit Month",
+      width: 130,
+    },
+    {
       field: "action",
       headerName: "Action",
       width: 160,
     },
   ];
-
 
   const expandColumns = [
     {
@@ -275,12 +281,16 @@ function Salary() {
       width: 130,
     },
     {
+      field: "creditMonth",
+      headerName: "Credit Month",
+      width: 130,
+    },
+    {
       field: "action",
       headerName: "Action",
       width: 160,
     },
   ];
-
 
   const generatePdf = async (rowData) => {
     if (rowData) {
@@ -389,6 +399,8 @@ function Salary() {
                 </Stack>
               </TableCell>
             );
+          } else if (column.field === "creditMonth") {
+            return <TableCell key={column.field}>{moment(row.creditMonth).format("LL")}</TableCell>;
           } else {
             return <TableCell key={column.field}>{row[column.field]}</TableCell>;
           }
@@ -531,6 +543,12 @@ function Salary() {
                                           : null}
                                       </Menu>
                                     </Stack>
+                                  </TableCell>
+                                );
+                              } else if (column.field === "creditMonth") {
+                                return (
+                                  <TableCell key={column.field}>
+                                    {moment(row.creditMonth).format("LL")}
                                   </TableCell>
                                 );
                               } else {
