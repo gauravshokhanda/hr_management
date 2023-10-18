@@ -2,7 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Checkbox from "@mui/material/Checkbox";
-import { Alert, Box, Button, CircularProgress, Grid, Input, Snackbar, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  Input,
+  Snackbar,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import { API_URL } from "../../config";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -72,18 +81,23 @@ function CreateSalary() {
           creditMonth: "",
         });
         setTimeout(() => {
-          navigate('/salary')
-        }, 1000)
+          navigate("/salary");
+        }, 1000);
       }
     } catch (error) {
-      const message = "Internal server error";
-      const alertType = "error";
-      displayNotification(message, alertType);
+      if (error.response.status === 400) {
+        const message = error.response.data.message;
+        const alertType = "error";
+        displayNotification(message, alertType);
+      } else {
+        const message = "Internal server error";
+        const alertType = "error";
+        displayNotification(message, alertType);
+      }
       setButtonLoading(false);
       console.log(error, "There is some error");
     }
   };
-
 
   return (
     <DashboardLayout>
@@ -125,7 +139,12 @@ function CreateSalary() {
                       </Grid>
                     </Grid>
                     <SoftBox mt={4} mb={1} display="flex" justifyContent="end">
-                      <SoftButton variant="gradient" disabled={buttonLoading} onClick={handleSubmit} color="dark">
+                      <SoftButton
+                        variant="gradient"
+                        disabled={buttonLoading}
+                        onClick={handleSubmit}
+                        color="dark"
+                      >
                         Create Salary
                         {buttonLoading ? (
                           <CircularProgress sx={{ ml: 1 }} color="inherit" size={14} />

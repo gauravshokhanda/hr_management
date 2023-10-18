@@ -221,6 +221,25 @@ function Salary() {
       width: 130,
     },
     {
+      field: "action",
+      headerName: "Action",
+      width: 160,
+    },
+  ];
+
+
+  const expandColumns = [
+    {
+      field: "employeeName",
+      headerName: "Name",
+      width: 130,
+    },
+    {
+      field: "monthlySalary",
+      headerName: "Salary",
+      width: 130,
+    },
+    {
       field: "totalWorkingDays",
       headerName: "Working Days",
       width: 130,
@@ -261,6 +280,7 @@ function Salary() {
       width: 160,
     },
   ];
+
 
   const generatePdf = async (rowData) => {
     if (rowData) {
@@ -324,7 +344,7 @@ function Salary() {
 
     return (
       <TableRow key={row._id}>
-        {initialColumns.map((column) => {
+        {expandColumns.map((column) => {
           if (column.field === "action") {
             return (
               <TableCell key={column.field}>
@@ -522,12 +542,12 @@ function Salary() {
                           </TableRow>
                           {expandedRow === row._id && (
                             <TableRow>
-                              <TableCell colSpan={initialColumns.length + 1}>
+                              <TableCell colSpan={expandColumns.length + 1}>
                                 <SoftBox sx={{ boxShadow: 1, m: 2, borderRadius: 3 }}>
                                   <Table>
                                     <TableHead sx={{ display: "table-header-group" }}>
                                       <TableRow>
-                                        {initialColumns.map((column) => (
+                                        {expandColumns.map((column) => (
                                           <TableCell key={column.field}>
                                             {column.headerName}
                                           </TableCell>
