@@ -167,7 +167,7 @@ function Attendence() {
         if (response.status === 200) {
           const lastAttendance = response.data.slice(-1)[0];
           setAttendance(response.data);
-          setAttendanceId(lastAttendance._id);
+          setAttendanceId(lastAttendance.id);
           setTodayAttendence(lastAttendance);
           setLoading(false);
         }
@@ -283,6 +283,7 @@ function Attendence() {
     }
   };
 
+
   const handleCheckIn = () => {
     setButtonLoading({ checkInLoading: true });
 
@@ -385,8 +386,8 @@ function Attendence() {
       headerName: "Break Time",
       width: 360,
       renderCell: (params) => {
-        const breakStarts = params.row.breakStart;
-        const breakEnds = params.row.breakEnd;
+        const breakStarts = JSON.parse(params.row.breakStart);
+        const breakEnds = JSON.parse(params.row.breakEnd);
 
         if (breakStarts && breakEnds) {
           const formattedBreakTimes = [];
@@ -499,7 +500,7 @@ function Attendence() {
             </SoftTypography>
           </SoftBox>
           {!employeeAttendanceId && (
-            <SoftBox display="flex" flexWrap='wrap' alignItems="center" sx={{ gap: "12px" }}>
+            <SoftBox display="flex" flexWrap="wrap" alignItems="center" sx={{ gap: "12px" }}>
               <LoadingButton
                 disabled={!checkInBtn}
                 variant="contained"
@@ -569,7 +570,7 @@ function Attendence() {
             // components={{
             //   Toolbar: GridToolbar,
             // }}
-            getRowId={(row) => row._id}
+            getRowId={(row) => row.id}
             sx={{
               "& .MuiDataGrid-footerContainer": {
                 "& .MuiInputBase-root": {

@@ -95,7 +95,7 @@ function Salary() {
 
   useEffect(() => {
     if (data && data.user) {
-      setUserId(data.user._id);
+      setUserId(data.user.id);
     }
   }, [data, userId]);
 
@@ -164,7 +164,7 @@ function Salary() {
       headerName: "Action",
       width: 160,
       renderCell: (params) => {
-        const rowId = params.row._id;
+        const rowId = params.row.id;
         const isOpen = openedMenuRow === rowId;
 
         const handleViewSalarySlipClick = () => {
@@ -236,7 +236,7 @@ function Salary() {
 
     const deleteBodyData = {
       employeeId: rowData.employeeId,
-      _id: rowData._id,
+      id: rowData.id,
     };
 
     console.log(deleteBodyData, "Body Data");
@@ -309,7 +309,7 @@ function Salary() {
                   //   </>
                   // },
                 }}
-                getRowId={(row) => row._id}
+                getRowId={(row) => row.id}
                 sx={{
                   "& .MuiDataGrid-footerContainer": {
                     "& .MuiInputBase-root": {
@@ -450,7 +450,7 @@ function Salary() {
 
   useEffect(() => {
     if (data && data.user) {
-      setUserId(data.user._id);
+      setUserId(data.user.id);
     }
   }, [data, userId]);
 
@@ -520,7 +520,7 @@ function Salary() {
       headerName: "Action",
       width: 160,
       renderCell: (params) => {
-        const rowId = params.row._id;
+        const rowId = params.row.id;
         const isOpen = openedMenuRow === rowId;
 
         const handleViewSalarySlipClick = () => {
@@ -592,7 +592,7 @@ function Salary() {
 
     const deleteBodyData = {
       employeeId: rowData.employeeId,
-      _id: rowData._id,
+      id: rowData.id,
     };
 
     console.log(deleteBodyData, "Body Data");
@@ -648,7 +648,7 @@ function Salary() {
                   Row: (slotParams ) => <CustomRow data={slotParams.row}/>
                 }}
                 getRowParams={getRowParams}
-                getRowId={(row) => row._id}
+                getRowId={(row) => row.id}
                 sx={{
                   "& .MuiDataGrid-footerContainer": {
                     "& .MuiInputBase-root": {

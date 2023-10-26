@@ -78,10 +78,10 @@ function Salary() {
 
   const toggleExpand = (row) => {
     setEmployeeId(row.employeeId);
-    if (expandedRow === row._id) {
+    if (expandedRow === row.id) {
       setExpandedRow(null);
     } else {
-      setExpandedRow(row._id);
+      setExpandedRow(row.id);
     }
   };
 
@@ -207,7 +207,7 @@ function Salary() {
 
   useEffect(() => {
     if (data && data.user) {
-      setUserId(data.user._id);
+      setUserId(data.user.id);
     }
   }, [data, userId]);
 
@@ -308,7 +308,7 @@ function Salary() {
 
     const deleteBodyData = {
       employeeId: rowData.employeeId,
-      _id: rowData._id,
+      id: rowData.id,
     };
 
     console.log(deleteBodyData, "Body Data");
@@ -337,7 +337,7 @@ function Salary() {
   const isAdmin = data?.user?.isAdmin || false;
 
   const renderRow = (row) => {
-    const isOpen = openedMenuRow === row._id;
+    const isOpen = openedMenuRow === row.id;
 
     const handleViewSalarySlipClick = () => {
       setSelectedRowData(row);
@@ -353,7 +353,7 @@ function Salary() {
     };
 
     return (
-      <TableRow key={row._id}>
+      <TableRow key={row.id}>
         {expandColumns.map((column) => {
           if (column.field === "action") {
             return (
@@ -363,7 +363,7 @@ function Salary() {
                     aria-controls={isOpen ? "basic-menu" : undefined}
                     aria-haspopup="true"
                     aria-expanded={isOpen ? "true" : undefined}
-                    onClick={(event) => handleClick(event, row._id)}
+                    onClick={(event) => handleClick(event, row.id)}
                     iconOnly
                     variant="contained"
                   >
@@ -453,7 +453,7 @@ function Salary() {
                     </TableHead>
                     <TableBody>
                       {paginatedSalaryData.map((row) => (
-                        <React.Fragment key={row._id}>
+                        <React.Fragment key={row.id}>
                           <TableRow>
                             <TableCell>
                               <IconButton
@@ -461,7 +461,7 @@ function Salary() {
                                 size="small"
                                 onClick={() => toggleExpand(row)}
                               >
-                                {expandedRow === row._id ? (
+                                {expandedRow === row.id ? (
                                   <KeyboardArrowUpIcon />
                                 ) : (
                                   <KeyboardArrowDownIcon />
@@ -470,7 +470,7 @@ function Salary() {
                             </TableCell>
                             {initialColumns.map((column) => {
                               if (column.field === "action") {
-                                const rowId = row._id;
+                                const rowId = row.id;
                                 const isOpen = openedMenuRow === rowId;
                                 // const rowEmployeeId = row.employeeId;
 
@@ -558,7 +558,7 @@ function Salary() {
                               }
                             })}
                           </TableRow>
-                          {expandedRow === row._id && (
+                          {expandedRow === row.id && (
                             <TableRow>
                               <TableCell colSpan={expandColumns.length + 1}>
                                 <SoftBox sx={{ boxShadow: 1, m: 2, borderRadius: 3 }}>
@@ -574,7 +574,7 @@ function Salary() {
                                     </TableHead>
                                     <TableBody>
                                       {employeSalaryData.map((row) => (
-                                        <React.Fragment key={row._id}>
+                                        <React.Fragment key={row.id}>
                                           {renderRow(row)}
                                         </React.Fragment>
                                       ))}

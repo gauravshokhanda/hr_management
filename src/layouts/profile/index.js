@@ -346,7 +346,7 @@ function Overview() {
 
                           {edit && data.user.isAdmin ? (
                             <SoftInput
-                              name="_id"
+                              name="id"
                               type="text"
                               value={userData._id}
                               onChange={handleChange}

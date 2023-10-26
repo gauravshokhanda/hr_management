@@ -71,7 +71,7 @@ function NoticeBoard({ signInTrue }) {
 
   const deleteNotice = async (notice) => {
     handleClickOpen();
-    setDeleteId(notice._id);
+    setDeleteId(notice.id);
     setDeleteName(notice.heading);
     console.log(notice, "Delete");
   };
@@ -243,7 +243,7 @@ function NoticeBoard({ signInTrue }) {
                         >
                           {notice.map((item) => {
                             return (
-                              <SwiperSlide key={item._id}>
+                              <SwiperSlide key={item.id}>
                                 {item.imgPath === null ? null : (
                                   <CardMedia
                                     component="img"
@@ -294,7 +294,7 @@ function NoticeBoard({ signInTrue }) {
                                       alignItems="center"
                                       spacing={2}
                                     >
-                                      <Link to={`/notice/add-notice/${item._id}`}>
+                                      <Link to={`/notice/add-notice/${item.id}`}>
                                         <SoftButton color="info" circular iconOnly>
                                           <EditIcon />
                                         </SoftButton>

@@ -116,7 +116,7 @@ function NoticeBoard() {
 
       // Append the image as binary data
       if (selectedImage) {
-        formData.append("image", selectedImage, selectedImage.name);
+        formData.append("imgPath", selectedImage, selectedImage.name);
       }
 
       const response = await (id
@@ -178,7 +178,6 @@ function NoticeBoard() {
     }
   };
 
-  console.log(selectedImage, "Imagew");
 
   const handleChangeSelect = (event) => {
     const {

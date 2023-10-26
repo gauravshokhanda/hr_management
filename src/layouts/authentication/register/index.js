@@ -109,7 +109,7 @@ function Register({ backButton, setAddEmployee }) {
 
     try {
       const formDataToSend = new FormData();
-        formDataToSend.append("image", selectedImage, selectedImage.name);
+        formDataToSend.append("image", selectedImage);
       // if (selectedImage) {
       // }
       formDataToSend.append("firstName", formData.firstName);
@@ -249,7 +249,7 @@ function RegisterWrapper({
               </SoftTypography>
             </SoftBox>
             <SoftBox pt={2} pb={3} px={3}>
-              <SoftBox component="form" role="form" onSubmit={handleSubmit}>
+              <SoftBox component="form" role="form">
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <SoftBox>
@@ -451,6 +451,7 @@ function RegisterWrapper({
                     variant="gradient"
                     type="submit"
                     color="dark"
+                    onClick={handleSubmit}
                   >
                     Register
                     {buttonLoading ? (
