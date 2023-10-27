@@ -104,7 +104,7 @@ function HolidayList() {
           setCurrentEvents((prevEvents) => [
             ...prevEvents,
             {
-              id: data._id,
+              id: data.id,
               title: data.title,
               start: data.start,
               end: data.end,
@@ -196,7 +196,7 @@ function HolidayList() {
     },
     color: event.holiday ? "#ff5537" : "green",
     textColor: event.holiday ? "#000" : "#000",
-    id: event._id,
+    id: event.id,
   }));
 
   const customDayCellClassNames = (arg) => {

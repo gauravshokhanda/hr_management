@@ -75,7 +75,7 @@ export default function HolidayTable({ isAdmin }) {
   }, []);
 
   const handleDeleteEvent = async (eve) => {
-    setDeleteId(eve._id);
+    setDeleteId(eve.id);
     setDeleteName(eve.title);
     handleClickOpen();
   };
@@ -185,7 +185,7 @@ export default function HolidayTable({ isAdmin }) {
                 showQuickFilter: true,
               },
             }}
-            getRowId={(row) => row._id}
+            getRowId={(row) => row.id}
             checkboxSelection
             sx={{
               "& .MuiDataGrid-footerContainer": {
