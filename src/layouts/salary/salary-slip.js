@@ -90,6 +90,8 @@ const styles = StyleSheet.create({
   },
   netPayAmount: {
     fontSize: "20px",
+    fontFamily: "Poppins",
+    fontWeight: 'medium',
   },
   expensisContainer: {
     paddingBottom: "20px",
@@ -110,7 +112,9 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
   },
   tableHeadingBottom: {
+    fontFamily: "Poppins",
     fontSize: "14px",
+    fontWeight: 500,  
   },
   tableHeadingConatiner: {
     width: "calc(50% - 50px)",
@@ -173,7 +177,7 @@ export default function SalarySlip({ salaryData }) {
           </View>
           <View style={styles.netPay}>
             <Text style={styles.employeeId}>Employee Net Pay</Text>
-            <Text style={styles.netPayAmount}>${salaryData.basicSalary}</Text>
+            <Text style={styles.netPayAmount}>₹{salaryData.basicSalary}</Text>
             <Text style={styles.employeeId}>Paid Days : {salaryData.totalWorkingDays}</Text>
           </View>
         </View>
@@ -191,39 +195,39 @@ export default function SalarySlip({ salaryData }) {
           <View style={styles.tableRrow}>
             <View style={styles.tableHeadingConatiner}>
               <Text style={styles.tableHeadingBottom}>Bonus</Text>
-              <Text style={styles.tableHeadingBottom}>$ {salaryData.bonus}</Text>
+              <Text style={styles.tableHeadingBottom}>₹ {salaryData.bonus}</Text>
             </View>
             <View style={styles.tableHeadingConatiner}>
               <Text style={styles.tableHeadingBottom}>P.F</Text>
-              <Text style={styles.tableHeadingBottom}>$ {salaryData.pfSalary}</Text>
+              <Text style={styles.tableHeadingBottom}>₹ {salaryData.pfSalary}</Text>
             </View>
           </View>
           <View style={styles.tableRrow}>
             <View style={styles.tableHeadingConatiner}></View>
             <View style={styles.tableHeadingConatiner}>
               <Text style={styles.tableHeadingBottom}>HRA</Text>
-              <Text style={styles.tableHeadingBottom}>$ {salaryData.hraSalary}</Text>
+              <Text style={styles.tableHeadingBottom}>₹ {salaryData.hraSalary}</Text>
             </View>
           </View>
           <View style={styles.tableRrow}>
             <View style={styles.tableHeadingConatiner}>
               {/* <Text style={styles.tableHeadingBottom}>Over Time Pay</Text>
-              <Text style={styles.tableHeadingBottom}>$ 2,500.00</Text> */}
+              <Text style={styles.tableHeadingBottom}>₹ 2,500.00</Text> */}
             </View>
             <View style={styles.tableHeadingConatiner}>
               <Text style={styles.tableHeadingBottom}>Conveyance</Text>
-              <Text style={styles.tableHeadingBottom}>{salaryData.conveyance}</Text>
+              <Text style={styles.tableHeadingBottom}>₹ {salaryData.conveyance}</Text>
             </View>
           </View>
           <View style={[styles.tableHeader, styles.tableRrow]}>
             <View style={styles.tableHeadingConatiner}>
               <Text style={styles.tableHeading}>TOTAL EARNINGS</Text>
-              <Text style={styles.tableHeading}>{salaryData.bonus}</Text>
+              <Text style={styles.tableHeading}>₹ {salaryData.bonus}</Text>
             </View>
             <View style={styles.tableHeadingConatiner}>
               <Text style={styles.tableHeading}>TOTAL DEDUCTIONS</Text>
               <Text style={styles.tableHeading}>
-                $ {salaryData.hraSalary + salaryData.conveyance + salaryData.pfSalary}
+                ₹ {salaryData.hraSalary + salaryData.conveyance + salaryData.pfSalary}
               </Text>
             </View>
           </View>
