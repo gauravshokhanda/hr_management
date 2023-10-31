@@ -10,6 +10,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
 import { useSelector, useDispatch } from "react-redux";
+import io from "socket.io-client";
+import useSound from "use-sound";
+
+import fanfareSfx from "./assets/sound/notification.wav";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -36,11 +40,17 @@ import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "contex
 // Images
 import brand from "assets/images/logo-ct.png";
 import jwtDecode from "jwt-decode";
+import { API_URL } from "config";
+import { Alert, AlertTitle, Snackbar } from "@mui/material";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
   const { miniSidenav, direction, layout, openConfigurator, sidenavColor } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [severity, setSeverity] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [play, { stop }] = useSound(fanfareSfx);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const data = useSelector((state) => state.auth);
@@ -87,14 +97,13 @@ export default function App() {
 
   if (token) {
     const decodedToken = jwtDecode(token);
-    const currentTime = Date.now() / 1000; 
-  
+    const currentTime = Date.now() / 1000;
+
     if (decodedToken.exp < currentTime) {
       console.log("Token is expired");
       reduxDispatch(clearUserAndToken());
     }
   }
-
 
   const filteredRoutes = isAdmin
     ? routes // If user is an admin, all routes are accessible
@@ -126,6 +135,40 @@ export default function App() {
 
       return null;
     });
+
+  // Socket start
+
+  const handleCloseNotification = () => {
+    setNotificationOpen(false);
+  };
+
+  const socket = io(API_URL);
+
+  const alertNotification = async (data) => {
+    setNotificationMessage(data.message);
+    setNotificationOpen(true);
+    setSeverity(data.type);
+  };
+
+  socket.on("connect", () => {
+    console.log(socket.id, "connect");
+  });
+  socket.on("disconnect", () => {
+    console.log(socket.id);
+  });
+  socket.on("connect_error", (error) => {
+    console.error("Socket connection error:", error);
+  });
+  socket.on("notification", (data) => {
+    // Handle the 'notification' event here
+    play();
+    alertNotification(data);
+    setTimeout(() => {
+      stop();
+    }, 1000);
+  });
+
+  // Socket end
 
   const configsButton = (
     <SoftBox
@@ -199,6 +242,19 @@ export default function App() {
         {getRoutes(filteredRoutes)}
         <Route path="*" element={<Navigate to="/404" />} />
       </Routes>
+
+      {/* Alert toast */}
+      <Snackbar
+        autoHideDuration={5000}
+        open={notificationOpen}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseNotification} severity={`info`} sx={{ width: "100%" }}>
+          <AlertTitle>{severity}</AlertTitle>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }

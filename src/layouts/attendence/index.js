@@ -14,6 +14,7 @@ import Avatar from "@mui/material/Avatar";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import LoadingButton from "@mui/lab/LoadingButton";
+import io from "socket.io-client";
 
 // Hr Management Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -50,9 +51,11 @@ function Attendence() {
     checkOutLoading: false,
   });
 
-  const { employeeAttendanceId } = useParams();
+  const socket = io(API_URL);
 
-  console.log(employeeAttendanceId, "Employee id");
+  console.log(socket, "socket");
+
+  const { employeeAttendanceId } = useParams();
 
   const data = useSelector((state) => state.auth);
 
@@ -102,8 +105,6 @@ function Attendence() {
   const isBreakStart = isTodayAttendance ? todayAttendence.breakStart : [];
   const isBreakEnd = isTodayAttendance ? todayAttendence.breakEnd : [];
   const isCheckOut = todayAttendence && todayAttendence.checkOut;
-
-  console.log(isCheckOut, "Out");
 
   useEffect(() => {
     // By default, all buttons are disabled
@@ -199,6 +200,8 @@ function Attendence() {
           fetchData();
           console.log(response.data, "Successfully submitted attendance");
 
+          socket.emit("notification");
+
           setButtonLoading({ checkInLoading: false });
         }
       } catch (error) {
@@ -209,6 +212,24 @@ function Attendence() {
       }
     }
   };
+
+  // Socket start
+
+  socket.on("connect", () => {
+    console.log(socket.id, "connect");
+  });
+  socket.on("disconnect", () => {
+    console.log(socket.id);
+  });
+  socket.on("connect_error", (error) => {
+    console.error("Socket connection error:", error);
+  });
+  socket.on("notification", (data) => {
+    // Handle the 'notification' event here
+    console.log("Received notification:", data);
+  });
+
+  // Socket end
 
   const submitBreakIn = async () => {
     if (user) {
@@ -282,7 +303,6 @@ function Attendence() {
       }
     }
   };
-
 
   const handleCheckIn = () => {
     setButtonLoading({ checkInLoading: true });
@@ -470,8 +490,6 @@ function Attendence() {
 
     localStorage.setItem("hasSeenDialog", "true");
   };
-
-  console.log(todayAttendence, "attendance");
 
   return (
     <DashboardLayout>

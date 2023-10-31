@@ -27,7 +27,6 @@ import SoftInput from "components/SoftInput";
 
 // Hr Management Dashboard React examples
 import Breadcrumbs from "examples/Breadcrumbs";
-import NotificationItem from "examples/Items/NotificationItem";
 
 // Custom styles for DashboardNavbar
 import {
@@ -48,12 +47,9 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 // Images
-import team2 from "assets/images/team-2.jpg";
-import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 import { Avatar } from "@mui/material";
 import { API_URL } from "config";
-
-
+import Notification from "./notification";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -63,7 +59,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const route = useLocation().pathname.split("/").slice(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -75,12 +71,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const handleClickLogout = () => {
     dispatchRedux(clearUserAndToken());
-    localStorage.clear(); 
+    localStorage.clear();
     window.location.reload();
   };
 
   const data = useSelector((state) => state.auth);
-
 
   useEffect(() => {
     // Setting the navbar type
@@ -112,7 +107,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
 
-  // Render the notifications menu
+  // Render the Notifications menu
   const renderMenu = () => (
     <Menu
       anchorEl={openMenu}
@@ -125,29 +120,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       onClose={handleCloseMenu}
       sx={{ mt: 2 }}
     >
-      <NotificationItem
-        image={<img src={team2} alt="person" />}
-        title={["New message", "from Laur"]}
-        date="13 minutes ago"
-        onClick={handleCloseMenu}
-      />
-      <NotificationItem
-        image={<img src={logoSpotify} alt="person" />}
-        title={["New album", "by Travis Scott"]}
-        date="1 day"
-        onClick={handleCloseMenu}
-      />
-      <NotificationItem
-        color="secondary"
-        image={
-          <Icon fontSize="small" sx={{ color: ({ palette: { white } }) => white.main }}>
-            payment
-          </Icon>
-        }
-        title={["", "Payment successfully completed"]}
-        date="2 days"
-        onClick={handleCloseMenu}
-      />
+      <Notification handleCloseMenu={handleCloseMenu} />
     </Menu>
   );
 
@@ -258,7 +231,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 size="small"
                 color="inherit"
                 sx={navbarIconButton}
-                aria-controls="notification-menu"
+                aria-controls="Notification-menu"
                 aria-haspopup="true"
                 variant="contained"
                 onClick={handleOpenMenu}
