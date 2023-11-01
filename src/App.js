@@ -11,7 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
 import { useSelector, useDispatch } from "react-redux";
 import io from "socket.io-client";
-import useSound from "use-sound";
+import { setEmployeeData } from "./store/userStatus"; 
 
 import fanfareSfx from "./assets/sound/notification.wav";
 
@@ -42,6 +42,7 @@ import brand from "assets/images/logo-ct.png";
 import jwtDecode from "jwt-decode";
 import { API_URL } from "config";
 import { Alert, AlertTitle, Snackbar } from "@mui/material";
+import useSound from "use-sound";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -166,6 +167,11 @@ export default function App() {
     setTimeout(() => {
       stop();
     }, 1000);
+  });
+
+  socket.on("onlineUsers", (data) => {
+    console.log(data, "onine Data");
+    reduxDispatch(setEmployeeData(data));
   });
 
   // Socket end

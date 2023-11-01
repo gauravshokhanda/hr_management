@@ -10,11 +10,8 @@ import SoftButton from "components/SoftButton";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 import curved9 from "assets/images/curved-images/curved-6.png";
 import { Alert, CircularProgress, Snackbar, Switch, Typography } from "@mui/material";
-import { useEffect } from "react";
 import { setUserAndToken } from "../../../store/authSlice"; // Update the path
-import { clearUserAndToken } from "../../../store/authSlice";
 import { useDispatch, useSelector } from "react-redux";
-import jwtDecode from "jwt-decode";
 
 function SignIn() {
   const [rememberMe, setRememberMe] = useState(true);

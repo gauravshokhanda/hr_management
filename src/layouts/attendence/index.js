@@ -213,23 +213,7 @@ function Attendence() {
     }
   };
 
-  // Socket start
 
-  socket.on("connect", () => {
-    console.log(socket.id, "connect");
-  });
-  socket.on("disconnect", () => {
-    console.log(socket.id);
-  });
-  socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error);
-  });
-  socket.on("notification", (data) => {
-    // Handle the 'notification' event here
-    console.log("Received notification:", data);
-  });
-
-  // Socket end
 
   const submitBreakIn = async () => {
     if (user) {
