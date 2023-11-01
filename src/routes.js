@@ -11,7 +11,7 @@ import Billing from "layouts/billing";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import Register from "layouts/authentication/register";
-import EmployeeDetail from "layouts/manageEmployee/employeeDetail";
+import StatusUser from "layouts/status";
 
 // Hr Management Dashboard React icons
 import Shop from "examples/Icons/Shop";
@@ -23,6 +23,7 @@ import BackHandIcon from '@mui/icons-material/BackHand';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PageNotFound from "404";
+import GroupIcon from '@mui/icons-material/Group';
 
 const routes = [
   {
@@ -102,6 +103,16 @@ const routes = [
     route: "/profile",
     icon: <CustomerSupport size="12px" />,
     component: <Profile />,
+    adminOnly: false,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "Status",
+    key: "status",
+    route: "/status",
+    icon: <GroupIcon size="12px" />,
+    component: <StatusUser />,
     adminOnly: false,
     noCollapse: true,
   },

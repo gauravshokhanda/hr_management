@@ -5,10 +5,11 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Use local storage
 
 import authReducer from "./authSlice"; // Import your auth slice
+import employeeReducer from "./userStatus";
 
 const rootReducer = combineReducers({
   auth: authReducer, // Add your auth reducer to the root reducer
-  // Add other reducers here if you have them
+  employee: employeeReducer,
 });
 
 const persistConfig = {

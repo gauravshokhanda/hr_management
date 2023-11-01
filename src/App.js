@@ -11,7 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
 import { useSelector, useDispatch } from "react-redux";
 import io from "socket.io-client";
-import useSound from "use-sound";
+import { setEmployeeData } from "./store/userStatus"; 
 
 import fanfareSfx from "./assets/sound/notification.wav";
 
@@ -42,6 +42,7 @@ import brand from "assets/images/logo-ct.png";
 import jwtDecode from "jwt-decode";
 import { API_URL } from "config";
 import { Alert, AlertTitle, Snackbar } from "@mui/material";
+import useSound from "use-sound";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -168,31 +169,12 @@ export default function App() {
     }, 1000);
   });
 
-  // Socket end
+  socket.on("onlineUsers", (data) => {
+    console.log(data, "onine Data");
+    reduxDispatch(setEmployeeData(data));
+  });
 
-  const configsButton = (
-    <SoftBox
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="3.5rem"
-      height="3.5rem"
-      bgColor="white"
-      shadow="sm"
-      borderRadius="50%"
-      position="fixed"
-      right="2rem"
-      bottom="2rem"
-      zIndex={99}
-      color="dark"
-      sx={{ cursor: "pointer" }}
-      onClick={handleConfiguratorOpen}
-    >
-      <Icon fontSize="default" color="inherit">
-        settings
-      </Icon>
-    </SoftBox>
-  );
+  // Socket end
 
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
