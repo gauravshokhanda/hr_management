@@ -5,13 +5,17 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import React from "react";
 import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
+import { removeOldDataExceptLatest } from "../../store/userStatus";
 
 export default function StatusUser() {
   const data = useSelector((state) => state.employee);
+  const dispatch = useDispatch();
 
   const userStatus = data.employees;
+
+  console.log(userStatus, "status");
 
   // Group the data by employeeId
   const groupedUsers = userStatus.reduce((acc, user) => {
@@ -29,10 +33,18 @@ export default function StatusUser() {
     return users[0];
   });
 
+  // Dispatch the action to remove old data except the latest one
+  const handleRemoveOldData = () => {
+    dispatch(removeOldDataExceptLatest());
+  };
+  
+  setInterval(() =>  {
+    handleRemoveOldData();
+  },100000)
+
   // Sort the users with online users first, then offline users
   latestUserStatus.sort((a, b) => (a.status === "online" ? -1 : 1));
 
- 
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
       backgroundColor: "#44b700",
@@ -100,7 +112,9 @@ export default function StatusUser() {
                   Last Online at {moment(user.date).format("LT")}
                 </Typography>
               ) : (
-                <Typography fontSize={12} fontWeight={600}>Online</Typography>
+                <Typography fontSize={12} fontWeight={600}>
+                  Online
+                </Typography>
               )}
             </Box>
           ))}
