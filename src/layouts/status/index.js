@@ -40,7 +40,7 @@ export default function StatusUser() {
   
   setInterval(() =>  {
     handleRemoveOldData();
-  },100000)
+  },1000000)
 
   // Sort the users with online users first, then offline users
   latestUserStatus.sort((a, b) => (a.status === "online" ? -1 : 1));

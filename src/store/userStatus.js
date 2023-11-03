@@ -28,5 +28,5 @@ const employeeSlice = createSlice({
   },
 });
 
-export const { setEmployeeData, removeOldDataExceptLatest } = employeeSlice.actions;
+export const { setEmployeeData, clearEmployeeData, removeOldDataExceptLatest } = employeeSlice.actions;
 export default employeeSlice.reducer;
