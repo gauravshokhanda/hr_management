@@ -57,6 +57,8 @@ function Salary() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [severity, setSeverity] = useState("");
 
+
+
   const handleCloseNotification = () => {
     setNotificationOpen(false);
   };
@@ -169,6 +171,9 @@ function Salary() {
         setLoading(false);
       }
     } catch (error) {
+      if (error.response.status === 404) {
+        setLoading(false);
+      }
       console.log("Something went wrong " + error);
     }
   };
@@ -207,9 +212,10 @@ function Salary() {
 
   useEffect(() => {
     if (data && data.user) {
-      setUserId(data.user.id);
+      setUserId(data.user._id);
     }
   }, [data, userId]);
+
 
   const initialColumns = [
     {
@@ -382,18 +388,18 @@ function Salary() {
                     <MenuItem onClick={handleViewSalarySlipDownload}>Download Salary Slip</MenuItem>
                     {isAdmin
                       ? [
-                          <MenuItem key="create-salary">
-                            <Link
-                              to={`/salary/create-salary/${employeeId}`}
-                              style={{ color: "inherit" }}
-                            >
-                              Create Salary
-                            </Link>
-                          </MenuItem>,
-                          <MenuItem key="delete-salary" onClick={handleDeleteSalary}>
-                            Delete Salary
-                          </MenuItem>,
-                        ]
+                        <MenuItem key="create-salary">
+                          <Link
+                            to={`/salary/create-salary/${employeeId}`}
+                            style={{ color: "inherit" }}
+                          >
+                            Create Salary
+                          </Link>
+                        </MenuItem>,
+                        <MenuItem key="delete-salary" onClick={handleDeleteSalary}>
+                          Delete Salary
+                        </MenuItem>,
+                      ]
                       : null}
                   </Menu>
                 </Stack>
@@ -517,29 +523,29 @@ function Salary() {
                                         </MenuItem>
                                         {isAdmin
                                           ? [
-                                              <MenuItem key="create-salary">
-                                                <Link
-                                                  to={`/salary/create-salary/${row.employeeId}`}
-                                                  style={{ color: "inherit" }}
-                                                >
-                                                  Create Salary
-                                                </Link>
-                                              </MenuItem>,
-                                              <MenuItem
-                                                key="delete-salary"
-                                                onClick={handleDeleteSalary}
-                                                disabled={buttonLoading}
+                                            <MenuItem key="create-salary">
+                                              <Link
+                                                to={`/salary/create-salary/${row.employeeId}`}
+                                                style={{ color: "inherit" }}
                                               >
-                                                Delete Salary
-                                                {buttonLoading ? (
-                                                  <CircularProgress
-                                                    sx={{ ml: 1 }}
-                                                    color="inherit"
-                                                    size={14}
-                                                  />
-                                                ) : null}
-                                              </MenuItem>,
-                                            ]
+                                                Create Salary
+                                              </Link>
+                                            </MenuItem>,
+                                            <MenuItem
+                                              key="delete-salary"
+                                              onClick={handleDeleteSalary}
+                                              disabled={buttonLoading}
+                                            >
+                                              Delete Salary
+                                              {buttonLoading ? (
+                                                <CircularProgress
+                                                  sx={{ ml: 1 }}
+                                                  color="inherit"
+                                                  size={14}
+                                                />
+                                              ) : null}
+                                            </MenuItem>,
+                                          ]
                                           : null}
                                       </Menu>
                                     </Stack>

@@ -427,6 +427,47 @@ function Attendence() {
       },
     },
     {
+      field: "",
+      headerName: "Working Hours",
+      width: 150,
+      renderCell: (params) => {
+        const checkInTime = moment(params.row.checkIn);
+        const checkOutTime = moment(params.row.checkOut);
+    
+        // Assuming breakStart and breakEnd are arrays of break periods
+        const breakStartArray = JSON.parse(params.row.breakStart);
+        const breakEndArray = JSON.parse(params.row.breakEnd);
+    
+        // Combine break periods into an array of objects
+        const breakPeriods = breakStartArray.map((breakStart, index) => ({
+          breakStart,
+          breakEnd: breakEndArray[index],
+        }));
+    
+        // Calculate total break time
+        const totalBreakTime = breakPeriods.reduce((total, breakPeriod) => {
+          const breakInTime = moment(breakPeriod.breakStart);
+          const breakEndTime = moment(breakPeriod.breakEnd);
+    
+          // Calculate break duration
+          const breakDuration = breakEndTime - breakInTime;
+    
+          // Accumulate break time
+          return total + breakDuration;
+        }, 0);
+    
+        // Calculate working hours excluding break time
+        const workingTime = checkOutTime - checkInTime - totalBreakTime;
+    
+        // Format working time
+        const formattedWorkingTime = moment.utc(workingTime).format('HH:mm');
+    
+        console.log(formattedWorkingTime, "time");
+
+        return formattedWorkingTime === 'Invalid date' ? "In Working" : formattedWorkingTime;
+      },
+    }, 
+    {
       field: "status",
       headerName: "Status",
       width: 120,
@@ -488,13 +529,12 @@ function Attendence() {
         >
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
             <Avatar
-              src={`${API_URL}/${
-                employeeAttendanceId
+              src={`${API_URL}/${employeeAttendanceId
+                ? todayAttendence.employeeImage
                   ? todayAttendence.employeeImage
-                    ? todayAttendence.employeeImage
-                    : ""
-                  : user.image
-              }`}
+                  : ""
+                : user.image
+                }`}
               sx={{ width: "60px", height: "60px", "& img": { height: "100%!important" } }}
             />
             <SoftTypography sx={{ textTransform: "capitalize" }} variant="h6">
