@@ -74,8 +74,8 @@ export default function EmployesTable({
     try {
       const response = await axios.delete(`${API_URL}/employes/delete-employee/${id}`, {
         headers: {
-          'Authorization': `${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json',
+          Authorization: `${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
       });
       if (response.status === 200) {
@@ -225,17 +225,6 @@ export default function EmployesTable({
                 <Link to={`/profile/${params.row._id}`} style={{ color: "inherit" }}>
                   View Profile
                 </Link>
-              </MenuItem>
-              <MenuItem
-                disabled={buttonLoading}
-                onClick={() => {
-                  handleDelete(params.row._id);
-                }}
-              >
-                Delete Employee
-                {buttonLoading ? (
-                  <CircularProgress sx={{ ml: 1 }} color="inherit" size={14} />
-                ) : null}
               </MenuItem>
             </Menu>
           </Stack>
