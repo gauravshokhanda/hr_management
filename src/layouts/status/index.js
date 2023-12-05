@@ -72,7 +72,7 @@ export default function StatusUser() {
         Online Employees Status
       </Typography>
       <Grid container mt={3}>
-        <Grid item xs={8}>
+        <Grid item md={8}>
           {latestUserStatus.map((user, index) => (
             <Box
               sx={{
