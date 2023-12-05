@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 // @mui material components
 import Grid from "@mui/material/Grid";
-import { useSelector } from "react-redux";
 import SoftBox from "components/SoftBox";
 
 // Hr Management Dashboard React examples
@@ -26,6 +25,8 @@ import { useParams } from "react-router-dom";
 import SoftButton from "components/SoftButton";
 import EditIcon from "@mui/icons-material/Edit";
 import SoftInput from "components/SoftInput";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserAndToken } from "store/authSlice";
 
 function Overview() {
   const [userData, setUserData] = useState([]);
@@ -38,6 +39,8 @@ function Overview() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [severity, setSeverity] = useState("");
   const [edit, setEdit] = useState(false);
+
+  const dispatchRedux = useDispatch();
 
   const data = useSelector((state) => state.auth);
 
@@ -86,6 +89,7 @@ function Overview() {
       if (response.status === 200) {
         console.log("Successfully found user");
         setUserData(response.data);
+        dispatchRedux(setUserAndToken({ user:response.data}));
         setLoading(false);
       }
     } catch (error) {

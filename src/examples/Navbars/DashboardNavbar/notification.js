@@ -10,13 +10,13 @@ export default function Notification({ handleCloseMenu }) {
     <>
       <NotificationItem
         image={<img src={team2} alt="person" />}
-        title={["New message", "from Laur"]}
+        title={["Laur", "Check In"]}
         date="13 minutes ago"
         onClick={handleCloseMenu}
       />
       <NotificationItem
         image={<img src={logoSpotify} alt="person" />}
-        title={["New album", "by Travis Scott"]}
+        title={["Shubhm", "Check Out"]}
         date="1 day"
         onClick={handleCloseMenu}
       />
@@ -27,7 +27,7 @@ export default function Notification({ handleCloseMenu }) {
             payment
           </Icon>
         }
-        title={["", "Payment successfully completed"]}
+        title={["Shivam", "Break Out"]}
         date="2 days"
         onClick={handleCloseMenu}
       />

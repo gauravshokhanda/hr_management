@@ -155,7 +155,7 @@ function Register({ backButton, setAddEmployee }) {
         }, 1000);
       }
     } catch (error) {
-      const message = `Internal server error`;
+      const message = error.response.status === 400 ? error.response.data.message : `Internal server error`;
       const alertType = "error";
       displayNotification(message, alertType);
       setButtonLoading(false);

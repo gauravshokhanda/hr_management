@@ -50,6 +50,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Avatar } from "@mui/material";
 import { API_URL } from "config";
 import Notification from "./notification";
+import axios from "axios";
+
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -59,47 +61,118 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const route = useLocation().pathname.split("/").slice(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
+  const [attendanceId, setAttendanceId] = useState("");
+  const [attendance, setAttendance] = useState("");
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const dispatchRedux = useDispatch();
+  const data = useSelector((state) => state.auth);
+  const user = data.user;
 
-  const handleClickLogout = () => {
-    dispatchRedux(clearUserAndToken());
-    localStorage.clear();
-    window.location.reload();
+  console.log(user, "user");
+
+  const fetchData = async () => {
+    if (user) {
+      try {
+        const response = await axios.get(
+          `${API_URL}/attendance/view/${user._id}`,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const lastAttendance = response.data.slice(-1)[0];
+          setAttendanceId(lastAttendance.id);
+          setAttendance(lastAttendance);
+        }
+      } catch (error) {
+        console.error("There is some issue " + error);
+      }
+
+      console.log("fetch");
+    }
   };
 
-  const data = useSelector((state) => state.auth);
+  console.log(attendance, "attendance");
 
   useEffect(() => {
-    // Setting the navbar type
+    fetchData();
+  }, []);
+
+
+  const checkoutEve = async (checkoutData) => {
+    if (user) {
+      try {
+        const response = await axios.post(
+          `${API_URL}/attendance/checkout`,
+          checkoutData,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          console.log(response, "Successfully submitted attendance");
+          const message = "Successfully Check Out";
+        }
+      } catch (error) {
+        console.log(error, "There is some error in submitting data");
+      }
+      console.log("check out");
+    }
+  };
+
+  const dispatchRedux = useDispatch();
+
+  const handleClickLogout = async () => {
+    dispatchRedux(clearUserAndToken());
+    localStorage.clear();
+  
+    // Update attendance state
+    if (user && attendanceId) {
+      const checkOutData = {
+        attendanceId: attendanceId,
+        checkOut: new Date().toISOString(),
+      };
+  
+      try {
+        await checkoutEve(checkOutData);
+        console.log("Successfully checked out");
+      } catch (error) {
+        console.error("Error checking out:", error);
+      }
+    }
+  
+    // Reload the page
+    window.location.reload();
+  };
+  
+  useEffect(() => {
     if (fixedNavbar) {
       setNavbarType("sticky");
     } else {
       setNavbarType("static");
     }
 
-    // A function that sets the transparent state of the navbar.
     function handleTransparentNavbar() {
       setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
     }
 
-    /** 
-     The event listener that's calling the handleTransparentNavbar function when 
-     scrolling the window.
-    */
     window.addEventListener("scroll", handleTransparentNavbar);
 
-    // Call the handleTransparentNavbar function to set the state with the initial value.
     handleTransparentNavbar();
 
-    // Remove event listener on cleanup
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
@@ -107,7 +180,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
 
-  // Render the Notifications menu
   const renderMenu = () => (
     <Menu
       anchorEl={openMenu}
@@ -196,8 +268,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                           },
                         }}
                       >
-                        <MenuItem onClick={handleClick}>Profile</MenuItem>
-                        <MenuItem onClick={handleClick}>My account</MenuItem>
+                        <MenuItem sx={{justifyContent:'center'}} component={Link} to={`/profile`}>Profile</MenuItem>
                         <MenuItem onClick={handleClickLogout}>Logout</MenuItem>
                       </Stack>
                     </CardContent>
@@ -247,14 +318,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
   );
 }
 
-// Setting default values for the props of DashboardNavbar
 DashboardNavbar.defaultProps = {
   absolute: false,
   light: false,
   isMini: false,
 };
 
-// Typechecking props for the DashboardNavbar
 DashboardNavbar.propTypes = {
   absolute: PropTypes.bool,
   light: PropTypes.bool,

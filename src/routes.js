@@ -12,6 +12,7 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import Register from "layouts/authentication/register";
 import StatusUser from "layouts/status";
+import Leave from "layouts/leave";
 
 // Hr Management Dashboard React icons
 import Shop from "examples/Icons/Shop";
@@ -24,6 +25,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PageNotFound from "404";
 import GroupIcon from '@mui/icons-material/Group';
+import LandscapeIcon from '@mui/icons-material/Landscape';
 
 const routes = [
   {
@@ -113,6 +115,16 @@ const routes = [
     route: "/status",
     icon: <GroupIcon size="12px" />,
     component: <StatusUser />,
+    adminOnly: false,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "Leave",
+    key: "leave",
+    route: "/leave",
+    icon: <LandscapeIcon size="12px" />,
+    component: <Leave />,
     adminOnly: false,
     noCollapse: true,
   },

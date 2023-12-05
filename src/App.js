@@ -43,6 +43,7 @@ import jwtDecode from "jwt-decode";
 import { API_URL } from "config";
 import { Alert, AlertTitle, Snackbar } from "@mui/material";
 import useSound from "use-sound";
+import axios from "axios";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -53,6 +54,8 @@ export default function App() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [play, { stop }] = useSound(fanfareSfx);
   const [rtlCache, setRtlCache] = useState(null);
+  const [attendanceId, setAttendanceId] = useState("");
+  const [attendance, setAttendance] = useState("");
   const { pathname } = useLocation();
   const data = useSelector((state) => state.auth);
   const user = data.user;
@@ -96,6 +99,61 @@ export default function App() {
 
   const token = localStorage.getItem("token");
 
+  
+  const fetchData = async () => {
+    if (user) {
+      try {
+        const response = await axios.get(
+          `${API_URL}/attendance/view/${user._id}`,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const lastAttendance = response.data.slice(-1)[0];
+          setAttendanceId(lastAttendance.id);
+          setAttendance(lastAttendance);
+        }
+      } catch (error) {
+        console.error("There is some issue " + error);
+      }
+    }
+  };
+
+  console.log(attendance, "attendance");
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const checkoutEve = async (checkoutData) => {
+    if (user) {
+      try {
+        const response = await axios.post(
+          `${API_URL}/attendance/checkout`,
+          checkoutData,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          console.log(response, "Successfully submitted attendance");
+          const message = "Successfully Check Out";
+        }
+      } catch (error) {
+        console.log(error, "There is some error in submitting data");
+      }
+    }
+  };
+
+
   if (token) {
     const decodedToken = jwtDecode(token);
     const currentTime = Date.now() / 1000;
@@ -103,6 +161,18 @@ export default function App() {
     if (decodedToken.exp < currentTime) {
       console.log("Token is expired");
       reduxDispatch(clearUserAndToken());
+
+      if (attendance.checkOut === null) {
+
+        if (user && attendanceId) {
+          const checkOutData = {
+            attendanceId: attendanceId,
+            checkOut: new Date().toISOString(),
+          };
+  
+          checkoutEve(checkOutData);
+        }
+      }
     }
   }
 
@@ -161,7 +231,6 @@ export default function App() {
     console.error("Socket connection error:", error);
   });
   socket.on("notification", (data) => {
-    // Handle the 'notification' event here
     play();
     alertNotification(data);
     setTimeout(() => {
@@ -170,8 +239,10 @@ export default function App() {
   });
 
   socket.on("onlineUsers", (data) => {
-    console.log(data, "onine Data");
-    reduxDispatch(setEmployeeData(data));
+    console.log(data, "onine Data new ");
+    if(data){
+      reduxDispatch(setEmployeeData(data));
+    }
   });
 
   // Socket end

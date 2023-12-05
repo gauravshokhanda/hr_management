@@ -33,15 +33,6 @@ export default function StatusUser() {
     return users[0];
   });
 
-  // Dispatch the action to remove old data except the latest one
-  const handleRemoveOldData = () => {
-    dispatch(removeOldDataExceptLatest());
-  };
-  
-  setInterval(() =>  {
-    handleRemoveOldData();
-  },1000000)
-
   // Sort the users with online users first, then offline users
   latestUserStatus.sort((a, b) => (a.status === "online" ? -1 : 1));
 

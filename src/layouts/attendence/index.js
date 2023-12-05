@@ -286,7 +286,7 @@ function Attendence() {
         displayNotification(message, alertType);
       }
     }
-  };
+  };  
 
   const handleCheckIn = () => {
     setButtonLoading({ checkInLoading: true });
@@ -488,13 +488,12 @@ function Attendence() {
         >
           <SoftBox display="flex" alignItems="center" sx={{ gap: "12px" }}>
             <Avatar
-              src={`${API_URL}/${
-                employeeAttendanceId
+              src={`${API_URL}/${employeeAttendanceId
                   ? todayAttendence.employeeImage
                     ? todayAttendence.employeeImage
                     : ""
                   : user.image
-              }`}
+                }`}
               sx={{ width: "60px", height: "60px", "& img": { height: "100%!important" } }}
             />
             <SoftTypography sx={{ textTransform: "capitalize" }} variant="h6">
