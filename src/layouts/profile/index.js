@@ -276,7 +276,7 @@ function Overview() {
 
                           {edit ? (
                             <SoftInput
-                              name="firstName"
+                              name="lastName"
                               type="text"
                               value={userData.lastName}
                               onChange={handleChange}
@@ -310,7 +310,7 @@ function Overview() {
                             </SoftButton>
                           </Box>
 
-                          {edit ? (
+                          {edit && data.user.isAdmin ?(
                             <SoftInput
                               name="userName"
                               type="text"
