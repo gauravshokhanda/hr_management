@@ -2,12 +2,12 @@ import { Avatar, Box, Grid, Stack, Typography } from "@mui/material";
 import { API_URL } from "config";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import React from "react";
+import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
-import { removeOldDataExceptLatest } from "../../store/userStatus";
+import axios from "axios";
 
 export default function StatusUser() {
   const data = useSelector((state) => state.employee);

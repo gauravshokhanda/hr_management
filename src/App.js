@@ -238,6 +238,23 @@ export default function App() {
     }, 1000);
   });
 
+  const fetchStatus = async () => {
+    try{
+      const response = await axios.get(`${API_URL}/attendance/status/view`);
+      if(response){
+        reduxDispatch(setEmployeeData(data));
+      }
+    }
+    catch(error){
+      console.log("There is some error 0", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStatus();
+  },[]);
+
+
   socket.on("onlineUsers", (data) => {
     console.log(data, "onine Data new ");
     if(data){
