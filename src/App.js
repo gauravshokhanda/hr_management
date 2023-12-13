@@ -11,7 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
 import { useSelector, useDispatch } from "react-redux";
 import io from "socket.io-client";
-import { setEmployeeData } from "./store/userStatus"; 
+import { setEmployeeData } from "./store/userStatus";
 
 import fanfareSfx from "./assets/sound/notification.wav";
 
@@ -99,7 +99,7 @@ export default function App() {
 
   const token = localStorage.getItem("token");
 
-  
+
   const fetchData = async () => {
     if (user) {
       try {
@@ -124,7 +124,6 @@ export default function App() {
     }
   };
 
-  console.log(attendance, "attendance");
 
   useEffect(() => {
     fetchData();
@@ -153,26 +152,24 @@ export default function App() {
     }
   };
 
-
   if (token) {
     const decodedToken = jwtDecode(token);
     const currentTime = Date.now() / 1000;
 
     if (decodedToken.exp < currentTime) {
       console.log("Token is expired");
-      reduxDispatch(clearUserAndToken());
 
       if (attendance.checkOut === null) {
-
         if (user && attendanceId) {
           const checkOutData = {
             attendanceId: attendanceId,
             checkOut: new Date().toISOString(),
           };
-  
+
           checkoutEve(checkOutData);
         }
       }
+      reduxDispatch(clearUserAndToken());
     }
   }
 
@@ -213,54 +210,40 @@ export default function App() {
     setNotificationOpen(false);
   };
 
-  const socket = io(API_URL);
-
+  
   const alertNotification = async (data) => {
     setNotificationMessage(data.message);
     setNotificationOpen(true);
     setSeverity(data.type);
   };
-
-  socket.on("connect", () => {
-    console.log(socket.id, "connect");
-  });
-  socket.on("disconnect", () => {
-    console.log(socket.id);
-  });
-  socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error);
-  });
-  socket.on("notification", (data) => {
-    play();
-    alertNotification(data);
-    setTimeout(() => {
-      stop();
-    }, 1000);
-  });
-
-  const fetchStatus = async () => {
-    try{
-      const response = await axios.get(`${API_URL}/attendance/status/view`);
-      if(response){
-        reduxDispatch(setEmployeeData(data));
-      }
-    }
-    catch(error){
-      console.log("There is some error 0", error);
-    }
-  };
-
+  
   useEffect(() => {
-    fetchStatus();
-  },[]);
+    const socket = io(API_URL);
+    
+    const handleConnectError = (error) => {
+      console.error("Socket connection error:", error);
+    };
 
+    const handleNotification = (data) => {
+      play();
+      alertNotification(data);
+      setTimeout(() => {
+        stop();
+      }, 1000);
+    };
 
-  socket.on("onlineUsers", (data) => {
-    console.log(data, "onine Data new ");
-    if(data){
-      reduxDispatch(setEmployeeData(data));
-    }
-  });
+    // Add event listeners
+    socket.on("connect_error", handleConnectError);
+    socket.on("notification", handleNotification);
+
+    // Cleanup function to remove event listeners and disconnect the socket
+    return () => {
+      socket.off("connect_error", handleConnectError);
+      socket.off("notification", handleNotification);
+      socket.disconnect();
+    };
+  }, []);
+
 
   // Socket end
 

@@ -1,20 +1,32 @@
 import NotificationItem from "examples/Items/NotificationItem";
-import React from "react";
+import React, { useEffect } from "react";
 import Icon from "@mui/material/Icon";
 
 import team2 from "assets/images/team-2.jpg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
+import axios from "axios";
+import { API_URL } from "config";
+import moment from "moment";
+import { Avatar } from "@mui/material";
 
-export default function Notification({ handleCloseMenu }) {
+
+export default function Notification({ handleCloseMenu, notificationStatus }) {
+
+  console.log(notificationStatus, "statas");
+
   return (
     <>
-      <NotificationItem
-        image={<img src={team2} alt="person" />}
-        title={["Laur", "Check In"]}
-        date="13 minutes ago"
-        onClick={handleCloseMenu}
-      />
-      <NotificationItem
+      {notificationStatus.map((notificationItem, index) => (
+        <NotificationItem
+          key={index}
+          image={<Avatar sx={{background: 'transparent'}} src={`${API_URL}/${notificationItem.image}`} alt={notificationItem.message} />}
+          title={[notificationItem.message]}
+          date={moment(notificationItem.date).startOf('minute').fromNow()}
+          onClick={handleCloseMenu}
+        />
+      ))}
+
+      {/* <NotificationItem
         image={<img src={logoSpotify} alt="person" />}
         title={["Shubhm", "Check Out"]}
         date="1 day"
@@ -30,7 +42,7 @@ export default function Notification({ handleCloseMenu }) {
         title={["Shivam", "Break Out"]}
         date="2 days"
         onClick={handleCloseMenu}
-      />
+      /> */}
     </>
   );
 }

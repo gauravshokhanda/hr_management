@@ -60,6 +60,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationStatus, setNotificationStatus] = useState([])
   const open = Boolean(anchorEl);
   const [attendanceId, setAttendanceId] = useState("");
   const [attendance, setAttendance] = useState("");
@@ -74,7 +75,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const data = useSelector((state) => state.auth);
   const user = data.user;
 
-  console.log(user, "user");
 
   const fetchData = async () => {
     if (user) {
@@ -102,11 +102,33 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
 
-  console.log(attendance, "attendance");
-
   useEffect(() => {
     fetchData();
   }, []);
+
+  const fetchNoification = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/attendance/notification/view`);
+      setNotificationStatus(response.data);
+    }
+    catch (error) {
+      console.log("Error: ", error)
+    }
+  };
+
+  const deleteNoification = async () => {
+    try {
+      const response = await axios.delete(`${API_URL}/attendance/notification/deleteOld`);
+    }
+    catch (error) {
+      console.log("Error: ", error)
+    }
+  };
+
+  useEffect(() => {
+    fetchNoification();
+    deleteNoification();
+  }, [])
 
 
   const checkoutEve = async (checkoutData) => {
@@ -138,14 +160,14 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleClickLogout = async () => {
     dispatchRedux(clearUserAndToken());
     localStorage.clear();
-  
+
     // Update attendance state
     if (user && attendanceId) {
       const checkOutData = {
         attendanceId: attendanceId,
         checkOut: new Date().toISOString(),
       };
-  
+
       try {
         await checkoutEve(checkOutData);
         console.log("Successfully checked out");
@@ -153,11 +175,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
         console.error("Error checking out:", error);
       }
     }
-  
+
     // Reload the page
     window.location.reload();
   };
-  
+
   useEffect(() => {
     if (fixedNavbar) {
       setNavbarType("sticky");
@@ -192,7 +214,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       onClose={handleCloseMenu}
       sx={{ mt: 2 }}
     >
-      <Notification handleCloseMenu={handleCloseMenu} />
+      <Notification handleCloseMenu={handleCloseMenu} notificationStatus={notificationStatus} />
     </Menu>
   );
 
@@ -268,7 +290,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                           },
                         }}
                       >
-                        <MenuItem sx={{justifyContent:'center'}} component={Link} to={`/profile`}>Profile</MenuItem>
+                        <MenuItem sx={{ justifyContent: 'center' }} component={Link} to={`/profile`}>Profile</MenuItem>
                         <MenuItem onClick={handleClickLogout}>Logout</MenuItem>
                       </Stack>
                     </CardContent>

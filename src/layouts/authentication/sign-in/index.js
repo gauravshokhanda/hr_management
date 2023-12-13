@@ -22,6 +22,11 @@ function SignIn() {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
   const [severity, setSeverity] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  }
 
   const navigate = useNavigate();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
@@ -120,8 +125,13 @@ function SignIn() {
                 setPassword(e.target.value);
                 setError(""); // Clear error when user types
               }}
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
+              icon={{
+                component: showPassword ? "visibilityIcon" : "visibility_off",
+                direction: "right",
+                onClick: handleShowPassword,
+              }}
             />
           </SoftBox>
           {error && (

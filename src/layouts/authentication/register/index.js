@@ -31,6 +31,7 @@ function Register({ backButton, setAddEmployee }) {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
   const [severity, setSeverity] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleCloseNotification = () => {
     setNotificationOpen(false);
@@ -103,13 +104,18 @@ function Register({ backButton, setAddEmployee }) {
     }));
   };
 
+  
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setButtonLoading(true);
 
     try {
       const formDataToSend = new FormData();
-        formDataToSend.append("image", selectedImage);
+      formDataToSend.append("image", selectedImage);
       // if (selectedImage) {
       // }
       formDataToSend.append("firstName", formData.firstName);
@@ -181,6 +187,8 @@ function Register({ backButton, setAddEmployee }) {
             buttonLoading={buttonLoading}
             backButton={backButton}
             setAddEmployee={setAddEmployee}
+            handleShowPassword={handleShowPassword}
+            showPassword={showPassword}
           />
         </DashboardLayout>
       ) : (
@@ -198,6 +206,8 @@ function Register({ backButton, setAddEmployee }) {
           buttonLoading={buttonLoading}
           backButton={backButton}
           setAddEmployee={setAddEmployee}
+          handleShowPassword={handleShowPassword}
+          showPassword={showPassword}
         />
       )}
     </>
@@ -218,6 +228,8 @@ function RegisterWrapper({
   buttonLoading,
   backButton,
   setAddEmployee,
+  handleShowPassword,
+  showPassword, 
 }) {
   return (
     <SoftBox>
@@ -330,8 +342,13 @@ function RegisterWrapper({
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        type="password"
+                        type= {showPassword ? "password" : "text"}  
                         placeholder="Password"
+                        icon={{
+                          component: showPassword ? "visibilityIcon" : "visibility_off",
+                          direction: "right",
+                          onClick: handleShowPassword,
+                        }}
                       />
                     </SoftBox>
                   </Grid>
@@ -385,11 +402,11 @@ function RegisterWrapper({
                   <Grid item xs={12}>
                     <SoftBox>
                       <Stack
-                      display={'flex'}
-                      alignItems={{sm: 'start', md: 'center'}}
-                      flexDirection={{sm:'column', md: 'row'}}
-                      spacing={2}
-                      justifyContent={'space-between'}
+                        display={'flex'}
+                        alignItems={{ sm: 'start', md: 'center' }}
+                        flexDirection={{ sm: 'column', md: 'row' }}
+                        spacing={2}
+                        justifyContent={'space-between'}
                         sx={{
                           padding: "20px",
                           border: "0.0625rem solid #d2d6da",
@@ -499,6 +516,7 @@ RegisterWrapper.propTypes = {
     notificationOpen: PropTypes.bool,
     buttonLoading: PropTypes.bool,
     backButton: PropTypes.bool,
+    showPassword: PropTypes.bool,
   }).isRequired,
   handleChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -507,6 +525,7 @@ RegisterWrapper.propTypes = {
   handleCloseNotification: PropTypes.func.isRequired,
   id: PropTypes.func.isRequired,
   setAddEmployee: PropTypes.func.isRequired,
+  handleShowPassword: PropTypes.func.isRequired,
 };
 
 export default Register;

@@ -25,6 +25,7 @@ export default function LeaveTable({ isAdmin }) {
   const [open, setOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [approveButtonLoading, setApproveButtonLoading] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
   const [severity, setSeverity] = useState("");
@@ -123,11 +124,13 @@ export default function LeaveTable({ isAdmin }) {
 
     const updateData = { leaveStatus: status === "no" ? false : true };
 
-    setButtonLoading(true);
+    status === 'no' ? setApproveButtonLoading(true) : setButtonLoading(true);
+
     try {
       const response = await axios.put(`${API_URL}/leave/leave-list/${deleteId}`, updateData);
 
       if (response.status === 200) {
+        setApproveButtonLoading(false);
         setButtonLoading(false);
         fetchData();
         const message = "Successfully Update Notice";
@@ -139,7 +142,7 @@ export default function LeaveTable({ isAdmin }) {
         handleClickcloseUpdate();
       }
     } catch (error) {
-      console.error("There is someee  error", error);
+      console.error("There is some error", error);
     }
 
   };
@@ -263,12 +266,12 @@ export default function LeaveTable({ isAdmin }) {
         <DialogActions>
           <SoftButton onClick={handleClickcloseUpdate}>Cancel</SoftButton>
           <SoftButton
-            disabled={buttonLoading || !clickEvent.leaveStatus}
+            disabled={approveButtonLoading || !clickEvent.leaveStatus}
             color="error"
             onClick={() => updateEvent("no")}
           >
             No Approve
-            {buttonLoading && <CircularProgress color="secondary" sx={{ ml: 2 }} size={22} />}
+            {approveButtonLoading && <CircularProgress color="secondary" sx={{ ml: 2 }} size={22} />}
           </SoftButton>
 
           <SoftButton

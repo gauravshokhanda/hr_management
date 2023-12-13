@@ -24,7 +24,6 @@ const NotificationItem = forwardRef(({ color, image, title, date, ...rest }, ref
       mr={2}
       mb={0.25}
       borderRadius="lg"
-      sx={(theme) => menuImage(theme, { color })}
     >
       {image}
     </SoftBox>

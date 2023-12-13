@@ -53,8 +53,6 @@ function Attendence() {
 
   const socket = io(API_URL);
 
-  console.log(socket, "socket");
-
   const { employeeAttendanceId } = useParams();
 
   const data = useSelector((state) => state.auth);
@@ -461,8 +459,6 @@ function Attendence() {
     
         // Format working time
         const formattedWorkingTime = moment.utc(workingTime).format('HH:mm');
-    
-        console.log(formattedWorkingTime, "time");
 
         return formattedWorkingTime === 'Invalid date' ? "In Working" : formattedWorkingTime;
       },

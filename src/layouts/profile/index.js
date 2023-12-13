@@ -180,9 +180,6 @@ function Overview() {
     }
   };
 
-  console.log(userId, "user id");
-  console.log(userData, "user data");
-
   const contentStyle = {
     // boxShadow: "2px 0px 16px rgb(223 216 216)",
     border: "1px dashed #ababab",
@@ -193,6 +190,7 @@ function Overview() {
     mt: 3,
     flexDirection: "column",
   };
+
 
   return (
     <DashboardLayout>
@@ -276,7 +274,7 @@ function Overview() {
 
                           {edit ? (
                             <SoftInput
-                              name="firstName"
+                              name="lastName"
                               type="text"
                               value={userData.lastName}
                               onChange={handleChange}
@@ -393,7 +391,7 @@ function Overview() {
                             />
                           ) : (
                             <Typography variant="subtitle1" color="#a9a9a9" fontWeight={400}>
-                              {userData.accountNumber}
+                              {userData.accountNumber === "null" ? "Not Inserted" : userData.accountNumber}
                             </Typography>
                           )}
                         </SoftBox>
@@ -484,7 +482,7 @@ function Overview() {
                             </Typography>
                           </Box>
                           <Typography variant="subtitle1" color="#a9a9a9" fontWeight={400}>
-                            {userData.salary}
+                            {userData.salary === "null" ? "Not Inserted" : userData.salary}
                           </Typography>
                         </SoftBox>
                         <SoftBox sx={contentStyle}>
@@ -518,7 +516,7 @@ function Overview() {
                             />
                           ) : (
                             <Typography variant="subtitle1" color="#a9a9a9" fontWeight={400}>
-                              {userData.ifscCode}
+                              {userData.ifscCode === "null" ? "Not Inserted" : userData.ifscCode}
                             </Typography>
                           )}
                         </SoftBox>

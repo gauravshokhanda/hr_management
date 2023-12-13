@@ -8,21 +8,63 @@ import Badge from "@mui/material/Badge";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
 import axios from "axios";
+import { setEmployeeData } from "store/userStatus";
+import { io } from "socket.io-client";
 
 export default function StatusUser() {
   const data = useSelector((state) => state.employee);
   const dispatch = useDispatch();
 
+
   const userStatus = data.employees;
 
-  console.log(userStatus, "status");
+  useEffect(() => {
+    const socket = io(API_URL);
 
-  // Group the data by employeeId
-  const groupedUsers = userStatus.reduce((acc, user) => {
-    if (!acc[user.employeeId]) {
-      acc[user.employeeId] = [];
+    // Event listener for 'onlineUsers' event
+    const handleOnlineUsers = (data) => {
+      if (data) {
+        fetchStatus();
+      }
+    };
+
+    // Attach the event listener
+    socket.on("onlineUsers", handleOnlineUsers);
+
+    // Fetch initial status
+    fetchStatus();
+
+    // Cleanup function to close the socket on component unmount
+    return () => {
+      socket.off("onlineUsers", handleOnlineUsers);
+      socket.close();
+    };
+  }, []);
+
+
+  const fetchStatus = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/attendance/status/view`);
+      if (response) {
+        dispatch(setEmployeeData(response.data));
+      }
     }
-    acc[user.employeeId].push(user);
+    catch (error) {
+      console.log("There is some error 0", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStatus();
+  }, []);
+
+
+  // Group the data by userId
+  const groupedUsers = userStatus.reduce((acc, user) => {
+    if (!acc[user.userId]) {
+      acc[user.userId] = [];
+    }
+    acc[user.userId].push(user);
     return acc;
   }, {});
 
