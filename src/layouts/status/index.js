@@ -100,7 +100,7 @@ export default function StatusUser() {
               <Typography variant="h6">{user.employeeName}</Typography>
               {user.status === "offline" ? (
                 <Typography fontSize={12}>
-                  Last Online at {moment(user.date).format("LT")}
+                  Last Online {moment(user.date).startOf('s').fromNow()}
                 </Typography>
               ) : (
                 <Typography fontSize={12} fontWeight={600}>

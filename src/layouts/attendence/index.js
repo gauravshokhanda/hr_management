@@ -13,7 +13,7 @@ import { Box, Chip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { useSelector } from "react-redux";
 import moment from "moment";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { LoadingButton } from '@mui/lab';
 import io from "socket.io-client";
 
 // Hr Management Dashboard React components

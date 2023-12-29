@@ -14,8 +14,8 @@
     "@fullcalendar/timegrid": "^6.1.9",
     "@material-table/core": "^6.2.4",
     "@mui/icons-material": "^5.11.16",
-    "@mui/lab": "^5.0.0-alpha.148",
-    "@mui/material": "5.13.0",
+    "@mui/lab": "^5.0.0-alpha.158",
+    "@mui/material": "^5.15.2",
     "@mui/styled-engine": "5.12.3",
     "@mui/x-data-grid": "^6.12.1",
     "@react-pdf/renderer": "^3.1.12",
@@ -66,12 +66,10 @@
     "eject": "DISABLE_ESLINT_PLUGIN=true react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "install:peer-deps": "npm install --legacy-peer-deps",
-    "postbuild": "node postbuild_script.js && react-snap", 
+    "postbuild": "node postbuild_script.js && react-snap",
     "gzipper": "gzipper",
-     "compress": "gzipper compress ./build/static/js"
+    "compress": "gzipper compress ./build/static/js"
   },
-
-
   "browserslist": {
     "production": [
       ">0.2%",
